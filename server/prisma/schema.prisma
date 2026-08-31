@@ -12,3 +12,10 @@ datasource db {
   provider = "postgresql"
   
 }
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  category_name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
