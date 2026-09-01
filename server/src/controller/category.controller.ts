@@ -40,6 +40,17 @@ export const deleteCategory = async (
   try {
     const { id } = req.params;
     const categoryId = Number(id);
+    const products = await prisma.product.findMany({
+      where: {
+        categoryId: categoryId,
+      },
+    });
+    if (products.length > 0) {
+      throw new ApiError(
+        400,
+        "Cannot delete category with associated products",
+      );
+    }
     const result = await prisma.category.findUnique({
       where: {
         id: categoryId,
@@ -67,8 +78,18 @@ export const updateCategory = async (
   try {
     const { id } = req.params;
     const categoryId = Number(id);
+    const products = await prisma.product.findMany({
+      where: {
+        categoryId: categoryId,
+      },
+    });
+    if (products.length > 0) {
+      throw new ApiError(
+        400,
+        "Cannot update category with associated products",
+      );
+    }
     const { category_name } = req.body;
-
     const result = await prisma.category.findUnique({
       where: {
         id: categoryId,

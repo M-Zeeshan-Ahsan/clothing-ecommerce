@@ -30,3 +30,17 @@ export const idSchema = Joi.object({
     "any.required": "ID is required",
   }),
 });
+export const multipleIdsSchema = Joi.object({
+  ids: Joi.array()
+    .items(Joi.number().integer().positive().required())
+    .min(1)
+    .required()
+    .messages({
+      "array.base": "IDs must be an array",
+      "array.min": "At least one ID is required",
+      "any.required": "IDs are required",
+      "number.base": "Each ID must be a number",
+      "number.integer": "Each ID must be an integer",
+      "number.positive": "Each ID must be a positive number",
+    }),
+});

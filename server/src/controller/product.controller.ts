@@ -67,33 +67,7 @@ export const getProducts = async (
     next(error);
   }
 };
-export const deleteProduct = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { id } = req.params;
-    const productId = Number(id);
-    const result = await prisma.product.findUnique({
-      where: {
-        id: productId,
-      },
-    });
 
-    if (!result) {
-      throw new ApiError(404, "Product not found");
-    }
-    await prisma.product.delete({
-      where: {
-        id: productId,
-      },
-    });
-    return handleResponse(res, 200, "Product delete successfully", result);
-  } catch (error) {
-    next(error);
-  }
-};
 export const updateProduct = async (
   req: Request,
   res: Response,
@@ -181,6 +155,63 @@ export const getSpecificProduct = async (
     }
 
     return handleResponse(res, 200, "Product fetched successfully", result);
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteProduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const productId = Number(id);
+    const result = await prisma.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
+
+    if (!result) {
+      throw new ApiError(404, "Product not found");
+    }
+    await prisma.product.delete({
+      where: {
+        id: productId,
+      },
+    });
+    return handleResponse(res, 200, "Product delete successfully", result);
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteMultipleProducts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { ids } = req.body;
+    const productIds = ids.map((id: string) => Number(id));
+    const result = await prisma.product.findMany({
+      where: {
+        id: {
+          in: productIds,
+        },
+      },
+    });
+    if (result.length !== productIds.length) {
+      throw new ApiError(404, "One or more products not found");
+    }
+    await prisma.product.deleteMany({
+      where: {
+        id: {
+          in: productIds,
+        },
+      },
+    });
+    return handleResponse(res, 200, "Products deleted successfully", result);
   } catch (error) {
     next(error);
   }
