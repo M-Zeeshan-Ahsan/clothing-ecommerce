@@ -186,6 +186,7 @@ export const deleteProduct = async (
     next(error);
   }
 };
+
 export const deleteMultipleProducts = async (
   req: Request,
   res: Response,
