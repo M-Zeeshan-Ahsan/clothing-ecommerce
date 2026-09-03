@@ -13,7 +13,7 @@ export const userLogin = async (
 ) => {
   try {
     const { email, password } = req.body;
-
+    console.log("test", req.body);
     const user = await prisma.user.findUnique({
       where: {
         email,
@@ -29,7 +29,7 @@ export const userLogin = async (
     if (!isMatch) {
       throw new ApiError(401, "Invalid email or password");
     }
-
+    console.log("isMatch", isMatch);
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 

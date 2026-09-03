@@ -9,7 +9,7 @@ export const createProduct = async (
   next: NextFunction,
 ) => {
   try {
-    const { product_name, product_image, categoryId } = req.body;
+    const { product_name, product_image, categoryId, price } = req.body;
     const category = await prisma.category.findUnique({
       where: {
         id: categoryId,
@@ -23,6 +23,7 @@ export const createProduct = async (
         product_name,
         product_image,
         categoryId,
+        price,
       },
     });
     return handleResponse(res, 201, "Product added successfully", result);

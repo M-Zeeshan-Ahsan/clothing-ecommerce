@@ -19,11 +19,12 @@ export const createUser = async (
     if (existingUser) {
       throw new ApiError(400, "User with this email already exists");
     }
+    const hashedPassword = await bcrypt.hash(password, 10);
     const result = await prisma.user.create({
       data: {
         name,
         email,
-        password,
+        password: hashedPassword,
       },
     });
     return handleResponse(res, 201, "User added successfully", result);

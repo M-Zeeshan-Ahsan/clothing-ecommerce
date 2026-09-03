@@ -21,6 +21,11 @@ export const productSchema = Joi.object({
     "number.positive": "Category ID must be a positive number",
     "any.required": "Category ID is required",
   }),
+  price: Joi.number().positive().required().messages({
+    "number.base": "Price must be a number",
+    "number.positive": "Price must be greater than 0",
+    "any.required": "Price is required",
+  }),
 });
 export const idSchema = Joi.object({
   id: Joi.number().integer().positive().required().messages({
