@@ -2,6 +2,7 @@ import prisma from "../prisma/client.js";
 import { Request, Response, NextFunction } from "express";
 import handleResponse from "../utils/response.js";
 import ApiError from "../utils/ApiError.js";
+
 export const addToCart = async (
   req: Request,
   res: Response,
@@ -10,11 +11,7 @@ export const addToCart = async (
   try {
     const { productId, quantity = 1 } = req.body;
 
-    if (!req.user) {
-      throw new ApiError(401, "Unauthorized");
-    }
-
-    const userId = req.user.id;
+    const userId = req.user!.id;
 
     // 1. Check product exists
     const product = await prisma.product.findUnique({
@@ -97,11 +94,7 @@ export const getCartItems = async (
   next: NextFunction,
 ) => {
   try {
-    if (!req.user) {
-      throw new ApiError(401, "Unauthorized");
-    }
-
-    const userId = req.user.id;
+    const userId = req.user!.id;
     const cart = await prisma.cart.findUnique({
       where: {
         userId,
@@ -129,23 +122,13 @@ export const updateCartQuantity = async (
   next: NextFunction,
 ) => {
   try {
-    if (!req.user) {
-      throw new ApiError(401, "Unauthorized");
-    }
-
-    const userId = req.user.id;
+    const userId = req.user!.id;
     const productId = Number(req.params.productId);
     const { quantity } = req.body;
 
-    console.log("req.params", req.params);
     // Product ID check
     if (isNaN(productId)) {
       throw new ApiError(400, "Invalid product ID");
-    }
-
-    // Quantity check
-    if (!quantity || quantity < 1) {
-      throw new ApiError(400, "Quantity must be at least 1");
     }
 
     // User ka cart find karo
@@ -199,11 +182,7 @@ export const removeFromCart = async (
   next: NextFunction,
 ) => {
   try {
-    if (!req.user) {
-      throw new ApiError(401, "Unauthorized");
-    }
-
-    const userId = req.user.id;
+    const userId = req.user!.id;
     const productId = Number(req.params.productId);
 
     if (isNaN(productId)) {
@@ -258,11 +237,7 @@ export const clearCart = async (
   next: NextFunction,
 ) => {
   try {
-    if (!req.user) {
-      throw new ApiError(401, "Unauthorized");
-    }
-
-    const userId = req.user.id;
+    const userId = req.user!.id;
 
     // User ka cart find karo
     const cart = await prisma.cart.findUnique({

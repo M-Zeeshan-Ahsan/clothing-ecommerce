@@ -11,6 +11,7 @@ import verifyToken from "../middleware/auth.middleware.js";
 import validate from "../middleware/validate.js";
 import {
   addToCartSchema,
+  updateCartProductIdSchema,
   updateCartQuantitySchema,
   productIdSchema,
 } from "../schemas/cart.schema.js";
@@ -21,7 +22,8 @@ router.get("/", verifyToken, getCartItems);
 router.patch(
   "/quantity/:productId",
   verifyToken,
-  validate(updateCartQuantitySchema, "params"),
+  validate(updateCartProductIdSchema, "params"),
+  validate(updateCartQuantitySchema),
   updateCartQuantity,
 );
 router.delete(
