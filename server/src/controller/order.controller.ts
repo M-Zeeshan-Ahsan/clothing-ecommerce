@@ -10,7 +10,7 @@ export const createOrder = async (
 ) => {
   try {
     const userId = req.user!.id;
-
+    const { addressId } = req.body;
     const cart = await prisma.cart.findUnique({
       where: { userId },
       include: {
@@ -38,6 +38,7 @@ export const createOrder = async (
     const order = await prisma.order.create({
       data: {
         userId,
+        addressId,
         totalAmount,
       },
     });
@@ -72,17 +73,51 @@ export const getOrders = async (
 ) => {
   try {
     const userId = req.user!.id;
-    const orders = await prisma.order.findMany({
-      where: { userId },
-      include: {
-        items: {
-          include: {
-            product: true,
+
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    const [orders, total] = await Promise.all([
+      prisma.order.findMany({
+        where: {
+          userId,
+        },
+        include: {
+          address: true,
+          items: {
+            include: {
+              product: true,
+            },
           },
         },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip,
+        take,
+      }),
+
+      prisma.order.count({
+        where: {
+          userId,
+        },
+      }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return handleResponse(res, 200, "Orders fetched successfully", {
+      orders,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
       },
     });
-    return handleResponse(res, 200, "Orders fetched successfully", orders);
   } catch (error) {
     next(error);
   }
