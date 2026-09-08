@@ -218,3 +218,50 @@ export const deleteMultipleProducts = async (
     next(error);
   }
 };
+export const getAllProductsAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        include: {
+          category: {
+            select: {
+              id: true,
+              category_name: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip,
+        take,
+      }),
+
+      prisma.product.count(),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return handleResponse(res, 200, "All products fetched successfully", {
+      products,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

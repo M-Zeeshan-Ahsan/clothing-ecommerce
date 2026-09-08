@@ -37,3 +37,10 @@ export const userIdSchema = Joi.object({
     "any.required": "User ID is required",
   }),
 });
+export const userRoleSchema = Joi.object({
+  role: Joi.string().valid("USER", "ADMIN").required().messages({
+    "string.base": "Role must be a string",
+    "any.only": "Role must be USER or ADMIN",
+    "any.required": "Role is required",
+  }),
+});
