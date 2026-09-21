@@ -70,7 +70,11 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
           </button>
 
           {/* Cart */}
-          <button className="header__action header__cart" aria-label="Cart">
+          <Link
+            to="/cart"
+            className="header__action header__cart"
+            aria-label="Cart"
+          >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M3 4h2l2.2 11h10.9L21 7H6" />
               <circle cx="9" cy="19" r="1.5" />
@@ -80,7 +84,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
             {cartCount > 0 && (
               <span className="header__cart-count">{cartCount}</span>
             )}
-          </button>
+          </Link>
 
           {/* Mobile Menu */}
           <button
