@@ -2,8 +2,17 @@ import ProductCard from "../../components/product/ProductCard";
 import { products } from "../../data/products";
 import "./Home.scss";
 
-const Home = () => {
+interface HomeProps {
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
+}
+
+const Home = ({ searchTerm, setSearchTerm }: HomeProps) => {
   const categories = ["All", "Women", "Men", "Lawn", "Boski", "Cotton"];
+
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   return (
     <main className="home">
@@ -29,7 +38,9 @@ const Home = () => {
         <div className="products-section__header">
           <div>
             <span>OUR COLLECTION</span>
-            <h2>Shop Our Products</h2>
+            <h2>
+              {searchTerm ? `Search: ${searchTerm}` : "Shop Our Products"}
+            </h2>
           </div>
 
           <div className="category-filter">
@@ -39,11 +50,41 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="products-grid">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+        {/* Home Search */}
+        <div className="product-search">
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => setSearchTerm("")}
+              className="product-search__clear"
+              aria-label="Clear search"
+            >
+              ×
+            </button>
+          )}
         </div>
+
+        {/* Products */}
+        {filteredProducts.length > 0 ? (
+          <div className="products-grid">
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="no-products">
+            <h3>No products found</h3>
+
+            <p>We couldn't find anything matching "{searchTerm}"</p>
+          </div>
+        )}
       </section>
     </main>
   );
