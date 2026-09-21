@@ -1,0 +1,193 @@
+.footer {
+  background: #111;
+  color: #fff;
+  margin-top: 80px;
+
+  &__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 70px 5%;
+
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
+    gap: 60px;
+  }
+
+  /* Brand */
+
+  &__brand {
+    max-width: 320px;
+  }
+
+  &__logo {
+    display: inline-block;
+    color: #fff;
+    text-decoration: none;
+
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 5px;
+
+    margin-bottom: 20px;
+  }
+
+  &__brand p {
+    color: #aaa;
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 25px;
+  }
+
+  /* Socials */
+
+  &__socials {
+    display: flex;
+    gap: 18px;
+  }
+
+  &__socials a {
+    color: #aaa;
+    text-decoration: none;
+    font-size: 13px;
+
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  /* Columns */
+
+  &__column,
+  &__newsletter {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__column h3,
+  &__newsletter h3 {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+
+    margin-bottom: 22px;
+  }
+
+  &__column a {
+    color: #aaa;
+    text-decoration: none;
+
+    font-size: 14px;
+    margin-bottom: 13px;
+
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  /* Newsletter */
+
+  &__newsletter p {
+    color: #aaa;
+    font-size: 14px;
+    line-height: 1.7;
+
+    margin-bottom: 20px;
+  }
+
+  &__form {
+    display: flex;
+    border-bottom: 1px solid #555;
+
+    input {
+      flex: 1;
+      min-width: 0;
+
+      height: 45px;
+
+      border: none;
+      outline: none;
+      background: transparent;
+
+      color: #fff;
+      font-size: 14px;
+
+      &::placeholder {
+        color: #777;
+      }
+    }
+
+    button {
+      border: none;
+      background: transparent;
+
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+
+      cursor: pointer;
+
+      padding: 0 0 0 15px;
+
+      &:hover {
+        opacity: 0.7;
+      }
+    }
+  }
+
+  /* Bottom */
+
+  &__bottom {
+    border-top: 1px solid #292929;
+
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 22px 5%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    p {
+      margin: 0;
+      color: #777;
+      font-size: 12px;
+    }
+  }
+
+  /* Responsive */
+
+  @media (max-width: 1000px) {
+    &__container {
+      grid-template-columns: 1fr 1fr;
+      gap: 45px;
+    }
+
+    &__brand {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 600px) {
+    margin-top: 50px;
+
+    &__container {
+      grid-template-columns: 1fr;
+      gap: 35px;
+      padding: 50px 6%;
+    }
+
+    &__bottom {
+      padding: 20px 6%;
+
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+  }
+}
