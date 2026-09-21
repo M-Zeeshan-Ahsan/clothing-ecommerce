@@ -1,0 +1,161 @@
+.home {
+  background: #fff;
+  color: #111;
+}
+
+.hero {
+  min-height: 650px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 80px 8%;
+
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.1)),
+    url("https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1800&q=80")
+      center / cover;
+
+  color: #fff;
+
+  &__content {
+    max-width: 600px;
+  }
+
+  span {
+    font-size: 12px;
+    letter-spacing: 3px;
+  }
+
+  h1 {
+    margin: 20px 0;
+    font-size: clamp(42px, 6vw, 76px);
+    line-height: 1.05;
+    font-weight: 500;
+  }
+
+  p {
+    max-width: 450px;
+    margin-bottom: 30px;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  button {
+    padding: 15px 30px;
+    border: none;
+    background: #fff;
+    color: #111;
+    cursor: pointer;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+
+    &:hover {
+      background: #111;
+      color: #fff;
+    }
+  }
+}
+
+.products-section {
+  max-width: 1400px;
+  margin: auto;
+  padding: 90px 5%;
+
+  &__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 45px;
+  }
+
+  &__header > div:first-child {
+    span {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: #888;
+    }
+
+    h2 {
+      margin-top: 8px;
+      font-size: 38px;
+      font-weight: 500;
+    }
+  }
+}
+
+.category-filter {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  button {
+    padding: 9px 17px;
+    border: 1px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+
+    &:hover {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+    }
+  }
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+}
+
+@media (max-width: 1100px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    min-height: 550px;
+    padding: 50px 6%;
+  }
+
+  .products-section {
+    padding: 60px 5%;
+
+    &__header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+
+  .product-card__image-wrapper {
+    height: 300px;
+  }
+}
+
+@media (max-width: 500px) {
+  .products-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .product-card__image-wrapper {
+    height: 240px;
+  }
+
+  .product-card__content {
+    padding: 12px 3px;
+  }
+
+  .product-card h3 {
+    font-size: 14px;
+  }
+}
