@@ -305,3 +305,25 @@
     grid-column: auto;
   }
 }
+.cart__checkout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 50px;
+  margin-top: 30px;
+
+  border: none;
+  background: #111;
+  color: #fff;
+
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
