@@ -47,6 +47,7 @@ export const userLogin = async (
     next(error);
   }
 };
+
 export const refreshToken = async (
   req: Request,
   res: Response,

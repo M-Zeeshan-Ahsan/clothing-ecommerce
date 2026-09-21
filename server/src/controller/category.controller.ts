@@ -20,6 +20,7 @@ export const createCategory = async (
     next(error);
   }
 };
+
 export const getCategory = async (
   req: Request,
   res: Response,
@@ -32,6 +33,7 @@ export const getCategory = async (
     next(error);
   }
 };
+
 export const deleteCategory = async (
   req: Request,
   res: Response,
@@ -70,6 +72,7 @@ export const deleteCategory = async (
     next(error);
   }
 };
+
 export const updateCategory = async (
   req: Request,
   res: Response,
@@ -119,6 +122,7 @@ export const updateCategory = async (
     next(error);
   }
 };
+
 export const getSpecificCategory = async (
   req: Request,
   res: Response,

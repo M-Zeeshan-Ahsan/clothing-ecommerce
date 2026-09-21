@@ -29,6 +29,7 @@ export const createAddress = async (
     next(error);
   }
 };
+
 export const getAddresses = async (
   req: Request,
   res: Response,
@@ -56,6 +57,7 @@ export const getAddresses = async (
     next(error);
   }
 };
+
 export const getAddressById = async (
   req: Request,
   res: Response,
@@ -81,6 +83,7 @@ export const getAddressById = async (
     next(error);
   }
 };
+
 export const updateAddress = async (
   req: Request,
   res: Response,
@@ -126,6 +129,7 @@ export const updateAddress = async (
     next(error);
   }
 };
+
 export const deleteAddress = async (
   req: Request,
   res: Response,

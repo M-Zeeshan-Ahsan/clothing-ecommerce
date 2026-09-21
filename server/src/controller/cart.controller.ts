@@ -88,6 +88,7 @@ export const addToCart = async (
     next(error);
   }
 };
+
 export const getCartItems = async (
   req: Request,
   res: Response,
@@ -116,6 +117,7 @@ export const getCartItems = async (
     next(error);
   }
 };
+
 export const updateCartQuantity = async (
   req: Request,
   res: Response,
@@ -176,6 +178,7 @@ export const updateCartQuantity = async (
     next(error);
   }
 };
+
 export const removeFromCart = async (
   req: Request,
   res: Response,
@@ -231,6 +234,7 @@ export const removeFromCart = async (
     next(error);
   }
 };
+
 export const clearCart = async (
   req: Request,
   res: Response,
@@ -262,6 +266,7 @@ export const clearCart = async (
     next(error);
   }
 };
+
 export const cartSummary = async (
   req: Request,
   res: Response,
