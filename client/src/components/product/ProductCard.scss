@@ -58,18 +58,16 @@
     position: absolute;
     bottom: 0;
     left: 0;
-
     width: 100%;
     padding: 13px;
-
     border: none;
     background: rgba(17, 17, 17, 0.92);
     color: #fff;
-
     cursor: pointer;
-
     transform: translateY(100%);
     transition: transform 0.3s ease;
+    text-decoration: none !important;
+    text-align: center;
   }
 
   &:hover &__quick {
@@ -117,6 +115,23 @@
     &:hover {
       background: #111;
       color: #fff;
+    }
+  }
+}
+.product-card__content {
+  .product-card__name {
+    display: block;
+
+    margin: 8px 0 12px;
+
+    color: #111;
+    text-decoration: none;
+
+    font-size: 15px;
+    font-weight: 500;
+
+    &:hover {
+      opacity: 0.65;
     }
   }
 }
