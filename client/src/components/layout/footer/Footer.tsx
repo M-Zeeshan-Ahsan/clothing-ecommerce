@@ -1,4 +1,5 @@
 import "./Footer.scss";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -6,9 +7,9 @@ const Footer = () => {
       <div className="footer__container">
         {/* Brand */}
         <div className="footer__brand">
-          <a href="/" className="footer__logo">
+          <Link to="/" className="footer__logo">
             LIBAAS
-          </a>
+          </Link>
 
           <p>
             Timeless fashion crafted for modern elegance. Discover premium
@@ -34,22 +35,22 @@ const Footer = () => {
         <div className="footer__column">
           <h3>Quick Links</h3>
 
-          <a href="/">Home</a>
-          <a href="/shop">Shop</a>
-          <a href="/categories">Categories</a>
-          <a href="/new-arrivals">New Arrivals</a>
-          <a href="/sale">Sale</a>
+          <Link to="/">Home</Link>
+          <Link to="/shop">Shop</Link>
+          <Link to="/categories">Categories</Link>
+          <Link to="/new-arrivals">New Arrivals</Link>
+          <Link to="/sale">Sale</Link>
         </div>
 
         {/* Customer Care */}
         <div className="footer__column">
           <h3>Customer Care</h3>
 
-          <a href="/contact">Contact Us</a>
-          <a href="/shipping">Shipping & Delivery</a>
-          <a href="/returns">Returns & Exchange</a>
-          <a href="/privacy-policy">Privacy Policy</a>
-          <a href="/terms">Terms & Conditions</a>
+          <Link to="/contact">Contact Us</Link>
+          <Link to="/shipping">Shipping & Delivery</Link>
+          <Link to="/returns">Returns & Exchange</Link>
+          <Link to="/privacy-policy">Privacy Policy</Link>
+          <Link to="/terms">Terms & Conditions</Link>
         </div>
 
         {/* Newsletter */}

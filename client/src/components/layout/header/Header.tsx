@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./Header.scss";
+import { Link } from "react-router-dom";
 
 interface HeaderProps {
   searchTerm: string;
@@ -23,17 +24,17 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
     <header className="header">
       <div className="header__container">
         {/* Logo */}
-        <a href="/" className="header__logo">
+        <Link to="/" className="header__logo">
           LIBAAS
-        </a>
+        </Link>
 
         {/* Desktop Navigation */}
         <nav className={`header__nav ${menuOpen ? "active" : ""}`}>
-          <a href="/">Home</a>
-          <a href="/shop">Shop</a>
-          <a href="/categories">Categories</a>
-          <a href="/new-arrivals">New Arrivals</a>
-          <a href="/sale">Sale</a>
+          <Link to="/">Home</Link>
+          <Link to="/shop">Shop</Link>
+          <Link to="/categories">Categories</Link>
+          <Link to="/new-arrivals">New Arrivals</Link>
+          <Link to="/sale">Sale</Link>
         </nav>
 
         {/* Actions */}

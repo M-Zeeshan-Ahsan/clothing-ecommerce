@@ -1,0 +1,30 @@
+import { Route, Routes } from "react-router-dom";
+import Home from "../pages/Home/Home";
+
+interface AppRoutesProps {
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
+}
+
+const AppRoutes = ({ searchTerm, setSearchTerm }: AppRoutesProps) => {
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={<Home searchTerm={searchTerm} setSearchTerm={setSearchTerm} />}
+      />
+
+      <Route path="/shop" element={<h1>Shop Page</h1>} />
+
+      <Route path="/categories" element={<h1>Categories Page</h1>} />
+
+      <Route path="/new-arrivals" element={<h1>New Arrivals Page</h1>} />
+
+      <Route path="/sale" element={<h1>Sale Page</h1>} />
+
+      <Route path="*" element={<h1>404 - Page Not Found</h1>} />
+    </Routes>
+  );
+};
+
+export default AppRoutes;
