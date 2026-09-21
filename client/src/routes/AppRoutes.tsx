@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import Home from "../pages/Home/Home";
+import Shop from "../pages/shop/Shop";
 
 interface AppRoutesProps {
   searchTerm: string;
@@ -14,7 +15,7 @@ const AppRoutes = ({ searchTerm, setSearchTerm }: AppRoutesProps) => {
         element={<Home searchTerm={searchTerm} setSearchTerm={setSearchTerm} />}
       />
 
-      <Route path="/shop" element={<h1>Shop Page</h1>} />
+      <Route path="/shop" element={<Shop />} />
 
       <Route path="/categories" element={<h1>Categories Page</h1>} />
 

@@ -47,7 +47,7 @@ export const products: Product[] = [
     name: "Edenrobe Premium",
     price: 3450,
     image:
-      "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=600&q=80",
     category: "Men",
   },
   {
@@ -55,7 +55,7 @@ export const products: Product[] = [
     name: "Premium Cotton Suit",
     price: 4200,
     image:
-      "https://images.unsplash.com/photo-1583743814966-8936f37f4678?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=600&q=80",
     category: "Cotton",
   },
 ];
