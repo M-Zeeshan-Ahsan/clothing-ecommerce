@@ -132,9 +132,9 @@ const Cart = () => {
             <strong>Rs. {subtotal.toLocaleString()}</strong>
           </div>
 
-          <button type="button" className="cart__checkout">
+          <Link to="/checkout" className="cart__checkout">
             Proceed to Checkout
-          </button>
+          </Link>
 
           <p className="cart__cod">Cash on Delivery available</p>
         </aside>

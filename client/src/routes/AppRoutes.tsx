@@ -3,6 +3,7 @@ import Home from "../pages/Home/Home";
 import Shop from "../pages/shop/Shop";
 import ProductDetails from "../pages/product-details/ProductDetails";
 import Cart from "../pages/cart/Cart";
+import Checkout from "../pages/checkout/Checkout";
 interface AppRoutesProps {
   searchTerm: string;
   setSearchTerm: (value: string) => void;
@@ -19,6 +20,7 @@ const AppRoutes = ({ searchTerm, setSearchTerm }: AppRoutesProps) => {
       <Route path="/shop" element={<Shop />} />
       <Route path="/product/:id" element={<ProductDetails />} />
       <Route path="/cart" element={<Cart />} />
+      <Route path="/checkout" element={<Checkout />} />
       <Route path="/categories" element={<h1>Categories Page</h1>} />
 
       <Route path="/new-arrivals" element={<h1>New Arrivals Page</h1>} />
