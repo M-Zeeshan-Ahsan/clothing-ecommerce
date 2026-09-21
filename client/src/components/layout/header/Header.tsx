@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./Header.scss";
 import { Link } from "react-router-dom";
+import { useAppSelector } from "../../../store/store";
 
 interface HeaderProps {
   searchTerm: string;
@@ -10,7 +11,9 @@ interface HeaderProps {
 const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const cartItems = useAppSelector((state) => state.cart.items);
 
+  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   const handleSearchToggle = () => {
     setSearchOpen((prev) => !prev);
   };
@@ -74,7 +77,9 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
               <circle cx="17" cy="19" r="1.5" />
             </svg>
 
-            <span>0</span>
+            {cartCount > 0 && (
+              <span className="header__cart-count">{cartCount}</span>
+            )}
           </button>
 
           {/* Mobile Menu */}

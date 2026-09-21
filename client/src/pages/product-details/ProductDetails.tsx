@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useAppDispatch } from "../../store/store";
+import { addToCart } from "../../store/slices/cartSlice";
 import { products } from "../../data/products";
+
 import "./ProductDetails.scss";
 
 const ProductDetails = () => {
   const { id } = useParams();
+  const dispatch = useAppDispatch();
 
   const product = products.find((item) => item.id === Number(id));
 
@@ -30,22 +34,29 @@ const ProductDetails = () => {
     setQuantity((prev) => Math.max(1, prev - 1));
   };
 
+  const handleAddToCart = () => {
+    for (let i = 0; i < quantity; i++) {
+      dispatch(addToCart(product));
+    }
+
+    setQuantity(1);
+  };
+
   const totalPrice = product.price * quantity;
 
   return (
     <main className="product-details">
-      {/* Breadcrumb */}
       <div className="product-details__breadcrumb">
         <Link to="/">Home</Link>
         <span>/</span>
+
         <Link to="/shop">Shop</Link>
         <span>/</span>
+
         <span>{product.name}</span>
       </div>
 
-      {/* Product */}
       <section className="product-details__container">
-        {/* Image */}
         <div className="product-details__image-wrapper">
           {product.badge && (
             <span className="product-details__badge">{product.badge}</span>
@@ -58,7 +69,6 @@ const ProductDetails = () => {
           />
         </div>
 
-        {/* Information */}
         <div className="product-details__info">
           <span className="product-details__category">{product.category}</span>
 
@@ -75,7 +85,6 @@ const ProductDetails = () => {
 
           <div className="product-details__divider" />
 
-          {/* Quantity */}
           <div className="product-details__quantity">
             <span>Quantity</span>
 
@@ -92,16 +101,18 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {/* Total */}
           <div className="product-details__total">
             <span>Total</span>
 
             <strong>Rs. {totalPrice.toLocaleString()}</strong>
           </div>
 
-          {/* Actions */}
           <div className="product-details__actions">
-            <button type="button" className="product-details__add">
+            <button
+              type="button"
+              className="product-details__add"
+              onClick={handleAddToCart}
+            >
               Add to Cart
             </button>
 
@@ -110,7 +121,6 @@ const ProductDetails = () => {
             </button>
           </div>
 
-          {/* Extra Information */}
           <div className="product-details__features">
             <div>
               <strong>Premium Quality</strong>
