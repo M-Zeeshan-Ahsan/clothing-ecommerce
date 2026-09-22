@@ -12,6 +12,11 @@ import AddCategory from "../pages/admin/categories/AddCategory";
 import EditCategory from "../pages/admin/categories/EditCategory";
 
 import Orders from "../pages/admin/orders/Orders";
+import OrderDetails from "../pages/admin/orders/OrderDetails";
+
+import Users from "../pages/admin/users/Users";
+import AddUser from "../pages/admin/users/AddUser";
+import EditUser from "../pages/admin/users/EditUser";
 
 const AdminRoutes: RouteObject[] = [
   {
@@ -56,11 +61,23 @@ const AdminRoutes: RouteObject[] = [
         path: "orders",
         element: <Orders />,
       },
+      {
+        path: "orders/:id",
+        element: <OrderDetails />,
+      },
 
       // Users
       {
         path: "users",
-        element: <h1>Users</h1>,
+        element: <Users />,
+      },
+      {
+        path: "users/add",
+        element: <AddUser />,
+      },
+      {
+        path: "users/edit/:id",
+        element: <EditUser />,
       },
 
       // Admin 404
