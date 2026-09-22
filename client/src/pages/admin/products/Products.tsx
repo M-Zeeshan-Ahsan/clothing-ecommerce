@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Product.scss";
+import Pagination from "../../../components/common/pagination/Pagination";
 
 interface AdminProduct {
   id: number;
@@ -69,7 +70,8 @@ const Products = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("All");
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const PRODUCTS_PER_PAGE = 2;
   const filteredProducts = useMemo(() => {
     return dummyProducts.filter((product) => {
       const matchesSearch = product.name
@@ -82,7 +84,12 @@ const Products = () => {
       return matchesSearch && matchesCategory;
     });
   }, [searchTerm, category]);
+  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
 
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * PRODUCTS_PER_PAGE,
+    currentPage * PRODUCTS_PER_PAGE,
+  );
   return (
     <div className="admin-products">
       {/* Page Header */}
@@ -138,8 +145,8 @@ const Products = () => {
           </thead>
 
           <tbody>
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
+            {paginatedProducts.length > 0 ? (
+              paginatedProducts.map((product) => (
                 <tr key={product.id}>
                   <td>
                     <div className="admin-products__product">
@@ -198,6 +205,11 @@ const Products = () => {
       <div className="admin-products__footer">
         Showing {filteredProducts.length} of {dummyProducts.length} products
       </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 };
