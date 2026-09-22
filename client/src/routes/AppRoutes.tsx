@@ -11,6 +11,8 @@ import MainLayout from "../layouts/MainLayout";
 import AdminLayout from "../layouts/AdminLayout";
 import Dashboard from "../pages/admin/dashboard/Dashboard";
 import Products from "../pages/admin/products/Products";
+import AddProduct from "../pages/admin/products/AddProduct";
+import EditProduct from "../pages/admin/products/EditProduct";
 const AppRoutes = () => {
   return (
     <Routes>
@@ -30,7 +32,9 @@ const AppRoutes = () => {
         <Route index element={<Dashboard />} />
 
         <Route path="products" element={<Products />} />
+        <Route path="products/add" element={<AddProduct />} />
 
+        <Route path="products/edit/:id" element={<EditProduct />} />
         <Route path="categories" element={<h1>Categories</h1>} />
 
         <Route path="orders" element={<h1>Orders</h1>} />

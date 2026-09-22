@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Product.scss";
 
 interface AdminProduct {
@@ -65,6 +66,7 @@ const dummyProducts: AdminProduct[] = [
 ];
 
 const Products = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("All");
 
@@ -90,7 +92,12 @@ const Products = () => {
           <p>Manage your store products</p>
         </div>
 
-        <button className="admin-products__add-btn">+ Add Product</button>
+        <button
+          className="admin-products__add-btn"
+          onClick={() => navigate("/admin/products/add")}
+        >
+          + Add Product
+        </button>
       </div>
 
       {/* Filters */}
@@ -163,7 +170,14 @@ const Products = () => {
 
                   <td>
                     <div className="admin-products__actions">
-                      <button title="Edit">✎</button>
+                      <button
+                        title="Edit"
+                        onClick={() =>
+                          navigate(`/admin/products/edit/${product.id}`)
+                        }
+                      >
+                        ✎
+                      </button>
                       <button title="Delete">🗑</button>
                     </div>
                   </td>
