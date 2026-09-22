@@ -1,0 +1,304 @@
+.admin-dashboard {
+  &__heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    margin-bottom: 30px;
+
+    span {
+      display: block;
+
+      margin-bottom: 7px;
+
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+
+      color: #888;
+    }
+
+    h1 {
+      margin: 0;
+
+      font-size: 30px;
+      font-weight: 500;
+    }
+
+    > p {
+      margin: 0;
+
+      font-size: 13px;
+      color: #777;
+    }
+  }
+
+  // =====================
+  // Stats
+  // =====================
+
+  &__stats {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 18px;
+
+    margin-bottom: 25px;
+  }
+
+  &__stat {
+    padding: 24px;
+
+    background: #fff;
+
+    border: 1px solid #eee;
+
+    &-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin-bottom: 18px;
+
+      span {
+        font-size: 11px;
+        color: #777;
+      }
+    }
+
+    &-icon {
+      width: 30px;
+      height: 30px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 50%;
+
+      background: #f2f2f2;
+
+      font-size: 18px;
+    }
+
+    > strong {
+      display: block;
+
+      margin-bottom: 10px;
+
+      font-size: 25px;
+      font-weight: 500;
+    }
+
+    small {
+      font-size: 10px;
+      color: #888;
+
+      b {
+        color: #16803c;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // =====================
+  // Grid
+  // =====================
+
+  &__grid {
+    display: grid;
+
+    grid-template-columns: 2fr 1fr;
+
+    gap: 20px;
+  }
+
+  &__orders,
+  &__summary {
+    padding: 25px;
+
+    background: #fff;
+
+    border: 1px solid #eee;
+  }
+
+  &__section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    margin-bottom: 25px;
+
+    span {
+      display: block;
+
+      margin-bottom: 6px;
+
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+
+      color: #999;
+    }
+
+    h2 {
+      margin: 0;
+
+      font-size: 20px;
+      font-weight: 500;
+    }
+
+    a {
+      color: #111;
+
+      font-size: 11px;
+      text-decoration: underline;
+    }
+  }
+
+  // =====================
+  // Table
+  // =====================
+
+  &__table-wrapper {
+    overflow-x: auto;
+
+    table {
+      width: 100%;
+
+      border-collapse: collapse;
+
+      th,
+      td {
+        padding: 15px 10px;
+
+        text-align: left;
+
+        border-bottom: 1px solid #eee;
+
+        white-space: nowrap;
+      }
+
+      th {
+        font-size: 10px;
+        font-weight: 600;
+
+        color: #888;
+      }
+
+      td {
+        font-size: 12px;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+    }
+  }
+
+  // =====================
+  // Status
+  // =====================
+
+  .status {
+    display: inline-flex;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    font-size: 9px;
+    font-weight: 600;
+
+    &--pending {
+      background: #fff4d6;
+      color: #9a6b00;
+    }
+
+    &--confirmed {
+      background: #e7f1ff;
+      color: #2463a8;
+    }
+
+    &--shipped {
+      background: #eee9ff;
+      color: #6842a5;
+    }
+
+    &--delivered {
+      background: #e4f7eb;
+      color: #16803c;
+    }
+
+    &--cancelled {
+      background: #ffe8e8;
+      color: #b42318;
+    }
+  }
+
+  // =====================
+  // Order Summary
+  // =====================
+
+  &__summary-list {
+    > div {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 17px 0;
+
+      border-bottom: 1px solid #eee;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      span {
+        font-size: 12px;
+        color: #777;
+      }
+
+      strong {
+        font-size: 15px;
+        font-weight: 500;
+      }
+    }
+  }
+
+  // =====================
+  // Tablet
+  // =====================
+
+  @media (max-width: 1100px) {
+    &__stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    &__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // =====================
+  // Mobile
+  // =====================
+
+  @media (max-width: 768px) {
+    &__heading {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    &__stats {
+      grid-template-columns: 1fr;
+    }
+
+    &__orders,
+    &__summary {
+      padding: 18px;
+    }
+  }
+}

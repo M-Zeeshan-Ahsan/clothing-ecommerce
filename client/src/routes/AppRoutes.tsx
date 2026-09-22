@@ -7,26 +7,36 @@ import Checkout from "../pages/checkout/Checkout";
 import NewArrivals from "../pages/new-arrivals/NewArrivals";
 import Sale from "../pages/sale/Sale";
 import Categories from "../pages/categories/Categories";
-interface AppRoutesProps {
-  searchTerm: string;
-  setSearchTerm: (value: string) => void;
-}
+import AdminLayout from "../layouts/AdminLayout";
+import Dashboard from "../pages/admin/dashboard/Dashboard";
+import MainLayout from "../layouts/MainLayout";
 
-const AppRoutes = ({ searchTerm, setSearchTerm }: AppRoutesProps) => {
+const AppRoutes = () => {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={<Home searchTerm={searchTerm} setSearchTerm={setSearchTerm} />}
-      />
+      <Route element={<MainLayout />}>
+        {" "}
+        <Route path="/" element={<Home />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/new-arrivals" element={<NewArrivals />} />
+        <Route path="/categories" element={<Categories />} />
+        <Route path="/sale" element={<Sale />} />
+      </Route>
 
-      <Route path="/shop" element={<Shop />} />
-      <Route path="/product/:id" element={<ProductDetails />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/checkout" element={<Checkout />} />
-      <Route path="/new-arrivals" element={<NewArrivals />} />
-      <Route path="/categories" element={<Categories />} />
-      <Route path="/sale" element={<Sale />} />
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<Dashboard />} />
+
+        <Route path="products" element={<h1>Products</h1>} />
+
+        <Route path="categories" element={<h1>Categories</h1>} />
+
+        <Route path="orders" element={<h1>Orders</h1>} />
+
+        <Route path="users" element={<h1>Users</h1>} />
+      </Route>
       <Route path="*" element={<h1>404 - Page Not Found</h1>} />
     </Routes>
   );

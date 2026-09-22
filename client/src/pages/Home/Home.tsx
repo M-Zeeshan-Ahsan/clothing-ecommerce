@@ -1,13 +1,17 @@
 import ProductCard from "../../components/product/ProductCard";
 import { products } from "../../data/products";
 import "./Home.scss";
+import { useOutletContext } from "react-router-dom";
 
-interface HomeProps {
+
+interface SearchContext {
   searchTerm: string;
   setSearchTerm: (value: string) => void;
 }
 
-const Home = ({ searchTerm, setSearchTerm }: HomeProps) => {
+
+const Home = () => {
+    const { searchTerm, setSearchTerm } = useOutletContext<SearchContext>();
   const categories = ["All", "Women", "Men", "Lawn", "Boski", "Cotton"];
 
   const filteredProducts = products.filter((product) =>
