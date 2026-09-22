@@ -7,10 +7,10 @@ import Checkout from "../pages/checkout/Checkout";
 import NewArrivals from "../pages/new-arrivals/NewArrivals";
 import Sale from "../pages/sale/Sale";
 import Categories from "../pages/categories/Categories";
+import MainLayout from "../layouts/MainLayout";
 import AdminLayout from "../layouts/AdminLayout";
 import Dashboard from "../pages/admin/dashboard/Dashboard";
-import MainLayout from "../layouts/MainLayout";
-
+import Products from "../pages/admin/products/Products";
 const AppRoutes = () => {
   return (
     <Routes>
@@ -29,7 +29,7 @@ const AppRoutes = () => {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
 
-        <Route path="products" element={<h1>Products</h1>} />
+        <Route path="products" element={<Products />} />
 
         <Route path="categories" element={<h1>Categories</h1>} />
 
