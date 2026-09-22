@@ -13,6 +13,9 @@ import Dashboard from "../pages/admin/dashboard/Dashboard";
 import Products from "../pages/admin/products/Products";
 import AddProduct from "../pages/admin/products/AddProduct";
 import EditProduct from "../pages/admin/products/EditProduct";
+import AdminCategories from "../pages/admin/categories/Categories";
+import AddCategory from "../pages/admin/categories/AddCategory";
+import EditCategory from "../pages/admin/categories/EditCategory";
 const AppRoutes = () => {
   return (
     <Routes>
@@ -35,8 +38,9 @@ const AppRoutes = () => {
         <Route path="products/add" element={<AddProduct />} />
 
         <Route path="products/edit/:id" element={<EditProduct />} />
-        <Route path="categories" element={<h1>Categories</h1>} />
-
+        <Route path="categories" element={<AdminCategories />} />
+        <Route path="categories/add" element={<AddCategory />} />
+        <Route path="categories/edit/:id" element={<EditCategory />} />
         <Route path="orders" element={<h1>Orders</h1>} />
 
         <Route path="users" element={<h1>Users</h1>} />
