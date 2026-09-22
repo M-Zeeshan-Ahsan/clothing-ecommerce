@@ -4,6 +4,9 @@ import Shop from "../pages/shop/Shop";
 import ProductDetails from "../pages/product-details/ProductDetails";
 import Cart from "../pages/cart/Cart";
 import Checkout from "../pages/checkout/Checkout";
+import NewArrivals from "../pages/new-arrivals/NewArrivals";
+import Sale from "../pages/sale/Sale";
+import Categories from "../pages/categories/Categories";
 interface AppRoutesProps {
   searchTerm: string;
   setSearchTerm: (value: string) => void;
@@ -21,12 +24,9 @@ const AppRoutes = ({ searchTerm, setSearchTerm }: AppRoutesProps) => {
       <Route path="/product/:id" element={<ProductDetails />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
-      <Route path="/categories" element={<h1>Categories Page</h1>} />
-
-      <Route path="/new-arrivals" element={<h1>New Arrivals Page</h1>} />
-
-      <Route path="/sale" element={<h1>Sale Page</h1>} />
-
+      <Route path="/new-arrivals" element={<NewArrivals />} />
+      <Route path="/categories" element={<Categories />} />
+      <Route path="/sale" element={<Sale />} />
       <Route path="*" element={<h1>404 - Page Not Found</h1>} />
     </Routes>
   );

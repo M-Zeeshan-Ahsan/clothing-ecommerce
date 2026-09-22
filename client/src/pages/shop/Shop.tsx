@@ -1,10 +1,13 @@
 import { useMemo, useState } from "react";
 import { products } from "../../data/products";
 import ProductCard from "../../components/product/ProductCard";
+import { useSearchParams } from "react-router-dom";
 import "./Shop.scss";
 
 const Shop = () => {
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const categoryFromUrl = searchParams.get("category") || "All";
+  const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("featured");
 
@@ -43,7 +46,17 @@ const Shop = () => {
 
     return result;
   }, [selectedCategory, searchTerm, sortBy]);
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
 
+    if (category === "All") {
+      setSearchParams({});
+    } else {
+      setSearchParams({
+        category,
+      });
+    }
+  };
   return (
     <main className="shop">
       {/* Shop Hero */}
@@ -82,7 +95,7 @@ const Shop = () => {
               <button
                 key={category}
                 className={selectedCategory === category ? "active" : ""}
-                onClick={() => setSelectedCategory(category)}
+                onClick={() => handleCategoryChange(category)}
               >
                 {category}
               </button>
