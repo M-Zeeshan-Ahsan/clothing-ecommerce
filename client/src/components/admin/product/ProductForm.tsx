@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import ImageUpload from "../../common/image-upload/ImageUpload";
+
 import "./ProductForm.scss";
 
 export interface ProductFormData {
@@ -8,7 +10,8 @@ export interface ProductFormData {
   category: string;
   price: string;
   stock: string;
-  image: string;
+  imageUrl: string;
+  imageFile: File | null;
   description: string;
 }
 
@@ -23,7 +26,8 @@ const emptyForm: ProductFormData = {
   category: "",
   price: "",
   stock: "",
-  image: "",
+  imageUrl: "",
+  imageFile: null,
   description: "",
 };
 
@@ -35,6 +39,8 @@ const ProductForm = ({ mode, initialData, onSubmit }: ProductFormProps) => {
   useEffect(() => {
     if (initialData) {
       setFormData(initialData);
+    } else {
+      setFormData(emptyForm);
     }
   }, [initialData]);
 
@@ -51,6 +57,13 @@ const ProductForm = ({ mode, initialData, onSubmit }: ProductFormProps) => {
     }));
   };
 
+  const handleImageChange = (file: File | null) => {
+    setFormData((prev) => ({
+      ...prev,
+      imageFile: file,
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -59,31 +72,28 @@ const ProductForm = ({ mode, initialData, onSubmit }: ProductFormProps) => {
 
   return (
     <div className="product-form">
-      {/* Page Header */}
       <div className="product-form__header">
-        <div>
-          <button
-            type="button"
-            className="product-form__back"
-            onClick={() => navigate("/admin/products")}
-          >
-            ← Back to Products
-          </button>
+        <button
+          type="button"
+          className="product-form__back"
+          onClick={() => navigate("/admin/products")}
+        >
+          ← Back to Products
+        </button>
 
-          <h1>{mode === "add" ? "Add New Product" : "Edit Product"}</h1>
+        <h1>{mode === "add" ? "Add New Product" : "Edit Product"}</h1>
 
-          <p>
-            {mode === "add"
-              ? "Create a new product for your store"
-              : "Update product information"}
-          </p>
-        </div>
+        <p>
+          {mode === "add"
+            ? "Create a new product for your store"
+            : "Update product information"}
+        </p>
       </div>
 
-      {/* Form */}
       <form className="product-form__card" onSubmit={handleSubmit}>
         <div className="product-form__section">
           <h2>Product Information</h2>
+
           <p>Enter the basic details of your product.</p>
         </div>
 
@@ -140,36 +150,27 @@ const ProductForm = ({ mode, initialData, onSubmit }: ProductFormProps) => {
           </div>
         </div>
 
-        {/* Stock + Image */}
-        <div className="product-form__row">
-          <div className="product-form__group">
-            <label htmlFor="stock">Stock</label>
+        {/* Stock */}
+        <div className="product-form__group">
+          <label htmlFor="stock">Stock</label>
 
-            <input
-              id="stock"
-              type="number"
-              name="stock"
-              placeholder="Enter stock quantity"
-              min="0"
-              value={formData.stock}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <input
+            id="stock"
+            type="number"
+            name="stock"
+            placeholder="Enter stock quantity"
+            min="0"
+            value={formData.stock}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-          <div className="product-form__group">
-            <label htmlFor="image">Product Image URL</label>
+        {/* Image */}
+        <div className="product-form__group">
+          <label>Product Image</label>
 
-            <input
-              id="image"
-              type="url"
-              name="image"
-              placeholder="https://example.com/image.jpg"
-              value={formData.image}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <ImageUpload value={formData.imageUrl} onChange={handleImageChange} />
         </div>
 
         {/* Description */}
