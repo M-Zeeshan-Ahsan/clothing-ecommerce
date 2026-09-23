@@ -60,6 +60,7 @@ export const getProducts = async (
     const category = String(req.query.category || "").trim();
 
     const newOnly = req.query.newOnly === "true";
+    const saleOnly = req.query.saleOnly === "true";
 
     // =========================
     // 5 DAYS AGO
@@ -95,6 +96,12 @@ export const getProducts = async (
       ...(newOnly && {
         createdAt: {
           gte: fiveDaysAgo,
+        },
+      }),
+
+      ...(saleOnly && {
+        sale_price: {
+          not: null,
         },
       }),
     };
