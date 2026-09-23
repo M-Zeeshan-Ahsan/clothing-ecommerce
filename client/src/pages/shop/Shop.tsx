@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+
 import useDebounce from "../../hooks/useDebounce";
+
 import ProductCard from "../../components/product/ProductCard";
 import Pagination from "../../components/common/pagination/Pagination";
 import Loader from "../../components/common/loader/Loader";
+
 import { useGetProductsQuery } from "../../store/api/productApi";
+import { useGetCategoriesQuery } from "../../store/api/categoryApi";
+
 import { showToast } from "../../utils/toast";
 import { getApiErrorMessage } from "../../utils/apiError";
 
@@ -13,52 +18,98 @@ import "./Shop.scss";
 const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const categoryFromUrl = searchParams.get("category") || "All";
+  // =========================
+  // URL CATEGORY
+  // =========================
 
-  const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
+  const categoryIdFromUrl = Number(searchParams.get("categoryId")) || undefined;
+
+  // =========================
+  // STATES
+  // =========================
+
+  const [selectedCategoryId, setSelectedCategoryId] = useState<
+    number | undefined
+  >(categoryIdFromUrl);
 
   const [searchTerm, setSearchTerm] = useState("");
+
   const debouncedSearch = useDebounce(searchTerm, 500);
+
   const [sortBy, setSortBy] = useState("featured");
 
   const [currentPage, setCurrentPage] = useState(1);
 
   const [limit] = useState(12);
 
-  const categories = ["All", "Women", "Men", "Lawn", "Boski", "Cotton"];
+  // =========================
+  // GET CATEGORIES
+  // =========================
+
+  const {
+    data: categoryData,
+    isLoading: categoriesLoading,
+    error: categoriesError,
+  } = useGetCategoriesQuery();
+
+  const categories = categoryData?.data ?? [];
 
   // =========================
   // GET PRODUCTS
   // =========================
 
-  const { data, isLoading, isFetching, error } = useGetProductsQuery({
+  const {
+    data: productData,
+    isLoading: productsLoading,
+    isFetching,
+    error: productsError,
+  } = useGetProductsQuery({
     page: currentPage,
     limit,
     search: debouncedSearch.trim(),
-    // categoryId: selectedCategory === "All" ? undefined : selectedCategory,
+    categoryId: selectedCategoryId,
   });
 
-  const products = data?.data.products ?? [];
-  const pagination = data?.data.pagination;
+  const products = productData?.data.products ?? [];
+
+  const pagination = productData?.data.pagination;
 
   // =========================
-  // ERROR
+  // CATEGORY ERROR
   // =========================
 
   useEffect(() => {
-    if (error) {
-      showToast(getApiErrorMessage(error), "error");
+    if (categoriesError) {
+      showToast(getApiErrorMessage(categoriesError), "error");
     }
-  }, [error]);
+  }, [categoriesError]);
+
+  // =========================
+  // PRODUCT ERROR
+  // =========================
+
+  useEffect(() => {
+    if (productsError) {
+      showToast(getApiErrorMessage(productsError), "error");
+    }
+  }, [productsError]);
 
   // =========================
   // URL CATEGORY SYNC
   // =========================
 
   useEffect(() => {
-    setSelectedCategory(categoryFromUrl);
+    setSelectedCategoryId(categoryIdFromUrl);
     setCurrentPage(1);
-  }, [categoryFromUrl]);
+  }, [categoryIdFromUrl]);
+
+  // =========================
+  // SELECTED CATEGORY NAME
+  // =========================
+
+  const selectedCategory = categories.find(
+    (category) => category.id === selectedCategoryId,
+  );
 
   // =========================
   // SORT PRODUCTS
@@ -84,16 +135,15 @@ const Shop = () => {
   // CATEGORY CHANGE
   // =========================
 
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
-
+  const handleCategoryChange = (categoryId: number | undefined) => {
+    setSelectedCategoryId(categoryId);
     setCurrentPage(1);
 
-    if (category === "All") {
+    if (categoryId === undefined) {
       setSearchParams({});
     } else {
       setSearchParams({
-        category,
+        categoryId: String(categoryId),
       });
     }
   };
@@ -113,7 +163,7 @@ const Shop = () => {
 
   const handleClearFilters = () => {
     setSearchTerm("");
-    setSelectedCategory("All");
+    setSelectedCategoryId(undefined);
     setSortBy("featured");
     setCurrentPage(1);
     setSearchParams({});
@@ -123,7 +173,7 @@ const Shop = () => {
   // LOADING
   // =========================
 
-  if (isLoading) {
+  if (productsLoading || categoriesLoading) {
     return <Loader />;
   }
 
@@ -148,7 +198,9 @@ const Shop = () => {
             <span>OUR COLLECTION</span>
 
             <h2>
-              {selectedCategory === "All" ? "All Products" : selectedCategory}
+              {selectedCategory
+                ? selectedCategory.category_name
+                : "All Products"}
             </h2>
           </div>
 
@@ -162,13 +214,24 @@ const Shop = () => {
         <div className="shop-filters">
           {/* Categories */}
           <div className="shop-categories">
+            {/* All */}
+            <button
+              type="button"
+              className={selectedCategoryId === undefined ? "active" : ""}
+              onClick={() => handleCategoryChange(undefined)}
+            >
+              All
+            </button>
+
+            {/* Backend Categories */}
             {categories.map((category) => (
               <button
-                key={category}
-                className={selectedCategory === category ? "active" : ""}
-                onClick={() => handleCategoryChange(category)}
+                key={category.id}
+                type="button"
+                className={selectedCategoryId === category.id ? "active" : ""}
+                onClick={() => handleCategoryChange(category.id)}
               >
-                {category}
+                {category.category_name}
               </button>
             ))}
           </div>
@@ -215,7 +278,7 @@ const Shop = () => {
         </div>
 
         {/* Fetching Indicator */}
-        {isFetching && !isLoading && (
+        {isFetching && !productsLoading && (
           <div className="shop-loading">
             <Loader />
           </div>
@@ -235,7 +298,9 @@ const Shop = () => {
 
               <p>Try another search or category.</p>
 
-              <button onClick={handleClearFilters}>Clear Filters</button>
+              <button type="button" onClick={handleClearFilters}>
+                Clear Filters
+              </button>
             </div>
           )
         )}
