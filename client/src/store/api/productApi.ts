@@ -6,6 +6,7 @@ interface GetProductsParams {
   limit?: number;
   search?: string;
   categoryId?: number;
+  newOnly?: boolean;
 }
 
 export const productApi = baseApi.injectEndpoints({
@@ -21,6 +22,9 @@ export const productApi = baseApi.injectEndpoints({
           }),
           ...(params?.categoryId && {
             categoryId: params.categoryId,
+          }),
+          ...(params?.newOnly && {
+            newOnly: true,
           }),
         },
       }),

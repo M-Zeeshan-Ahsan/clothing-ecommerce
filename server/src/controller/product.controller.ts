@@ -45,6 +45,7 @@ export const createProduct = async (
     next(error);
   }
 };
+
 export const getProducts = async (
   req: Request,
   res: Response,
@@ -56,14 +57,51 @@ export const getProducts = async (
 
     const search = String(req.query.search || "").trim();
 
-    const where = search
-      ? {
-          product_name: {
-            contains: search,
+    const category = String(req.query.category || "").trim();
+
+    const newOnly = req.query.newOnly === "true";
+
+    // =========================
+    // 5 DAYS AGO
+    // =========================
+
+    const fiveDaysAgo = new Date();
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
+    // =========================
+    // WHERE
+    // =========================
+
+    const where = {
+      // Search
+      ...(search && {
+        product_name: {
+          contains: search,
+          mode: "insensitive" as const,
+        },
+      }),
+
+      // Category
+      ...(category && {
+        category: {
+          category_name: {
+            equals: category,
             mode: "insensitive" as const,
           },
-        }
-      : {};
+        },
+      }),
+
+      // New products only
+      ...(newOnly && {
+        createdAt: {
+          gte: fiveDaysAgo,
+        },
+      }),
+    };
+
+    // =========================
+    // GET PRODUCTS
+    // =========================
 
     const products = await prisma.product.findMany({
       where,
@@ -85,11 +123,10 @@ export const getProducts = async (
       },
     });
 
-    // 5 days ago
-    const fiveDaysAgo = new Date();
-    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+    // =========================
+    // PRODUCT DETAILS
+    // =========================
 
-    // Add price details + badge
     const productsWithDetails = products.map((product) => {
       // Convert Prisma Decimal to number
       const price = Number(product.price);
@@ -97,10 +134,10 @@ export const getProducts = async (
       const salePrice =
         product.sale_price !== null ? Number(product.sale_price) : null;
 
-      // Check NEW product
+      // NEW
       const isNew = product.createdAt >= fiveDaysAgo;
 
-      // Check SALE product
+      // SALE
       const isSale = salePrice !== null;
 
       // Current selling price
@@ -115,7 +152,10 @@ export const getProducts = async (
           ? Math.round(((price - salePrice) / price) * 100)
           : 0;
 
-      // Product badge
+      // =========================
+      // BADGE
+      // =========================
+
       let badge: string | null = null;
 
       if (isNew && isSale) {
@@ -129,11 +169,11 @@ export const getProducts = async (
       return {
         ...product,
 
-        // Convert Decimal values for frontend
+        // Decimal → number
         price,
         sale_price: salePrice,
 
-        // Calculated values
+        // Price details
         current_price: currentPrice,
         saved_amount: savedAmount,
         discount_percentage: discountPercentage,
@@ -143,10 +183,17 @@ export const getProducts = async (
       };
     });
 
-    // Total products
+    // =========================
+    // TOTAL
+    // =========================
+
     const total = await prisma.product.count({
       where,
     });
+
+    // =========================
+    // RESPONSE
+    // =========================
 
     return handleResponse(res, 200, "Products fetched successfully", {
       products: productsWithDetails,

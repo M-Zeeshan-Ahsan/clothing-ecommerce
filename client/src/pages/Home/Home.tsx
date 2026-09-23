@@ -21,7 +21,7 @@ const Home = () => {
   const { data, isLoading, error } = useGetProductsQuery({
     page: currentPage,
     limit,
-    search: debouncedSearch,
+    search: debouncedSearch.trim(),
   });
   const products = data?.data.products ?? [];
   const pagination = data?.data.pagination;

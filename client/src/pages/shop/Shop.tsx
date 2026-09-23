@@ -1,53 +1,93 @@
-import { useMemo, useState } from "react";
-import { products } from "../../data/products";
-import ProductCard from "../../components/product/ProductCard";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import useDebounce from "../../hooks/useDebounce";
+import ProductCard from "../../components/product/ProductCard";
+import Pagination from "../../components/common/pagination/Pagination";
+import Loader from "../../components/common/loader/Loader";
+import { useGetProductsQuery } from "../../store/api/productApi";
+import { showToast } from "../../utils/toast";
+import { getApiErrorMessage } from "../../utils/apiError";
+
 import "./Shop.scss";
 
 const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+
   const categoryFromUrl = searchParams.get("category") || "All";
+
   const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
+
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 500);
   const [sortBy, setSortBy] = useState("featured");
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [limit] = useState(12);
 
   const categories = ["All", "Women", "Men", "Lawn", "Boski", "Cotton"];
 
-  const filteredProducts = useMemo(() => {
-    let result = [...products];
+  // =========================
+  // GET PRODUCTS
+  // =========================
 
-    // Category filter
-    if (selectedCategory !== "All") {
-      result = result.filter(
-        (product) =>
-          product.category.toLowerCase() === selectedCategory.toLowerCase(),
-      );
+  const { data, isLoading, isFetching, error } = useGetProductsQuery({
+    page: currentPage,
+    limit,
+    search: debouncedSearch.trim(),
+    // categoryId: selectedCategory === "All" ? undefined : selectedCategory,
+  });
+
+  const products = data?.data.products ?? [];
+  const pagination = data?.data.pagination;
+
+  // =========================
+  // ERROR
+  // =========================
+
+  useEffect(() => {
+    if (error) {
+      showToast(getApiErrorMessage(error), "error");
     }
+  }, [error]);
 
-    // Search filter
-    if (searchTerm.trim()) {
-      result = result.filter((product) =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()),
-      );
-    }
+  // =========================
+  // URL CATEGORY SYNC
+  // =========================
 
-    // Sorting
+  useEffect(() => {
+    setSelectedCategory(categoryFromUrl);
+    setCurrentPage(1);
+  }, [categoryFromUrl]);
+
+  // =========================
+  // SORT PRODUCTS
+  // =========================
+
+  const sortedProducts = [...products].sort((a, b) => {
     if (sortBy === "price-low") {
-      result.sort((a, b) => a.price - b.price);
+      return a.current_price - b.current_price;
     }
 
     if (sortBy === "price-high") {
-      result.sort((a, b) => b.price - a.price);
+      return b.current_price - a.current_price;
     }
 
     if (sortBy === "name") {
-      result.sort((a, b) => a.name.localeCompare(b.name));
+      return a.product_name.localeCompare(b.product_name);
     }
 
-    return result;
-  }, [selectedCategory, searchTerm, sortBy]);
+    return 0;
+  });
+
+  // =========================
+  // CATEGORY CHANGE
+  // =========================
+
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
+
+    setCurrentPage(1);
 
     if (category === "All") {
       setSearchParams({});
@@ -57,6 +97,36 @@ const Shop = () => {
       });
     }
   };
+
+  // =========================
+  // SEARCH CHANGE
+  // =========================
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  // =========================
+  // CLEAR FILTERS
+  // =========================
+
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("All");
+    setSortBy("featured");
+    setCurrentPage(1);
+    setSearchParams({});
+  };
+
+  // =========================
+  // LOADING
+  // =========================
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
     <main className="shop">
       {/* Shop Hero */}
@@ -72,6 +142,7 @@ const Shop = () => {
 
       {/* Products Section */}
       <section className="shop-products">
+        {/* Header */}
         <div className="shop-products__header">
           <div>
             <span>OUR COLLECTION</span>
@@ -82,8 +153,8 @@ const Shop = () => {
           </div>
 
           <p>
-            {filteredProducts.length}{" "}
-            {filteredProducts.length === 1 ? "Product" : "Products"}
+            {pagination?.total ?? 0}{" "}
+            {pagination?.total === 1 ? "Product" : "Products"}
           </p>
         </div>
 
@@ -104,18 +175,19 @@ const Shop = () => {
 
           {/* Search + Sort */}
           <div className="shop-actions">
+            {/* Search */}
             <div className="shop-search">
               <input
                 type="text"
                 placeholder="Search products..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
               />
 
               {searchTerm && (
                 <button
                   type="button"
-                  onClick={() => setSearchTerm("")}
+                  onClick={() => handleSearchChange("")}
                   aria-label="Clear search"
                 >
                   ×
@@ -123,7 +195,14 @@ const Shop = () => {
               )}
             </div>
 
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            {/* Sort */}
+            <select
+              value={sortBy}
+              onChange={(e) => {
+                setSortBy(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
               <option value="featured">Featured</option>
 
               <option value="price-low">Price: Low to High</option>
@@ -135,28 +214,39 @@ const Shop = () => {
           </div>
         </div>
 
+        {/* Fetching Indicator */}
+        {isFetching && !isLoading && (
+          <div className="shop-loading">
+            <Loader />
+          </div>
+        )}
+
         {/* Products */}
-        {filteredProducts.length > 0 ? (
+        {!isFetching && sortedProducts.length > 0 ? (
           <div className="shop-grid">
-            {filteredProducts.map((product) => (
+            {sortedProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
         ) : (
-          <div className="shop-empty">
-            <h3>No products found</h3>
+          !isFetching && (
+            <div className="shop-empty">
+              <h3>No products found</h3>
 
-            <p>Try another search or category.</p>
+              <p>Try another search or category.</p>
 
-            <button
-              onClick={() => {
-                setSearchTerm("");
-                setSelectedCategory("All");
-              }}
-            >
-              Clear Filters
-            </button>
-          </div>
+              <button onClick={handleClearFilters}>Clear Filters</button>
+            </div>
+          )
+        )}
+
+        {/* Pagination */}
+        {!isFetching && sortedProducts.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={pagination?.totalPages ?? 1}
+            onPageChange={setCurrentPage}
+          />
         )}
       </section>
     </main>
