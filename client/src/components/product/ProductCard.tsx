@@ -11,7 +11,9 @@ const ProductCard = ({ product }: Props) => {
     <div className="product-card">
       {/* Product Image */}
       <div className="product-card__image-wrapper">
-        <span className="product-card__badge">New</span>
+        {product.badge && (
+          <span className="product-card__badge">{product.badge}</span>
+        )}
 
         <button
           type="button"

@@ -4,6 +4,7 @@ export interface Product {
   product_image: string;
   categoryId: number;
   price: number;
+  badge:string;
   createdAt: string;
   updatedAt: string;
   category: Category;

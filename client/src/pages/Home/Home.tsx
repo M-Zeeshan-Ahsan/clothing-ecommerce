@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ProductCard from "../../components/product/ProductCard";
 import "./Home.scss";
 import { useOutletContext } from "react-router-dom";
@@ -6,21 +6,28 @@ import { useGetProductsQuery } from "../../store/api/productApi";
 import Loader from "../../components/common/loader/Loader";
 import { showToast } from "../../utils/toast";
 import { getApiErrorMessage } from "../../utils/apiError";
+import Pagination from "../../components/common/pagination/Pagination";
+import useDebounce from "../../hooks/useDebounce";
 interface SearchContext {
   searchTerm: string;
   setSearchTerm: (value: string) => void;
 }
 
 const Home = () => {
-  const { data, isLoading, error } = useGetProductsQuery();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit] = useState(12);
+  const { searchTerm, setSearchTerm } = useOutletContext<SearchContext>();
+  const debouncedSearch = useDebounce(searchTerm, 500);
+  const { data, isLoading, error } = useGetProductsQuery({
+    page: currentPage,
+    limit,
+    search: debouncedSearch,
+  });
   const products = data?.data.products ?? [];
   const pagination = data?.data.pagination;
-  const { searchTerm, setSearchTerm } = useOutletContext<SearchContext>();
+
   const categories = ["All", "Women", "Men", "Lawn", "Boski", "Cotton"];
 
-  const filteredProducts = products.filter((product) =>
-    product.product_name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
   useEffect(() => {
     if (error) {
       showToast(getApiErrorMessage(error), "error");
@@ -57,6 +64,7 @@ const Home = () => {
             <h2>
               {searchTerm ? `Search: ${searchTerm}` : "Shop Our Products"}
             </h2>
+            <p>{pagination?.total ?? 0} Products</p>
           </div>
 
           <div className="category-filter">
@@ -88,9 +96,9 @@ const Home = () => {
         </div>
 
         {/* Products */}
-        {filteredProducts.length > 0 ? (
+        {products.length > 0 ? (
           <div className="products-grid">
-            {filteredProducts.map((product) => (
+            {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
@@ -102,6 +110,11 @@ const Home = () => {
           </div>
         )}
       </section>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={pagination?.totalPages ?? 1}
+        onPageChange={setCurrentPage}
+      />
     </main>
   );
 };
