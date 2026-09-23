@@ -57,7 +57,7 @@ export const getProducts = async (
 
     const search = String(req.query.search || "").trim();
 
-    const category = String(req.query.category || "").trim();
+    const categoryId = Number(req.query.categoryId) || undefined;
 
     const newOnly = req.query.newOnly === "true";
     const saleOnly = req.query.saleOnly === "true";
@@ -82,14 +82,9 @@ export const getProducts = async (
         },
       }),
 
-      // Category
-      ...(category && {
-        category: {
-          category_name: {
-            equals: category,
-            mode: "insensitive" as const,
-          },
-        },
+      // Category ID
+      ...(categoryId && {
+        categoryId,
       }),
 
       // New products only
@@ -99,6 +94,7 @@ export const getProducts = async (
         },
       }),
 
+      // Sale products only
       ...(saleOnly && {
         sale_price: {
           not: null,
@@ -135,33 +131,23 @@ export const getProducts = async (
     // =========================
 
     const productsWithDetails = products.map((product) => {
-      // Convert Prisma Decimal to number
       const price = Number(product.price);
 
       const salePrice =
         product.sale_price !== null ? Number(product.sale_price) : null;
 
-      // NEW
       const isNew = product.createdAt >= fiveDaysAgo;
 
-      // SALE
       const isSale = salePrice !== null;
 
-      // Current selling price
       const currentPrice = salePrice ?? price;
 
-      // Saved amount
       const savedAmount = salePrice !== null ? price - salePrice : 0;
 
-      // Discount percentage
       const discountPercentage =
         salePrice !== null
           ? Math.round(((price - salePrice) / price) * 100)
           : 0;
-
-      // =========================
-      // BADGE
-      // =========================
 
       let badge: string | null = null;
 
@@ -175,17 +161,11 @@ export const getProducts = async (
 
       return {
         ...product,
-
-        // Decimal → number
         price,
         sale_price: salePrice,
-
-        // Price details
         current_price: currentPrice,
         saved_amount: savedAmount,
         discount_percentage: discountPercentage,
-
-        // Badge
         badge,
       };
     });
