@@ -1,6 +1,6 @@
-import type { Product } from "../../data/products";
 import { Link } from "react-router-dom";
 import "./ProductCard.scss";
+import type { Product } from "../../types/product";
 
 interface Props {
   product: Product;
@@ -11,9 +11,7 @@ const ProductCard = ({ product }: Props) => {
     <div className="product-card">
       {/* Product Image */}
       <div className="product-card__image-wrapper">
-        {product.badge && (
-          <span className="product-card__badge">{product.badge}</span>
-        )}
+        <span className="product-card__badge">New</span>
 
         <button
           type="button"
@@ -25,8 +23,8 @@ const ProductCard = ({ product }: Props) => {
 
         <Link to={`/product/${product.id}`}>
           <img
-            src={product.image}
-            alt={product.name}
+            src={product.product_image}
+            alt={product.product_name}
             className="product-card__image"
           />
         </Link>
@@ -38,10 +36,12 @@ const ProductCard = ({ product }: Props) => {
 
       {/* Product Content */}
       <div className="product-card__content">
-        <span className="product-card__category">{product.category}</span>
+        <span className="product-card__category">
+          {product.category.category_name}
+        </span>
 
         <Link to={`/product/${product.id}`} className="product-card__name">
-          {product.name}
+          {product.product_name}
         </Link>
 
         <div className="product-card__bottom">
@@ -52,7 +52,7 @@ const ProductCard = ({ product }: Props) => {
           <button
             type="button"
             className="product-card__cart"
-            aria-label={`Add ${product.name} to cart`}
+            aria-label={`Add ${product.product_name} to cart`}
           >
             +
           </button>

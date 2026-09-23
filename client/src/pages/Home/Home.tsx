@@ -1,23 +1,35 @@
+import { useEffect } from "react";
 import ProductCard from "../../components/product/ProductCard";
-import { products } from "../../data/products";
 import "./Home.scss";
 import { useOutletContext } from "react-router-dom";
-
-
+import { useGetProductsQuery } from "../../store/api/productApi";
+import Loader from "../../components/common/loader/Loader";
+import { showToast } from "../../utils/toast";
+import { getApiErrorMessage } from "../../utils/apiError";
 interface SearchContext {
   searchTerm: string;
   setSearchTerm: (value: string) => void;
 }
 
-
 const Home = () => {
-    const { searchTerm, setSearchTerm } = useOutletContext<SearchContext>();
+  const { data, isLoading, error } = useGetProductsQuery();
+  const products = data?.data.products ?? [];
+  const pagination = data?.data.pagination;
+  const { searchTerm, setSearchTerm } = useOutletContext<SearchContext>();
   const categories = ["All", "Women", "Men", "Lawn", "Boski", "Cotton"];
 
   const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    product.product_name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+  useEffect(() => {
+    if (error) {
+      showToast(getApiErrorMessage(error), "error");
+    }
+  }, [error]);
 
+  if (isLoading) {
+    return <Loader />;
+  }
   return (
     <main className="home">
       {/* Hero */}
