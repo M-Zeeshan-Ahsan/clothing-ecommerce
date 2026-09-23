@@ -7,6 +7,10 @@
     transform: translateY(-5px);
   }
 
+  // =========================
+  // IMAGE
+  // =========================
+
   &__image-wrapper {
     position: relative;
     height: 390px;
@@ -25,18 +29,30 @@
     transform: scale(1.05);
   }
 
+  // =========================
+  // BADGE
+  // =========================
+
   &__badge {
     position: absolute;
     top: 15px;
     left: 15px;
     z-index: 2;
+
     padding: 6px 12px;
+
     background: #111;
     color: #fff;
+
     font-size: 11px;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 1px;
   }
+
+  // =========================
+  // WISHLIST
+  // =========================
 
   &__wishlist {
     position: absolute;
@@ -49,77 +65,84 @@
 
     border: none;
     border-radius: 50%;
+
     background: #fff;
+
     font-size: 20px;
+
     cursor: pointer;
+
+    transition:
+      background 0.2s ease,
+      color 0.2s ease,
+      transform 0.2s ease;
+
+    &:hover {
+      background: #111;
+      color: #fff;
+      transform: scale(1.05);
+    }
   }
+
+  // =========================
+  // QUICK VIEW
+  // =========================
 
   &__quick {
     position: absolute;
     bottom: 0;
     left: 0;
+
     width: 100%;
+
     padding: 13px;
-    border: none;
+
     background: rgba(17, 17, 17, 0.92);
     color: #fff;
+
     cursor: pointer;
+
     transform: translateY(100%);
     transition: transform 0.3s ease;
+
     text-decoration: none !important;
     text-align: center;
+
+    font-size: 13px;
+    letter-spacing: 0.5px;
   }
 
   &:hover &__quick {
     transform: translateY(0);
   }
 
+  // =========================
+  // CONTENT
+  // =========================
+
   &__content {
     padding: 18px 5px;
   }
 
+  // =========================
+  // CATEGORY
+  // =========================
+
   &__category {
+    display: block;
+
     color: #888;
+
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 1px;
   }
 
-  h3 {
-    margin: 7px 0 14px;
-    font-size: 16px;
-    font-weight: 500;
-  }
+  // =========================
+  // PRODUCT NAME
+  // =========================
 
-  &__bottom {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  &__price {
-    font-size: 16px;
-    font-weight: 600;
-  }
-
-  &__cart {
-    width: 35px;
-    height: 35px;
-
-    border: 1px solid #ddd;
-    background: #fff;
-
-    font-size: 20px;
-    cursor: pointer;
-
-    &:hover {
-      background: #111;
-      color: #fff;
-    }
-  }
-}
-.product-card__content {
-  .product-card__name {
+  &__name {
     display: block;
 
     margin: 8px 0 12px;
@@ -130,8 +153,119 @@
     font-size: 15px;
     font-weight: 500;
 
+    transition: opacity 0.2s ease;
+
     &:hover {
       opacity: 0.65;
+    }
+  }
+
+  // =========================
+  // PRICING
+  // =========================
+
+  &__pricing {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 5px;
+  }
+
+  &__prices {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 8px;
+  }
+
+  &__price {
+    color: #111;
+
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  &__old-price {
+    color: #999;
+
+    font-size: 13px;
+    font-weight: 400;
+
+    text-decoration: line-through;
+  }
+
+  // =========================
+  // DISCOUNT
+  // =========================
+
+  &__discount {
+    padding: 4px 7px;
+
+    background: #f3f3f3;
+    color: #111;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+
+  // =========================
+  // SAVING
+  // =========================
+
+  &__saving {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #777;
+
+    font-size: 11px;
+  }
+
+  // =========================
+  // BOTTOM
+  // =========================
+
+  &__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    margin-top: 12px;
+  }
+
+  // =========================
+  // CART BUTTON
+  // =========================
+
+  &__cart {
+    width: 35px;
+    height: 35px;
+
+    border: 1px solid #ddd;
+    background: #fff;
+
+    color: #111;
+
+    font-size: 20px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+      background 0.2s ease,
+      color 0.2s ease;
+
+    &:hover {
+      background: #111;
+      color: #fff;
     }
   }
 }

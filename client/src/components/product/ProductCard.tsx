@@ -7,6 +7,9 @@ interface Props {
 }
 
 const ProductCard = ({ product }: Props) => {
+  const isSale =
+    product.sale_price !== null && product.sale_price !== undefined;
+
   return (
     <div className="product-card">
       {/* Product Image */}
@@ -46,11 +49,36 @@ const ProductCard = ({ product }: Props) => {
           {product.product_name}
         </Link>
 
-        <div className="product-card__bottom">
-          <span className="product-card__price">
-            Rs. {product.price.toLocaleString()}
-          </span>
+        {/* Price */}
+        <div className="product-card__pricing">
+          <div className="product-card__prices">
+            <span className="product-card__price">
+              Rs. {product.current_price.toLocaleString()}
+            </span>
 
+            {isSale && (
+              <span className="product-card__old-price">
+                Rs. {product.price.toLocaleString()}
+              </span>
+            )}
+          </div>
+
+          {isSale && (
+            <span className="product-card__discount">
+              {product.discount_percentage}% OFF
+            </span>
+          )}
+        </div>
+
+        {/* Saved Amount */}
+        {isSale && (
+          <span className="product-card__saving">
+            Save Rs. {product.saved_amount.toLocaleString()}
+          </span>
+        )}
+
+        {/* Bottom */}
+        <div className="product-card__bottom">
           <button
             type="button"
             className="product-card__cart"

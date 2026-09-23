@@ -4,7 +4,11 @@ export interface Product {
   product_image: string;
   categoryId: number;
   price: number;
-  badge:string;
+  sale_price: number;
+  current_price: number;
+  saved_amount: number;
+  discount_percentage: number;
+  badge: string;
   createdAt: string;
   updatedAt: string;
   category: Category;
