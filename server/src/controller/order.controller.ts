@@ -290,7 +290,7 @@ export const createCheckoutOrder = async (
   try {
     const userId = req.user?.id ?? null;
 
-    const { address, items, paymentMethod } = req.body;
+    const { email, address, items, paymentMethod } = req.body;
 
     const productIds = items.map((item: { productId: number }) =>
       Number(item.productId),
@@ -361,6 +361,7 @@ export const createCheckoutOrder = async (
         data: {
           userId,
           addressId: newAddress.id,
+          customerEmail: email || null,
           totalAmount,
           status: "PENDING",
           paymentMethod: "COD",

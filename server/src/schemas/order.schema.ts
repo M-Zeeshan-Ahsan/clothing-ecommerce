@@ -66,4 +66,7 @@ export const checkoutOrderSchema = Joi.object({
     "any.only": "Only Cash on Delivery is available",
     "any.required": "Payment method is required",
   }),
+  email: Joi.string().email().allow("").optional().messages({
+    "string.email": "Please enter a valid email address",
+  }),
 });

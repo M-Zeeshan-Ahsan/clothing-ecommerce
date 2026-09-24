@@ -83,13 +83,14 @@ model CartItem {
 model Order {
   id            Int           @id @default(autoincrement())
   userId        Int?
+  customerEmail String?
   totalAmount   Decimal       @db.Decimal(10, 2)
   status        OrderStatus   @default(PENDING)
   createdAt     DateTime      @default(now())
   paymentMethod PaymentMethod @default(COD)
   updatedAt     DateTime      @updatedAt
   addressId     Int
-  user          User?          @relation(fields: [userId], references: [id])
+  user          User?         @relation(fields: [userId], references: [id])
   items         OrderItem[]
   address       Address       @relation(fields: [addressId], references: [id])
 }
@@ -128,5 +129,5 @@ model Address {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   orders     Order[]
-  user       User?     @relation(fields: [userId], references: [id])
+  user       User?    @relation(fields: [userId], references: [id])
 }

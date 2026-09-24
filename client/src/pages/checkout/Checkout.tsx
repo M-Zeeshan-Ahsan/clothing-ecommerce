@@ -23,6 +23,7 @@ const Checkout = () => {
     address: "",
     city: "",
     postalCode: "",
+    email: "",
   });
 
   const subtotal = cartItems.reduce(
@@ -126,7 +127,18 @@ const Checkout = () => {
                 required
               />
             </div>
+            <div className="checkout__field checkout__field--full">
+              <label htmlFor="email">Email Address</label>
 
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </div>
             <div className="checkout__field checkout__field--full">
               <label htmlFor="address">Complete Address</label>
 
