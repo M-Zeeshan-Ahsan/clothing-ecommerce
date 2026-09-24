@@ -5,22 +5,6 @@ import Loader from "../../components/common/loader/Loader";
 
 import "./Categories.scss";
 
-const categoryImages: Record<string, string> = {
-  men: "https://images.unsplash.com/photo-1603252110481-7ba873bf42ab?auto=format&fit=crop&w=900&q=85",
-
-  women:
-    "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=900&q=85",
-};
-
-const categoryDescriptions: Record<string, string> = {
-  men: "Classic looks for modern men.",
-
-  women: "Elegant styles designed for every occasion.",
-};
-
-const defaultImage =
-  "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=85";
-
 const Categories = () => {
   const { data, isLoading, error } = useGetCategoriesQuery();
 
@@ -74,14 +58,6 @@ const Categories = () => {
 
         <div className="categories__grid">
           {categories.map((category) => {
-            const categoryKey = category.category_name.toLowerCase();
-
-            const image = categoryImages[categoryKey] ?? defaultImage;
-
-            const description =
-              categoryDescriptions[categoryKey] ??
-              `Explore our ${category.category_name} collection.`;
-
             return (
               <Link
                 key={category.id}
@@ -90,7 +66,7 @@ const Categories = () => {
               >
                 <div className="categories__image-wrapper">
                   <img
-                    src={image}
+                    src={category.category_image}
                     alt={category.category_name}
                     className="categories__image"
                   />
@@ -103,7 +79,7 @@ const Categories = () => {
 
                   <h3>{category.category_name}</h3>
 
-                  <p>{description}</p>
+                  <p>{category.category_slogan}</p>
 
                   <span className="categories__link">Shop Collection →</span>
                 </div>

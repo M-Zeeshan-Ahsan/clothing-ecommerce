@@ -13,26 +13,28 @@ datasource db {
 }
 
 model Category {
-  id            Int      @id @default(autoincrement())
-  category_name String   @unique
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  category_name   String   @unique
+  category_image  String?
+  category_slogan String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   products Product[]
 }
 
 model Product {
-  id            Int      @id @default(autoincrement())
-  product_name  String   @unique
+  id            Int         @id @default(autoincrement())
+  product_name  String      @unique
   product_image String
   categoryId    Int
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  price         Decimal  @default(0) @db.Decimal(10, 2)
- sale_price    Decimal?  @db.Decimal(10, 2)
-  category   Category    @relation(fields: [categoryId], references: [id])
-  cartItems  CartItem[]
-  orderItems OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  price         Decimal     @default(0) @db.Decimal(10, 2)
+  sale_price    Decimal?    @db.Decimal(10, 2)
+  category      Category    @relation(fields: [categoryId], references: [id])
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
 }
 
 model User {
