@@ -1,12 +1,19 @@
 import { Link } from "react-router-dom";
 import "./ProductCard.scss";
 import type { Product } from "../../types/product";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { toggleWishlist } from "../../store/slices/wishlistSlice";
 
 interface Props {
   product: Product;
 }
 
 const ProductCard = ({ product }: Props) => {
+  const dispatch = useAppDispatch();
+  const wishlistItems = useAppSelector((state) => state.wishlist.items);
+
+  const isWishlisted = wishlistItems.some((item) => item.id === product.id);
+
   const isSale =
     product.sale_price !== null && product.sale_price !== undefined;
 
@@ -20,12 +27,14 @@ const ProductCard = ({ product }: Props) => {
 
         <button
           type="button"
-          className="product-card__wishlist"
-          aria-label="Add to wishlist"
+          className={`product-card__wishlist ${
+            isWishlisted ? "product-card__wishlist--active" : ""
+          }`}
+          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          onClick={() => dispatch(toggleWishlist(product))}
         >
-          ♡
+          {isWishlisted ? "♥" : "♡"}
         </button>
-
         <Link to={`/product/${product.id}`}>
           <img
             src={product.product_image}

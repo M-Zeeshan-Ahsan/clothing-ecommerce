@@ -3,10 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import type { TypedUseSelectorHook } from "react-redux";
 import { baseApi } from "./api/baseApi";
 import cartReducer from "./slices/cartSlice";
+import wishlistReducer from "./slices/wishlistSlice";
 
 export const store = configureStore({
   reducer: {
     cart: cartReducer,
+    wishlist: wishlistReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

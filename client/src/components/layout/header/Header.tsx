@@ -17,7 +17,8 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
   const handleSearchToggle = () => {
     setSearchOpen((prev) => !prev);
   };
-
+  const wishlistItems = useAppSelector((state) => state.wishlist.items);
+  const wishlistCount = wishlistItems.length;
   const handleSearchClose = () => {
     setSearchOpen(false);
     setSearchTerm("");
@@ -63,11 +64,28 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
           </button>
 
           {/* Wishlist */}
-          <button className="header__action" aria-label="Wishlist">
+          <Link
+            to="/wishlist"
+            className={`header__action header__wishlist ${
+              wishlistCount > 0 ? "header__wishlist--active" : ""
+            }`}
+            aria-label="Wishlist"
+          >
             <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M20.8 8.6c0 5.5-8.8 10.4-8.8 10.4S3.2 14.1 3.2 8.6C3.2 5.5 5.3 3.5 8 3.5c1.7 0 3.2.8 4 2.1.8-1.3 2.3-2.1 4-2.1 2.7 0 4.8 2 4.8 5.1Z" />
+              {wishlistCount > 0 ? (
+                <path
+                  d="M20.8 8.6c0 5.5-8.8 10.4-8.8 10.4S3.2 14.1 3.2 8.6C3.2 5.5 5.3 3.5 8 3.5c1.7 0 3.2.8 4 2.1.8-1.3 2.3-2.1 4-2.1 2.7 0 4.8 2 4.8 5.1Z"
+                  fill="currentColor"
+                />
+              ) : (
+                <path d="M20.8 8.6c0 5.5-8.8 10.4-8.8 10.4S3.2 14.1 3.2 8.6C3.2 5.5 5.3 3.5 8 3.5c1.7 0 3.2.8 4 2.1.8-1.3 2.3-2.1 4-2.1 2.7 0 4.8 2 4.8 5.1Z" />
+              )}
             </svg>
-          </button>
+
+            {wishlistCount > 0 && (
+              <span className="header__wishlist-count">{wishlistCount}</span>
+            )}
+          </Link>
 
           {/* Cart */}
           <Link
