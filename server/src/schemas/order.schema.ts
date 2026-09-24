@@ -30,7 +30,9 @@ export const checkoutOrderSchema = Joi.object({
       "any.required": "Phone number is required",
       "string.empty": "Phone number is required",
     }),
-
+    email: Joi.string().email().allow("").optional().messages({
+      "string.email": "Please enter a valid email address",
+    }),
     address: Joi.string().trim().required().messages({
       "any.required": "Complete address is required",
       "string.empty": "Complete address is required",
@@ -65,8 +67,5 @@ export const checkoutOrderSchema = Joi.object({
   paymentMethod: Joi.string().valid("COD").required().messages({
     "any.only": "Only Cash on Delivery is available",
     "any.required": "Payment method is required",
-  }),
-  email: Joi.string().email().allow("").optional().messages({
-    "string.email": "Please enter a valid email address",
   }),
 });

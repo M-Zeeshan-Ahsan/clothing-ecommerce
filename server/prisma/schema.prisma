@@ -83,7 +83,6 @@ model CartItem {
 model Order {
   id            Int           @id @default(autoincrement())
   userId        Int?
-  customerEmail String?
   totalAmount   Decimal       @db.Decimal(10, 2)
   status        OrderStatus   @default(PENDING)
   createdAt     DateTime      @default(now())
@@ -123,6 +122,7 @@ model Address {
   userId     Int?
   fullName   String
   phone      String
+  email String?
   address    String
   city       String
   postalCode String?
