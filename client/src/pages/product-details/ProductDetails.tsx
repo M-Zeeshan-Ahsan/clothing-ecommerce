@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { useAppDispatch } from "../../store/store";
 import { addToCart } from "../../store/slices/cartSlice";
@@ -12,6 +12,8 @@ import "./ProductDetails.scss";
 
 const ProductDetails = () => {
   const { id } = useParams();
+
+  const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
 
@@ -70,6 +72,23 @@ const ProductDetails = () => {
     }
 
     setQuantity(1);
+  };
+
+  const handleBuyNow = () => {
+    for (let i = 0; i < quantity; i++) {
+      dispatch(
+        addToCart({
+          id: product.id,
+          name: product.product_name,
+          price: product.current_price,
+          image: product.product_image,
+          category: product.category.category_name,
+          badge: product.badge ?? undefined,
+        }),
+      );
+    }
+
+    navigate("/checkout");
   };
 
   const totalPrice = product.current_price * quantity;
@@ -167,7 +186,11 @@ const ProductDetails = () => {
               Add to Cart
             </button>
 
-            <button type="button" className="product-details__buy">
+            <button
+              type="button"
+              className="product-details__buy"
+              onClick={handleBuyNow}
+            >
               Buy Now
             </button>
           </div>

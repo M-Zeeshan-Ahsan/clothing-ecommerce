@@ -10,13 +10,29 @@ interface CartState {
   items: CartItem[];
 }
 
+const getInitialCart = (): CartItem[] => {
+  try {
+    const cart = localStorage.getItem("cart");
+
+    return cart ? JSON.parse(cart) : [];
+  } catch {
+    return [];
+  }
+};
+
 const initialState: CartState = {
-  items: [],
+  items: getInitialCart(),
+};
+
+const saveCart = (items: CartItem[]) => {
+  localStorage.setItem("cart", JSON.stringify(items));
 };
 
 const cartSlice = createSlice({
   name: "cart",
+
   initialState,
+
   reducers: {
     addToCart: (state, action: PayloadAction<Product>) => {
       const existingItem = state.items.find(
@@ -31,12 +47,16 @@ const cartSlice = createSlice({
           quantity: 1,
         });
       }
+
+      saveCart(state.items);
     },
 
     removeFromCart: (state, action: PayloadAction<number>) => {
       state.items = state.items.filter(
         (item) => item.product.id !== action.payload,
       );
+
+      saveCart(state.items);
     },
 
     increaseQuantity: (state, action: PayloadAction<number>) => {
@@ -47,6 +67,8 @@ const cartSlice = createSlice({
       if (item) {
         item.quantity += 1;
       }
+
+      saveCart(state.items);
     },
 
     decreaseQuantity: (state, action: PayloadAction<number>) => {
@@ -63,10 +85,14 @@ const cartSlice = createSlice({
           );
         }
       }
+
+      saveCart(state.items);
     },
 
     clearCart: (state) => {
       state.items = [];
+
+      saveCart(state.items);
     },
   },
 });
