@@ -264,8 +264,17 @@ export const getSpecificProduct = async (
 ) => {
   try {
     const { id } = req.params;
+
     const productId = Number(id);
-    const result = await prisma.product.findUnique({
+
+    if (!productId) {
+      throw new ApiError(400, "Invalid product ID");
+    }
+
+    const fiveDaysAgo = new Date();
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
+    const product = await prisma.product.findUnique({
       where: {
         id: productId,
       },
@@ -279,11 +288,51 @@ export const getSpecificProduct = async (
       },
     });
 
-    if (!result) {
+    if (!product) {
       throw new ApiError(404, "Product not found");
     }
 
-    return handleResponse(res, 200, "Product fetched successfully", result);
+    const price = Number(product.price);
+
+    const salePrice =
+      product.sale_price !== null ? Number(product.sale_price) : null;
+
+    const isNew = product.createdAt >= fiveDaysAgo;
+    const isSale = salePrice !== null;
+
+    const currentPrice = salePrice ?? price;
+
+    const savedAmount = salePrice !== null ? price - salePrice : 0;
+
+    const discountPercentage =
+      salePrice !== null ? Math.round(((price - salePrice) / price) * 100) : 0;
+
+    let badge: string | null = null;
+
+    if (isNew && isSale) {
+      badge = "NEW & SALE";
+    } else if (isNew) {
+      badge = "NEW";
+    } else if (isSale) {
+      badge = "SALE";
+    }
+
+    const productWithDetails = {
+      ...product,
+      price,
+      sale_price: salePrice,
+      current_price: currentPrice,
+      saved_amount: savedAmount,
+      discount_percentage: discountPercentage,
+      badge,
+    };
+
+    return handleResponse(
+      res,
+      200,
+      "Product fetched successfully",
+      productWithDetails,
+    );
   } catch (error) {
     next(error);
   }

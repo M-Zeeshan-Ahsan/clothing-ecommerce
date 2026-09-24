@@ -1,25 +1,46 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+
 import { useAppDispatch } from "../../store/store";
 import { addToCart } from "../../store/slices/cartSlice";
-import { products } from "../../data/products";
+
+import { useGetProductByIdQuery } from "../../store/api/productApi";
+
+import Loader from "../../components/common/loader/Loader";
 
 import "./ProductDetails.scss";
 
 const ProductDetails = () => {
   const { id } = useParams();
+
   const dispatch = useAppDispatch();
 
-  const product = products.find((item) => item.id === Number(id));
+  const productId = Number(id);
+
+  const { data, isLoading, isFetching, error } = useGetProductByIdQuery(
+    productId,
+    {
+      skip: !productId,
+    },
+  );
+
+  const product = data?.data;
 
   const [quantity, setQuantity] = useState(1);
 
-  if (!product) {
+  if (isLoading || isFetching) {
+    return <Loader />;
+  }
+
+  if (error || !product) {
     return (
       <main className="product-details product-details--not-found">
         <h2>Product Not Found</h2>
 
-        <p>The product you're looking for doesn't exist.</p>
+        <p>
+          The product you're looking for doesn't exist or is no longer
+          available.
+        </p>
 
         <Link to="/shop">Back to Shop</Link>
       </main>
@@ -36,24 +57,37 @@ const ProductDetails = () => {
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
-      dispatch(addToCart(product));
+      dispatch(
+        addToCart({
+          id: product.id,
+          name: product.product_name,
+          price: product.current_price,
+          image: product.product_image,
+          category: product.category.category_name,
+          badge: product.badge ?? undefined,
+        }),
+      );
     }
 
     setQuantity(1);
   };
 
-  const totalPrice = product.price * quantity;
+  const totalPrice = product.current_price * quantity;
+
+  const isSale = product.sale_price !== null;
 
   return (
     <main className="product-details">
       <div className="product-details__breadcrumb">
         <Link to="/">Home</Link>
+
         <span>/</span>
 
         <Link to="/shop">Shop</Link>
+
         <span>/</span>
 
-        <span>{product.name}</span>
+        <span>{product.product_name}</span>
       </div>
 
       <section className="product-details__container">
@@ -63,24 +97,41 @@ const ProductDetails = () => {
           )}
 
           <img
-            src={product.image}
-            alt={product.name}
+            src={product.product_image}
+            alt={product.product_name}
             className="product-details__image"
           />
         </div>
 
         <div className="product-details__info">
-          <span className="product-details__category">{product.category}</span>
+          <span className="product-details__category">
+            {product.category.category_name}
+          </span>
 
-          <h1>{product.name}</h1>
+          <h1>{product.product_name}</h1>
 
           <div className="product-details__price">
-            Rs. {product.price.toLocaleString()}
+            <strong>Rs. {product.current_price.toLocaleString()}</strong>
+
+            {isSale && <del>Rs. {product.price.toLocaleString()}</del>}
+
+            {isSale && (
+              <span className="product-details__discount">
+                {product.discount_percentage}% OFF
+              </span>
+            )}
           </div>
 
+          {isSale && (
+            <p className="product-details__saving">
+              Save Rs. {product.saved_amount.toLocaleString()}
+            </p>
+          )}
+
           <p className="product-details__description">
-            Discover premium quality and timeless style with our {product.name}.
-            Carefully selected for comfort, quality and everyday elegance.
+            Discover premium quality and timeless style with our{" "}
+            {product.product_name}. Carefully selected for comfort, quality and
+            everyday elegance.
           </p>
 
           <div className="product-details__divider" />
