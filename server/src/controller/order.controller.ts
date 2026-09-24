@@ -281,3 +281,114 @@ export const getAllOrders = async (
     next(error);
   }
 };
+
+export const createCheckoutOrder = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.user?.id ?? null;
+
+    const { address, items, paymentMethod } = req.body;
+
+    const productIds = items.map((item: { productId: number }) =>
+      Number(item.productId),
+    );
+
+    const products = await prisma.product.findMany({
+      where: {
+        id: {
+          in: productIds,
+        },
+      },
+    });
+
+    if (products.length !== productIds.length) {
+      throw new ApiError(400, "One or more products are no longer available");
+    }
+
+    let subtotal = 0;
+
+    const orderItems: {
+      productId: number;
+      quantity: number;
+      price: (typeof products)[number]["price"];
+    }[] = items.map((item: { productId: number; quantity: number }) => {
+      const product = products.find(
+        (product) => product.id === Number(item.productId),
+      );
+
+      if (!product) {
+        throw new ApiError(404, "Product not found");
+      }
+
+      const quantity = Number(item.quantity);
+
+      const currentPrice =
+        product.sale_price !== null
+          ? Number(product.sale_price)
+          : Number(product.price);
+
+      subtotal += currentPrice * quantity;
+
+      return {
+        productId: product.id,
+        quantity,
+        price: product.sale_price !== null ? product.sale_price : product.price,
+      };
+    });
+
+    const shippingFee = 199;
+
+    const totalAmount = subtotal + shippingFee;
+
+    const order = await prisma.$transaction(async (tx) => {
+      // Create Address
+      const newAddress = await tx.address.create({
+        data: {
+          userId,
+          fullName: address.fullName,
+          phone: address.phone,
+          address: address.address,
+          city: address.city,
+          postalCode: address.postalCode || null,
+        },
+      });
+
+      // Create Order
+      const newOrder = await tx.order.create({
+        data: {
+          userId,
+          addressId: newAddress.id,
+          totalAmount,
+          status: "PENDING",
+          paymentMethod: "COD",
+        },
+      });
+
+      // Create Order Items
+      await tx.orderItem.createMany({
+        data: orderItems.map((item) => ({
+          orderId: newOrder.id,
+          productId: item.productId,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+      });
+
+      return newOrder;
+    });
+
+    return handleResponse(res, 201, "Order placed successfully", {
+      order,
+      shippingAddress: address,
+      paymentMethod: "COD",
+      subtotal,
+      shippingFee,
+      totalAmount,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
