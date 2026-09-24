@@ -12,6 +12,10 @@ import Categories from "../pages/categories/Categories";
 import Wishlist from "../pages/wishlist/Wishlist";
 import OrderSuccess from "../pages/orders/OrderSuccess";
 import Contact from "../pages/contact/Contact";
+import Terms from "../pages/terms/Terms";
+import Privacy from "../pages/privacy/Privacy";
+import Shipping from "../pages/shipping/Shipping";
+import ReturnExchange from "../pages/return-exchange/ReturnExchange";
 import AdminRoutes from "./AdminRoutes";
 
 const AppRoutes = () => {
@@ -59,6 +63,22 @@ const AppRoutes = () => {
         {
           path: "/contact",
           element: <Contact />,
+        },
+        {
+          path: "/terms",
+          element: <Terms />,
+        },
+        {
+          path: "/privacy-policy",
+          element: <Privacy />,
+        },
+        {
+          path: "/shipping",
+          element: <Shipping />,
+        },
+        {
+          path: "/returns",
+          element: <ReturnExchange />,
         },
         {
           path: "/order-success/:id",
