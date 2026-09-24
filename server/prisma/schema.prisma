@@ -131,3 +131,12 @@ model Address {
   orders     Order[]
   user       User?    @relation(fields: [userId], references: [id])
 }
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String?
+  phone     String
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -11,6 +11,7 @@ import Sale from "../pages/sale/Sale";
 import Categories from "../pages/categories/Categories";
 import Wishlist from "../pages/wishlist/Wishlist";
 import OrderSuccess from "../pages/orders/OrderSuccess";
+import Contact from "../pages/contact/Contact";
 import AdminRoutes from "./AdminRoutes";
 
 const AppRoutes = () => {
@@ -54,6 +55,10 @@ const AppRoutes = () => {
         {
           path: "/wishlist",
           element: <Wishlist />,
+        },
+        {
+          path: "/contact",
+          element: <Contact />,
         },
         {
           path: "/order-success/:id",
