@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "../../../store/store";
 
 import { logout } from "../../../store/slices/authSlice";
 import { showToast } from "../../../utils/toast";
+import { baseApi } from "../../../store/api/baseApi";
 
 interface HeaderProps {
   searchTerm: string;
@@ -44,7 +45,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
 
   const handleLogout = () => {
     dispatch(logout());
-
+    dispatch(baseApi.util.resetApiState());
     showToast("Logged out successfully", "success");
 
     setMenuOpen(false);
