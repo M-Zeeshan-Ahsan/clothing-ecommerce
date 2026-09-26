@@ -16,6 +16,8 @@ import Terms from "../pages/terms/Terms";
 import Privacy from "../pages/privacy/Privacy";
 import Shipping from "../pages/shipping/Shipping";
 import ReturnExchange from "../pages/return-exchange/ReturnExchange";
+import Login from "../pages/auth/Login";
+import Register from "../pages/auth/Register";
 import AdminRoutes from "./AdminRoutes";
 
 const AppRoutes = () => {
@@ -24,6 +26,14 @@ const AppRoutes = () => {
     {
       element: <MainLayout />,
       children: [
+        {
+          path: "/register",
+          element: <Register />,
+        },
+        {
+          path: "/login",
+          element: <Login />,
+        },
         {
           path: "/",
           element: <Home />,
