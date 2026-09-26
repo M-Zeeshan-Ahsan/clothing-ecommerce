@@ -19,6 +19,8 @@ import ReturnExchange from "../pages/return-exchange/ReturnExchange";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import Profile from "../pages/profile/Profile";
+import Orders from "../pages/orders/Orders";
+import OrderDetails from "../pages/orders/OrderDetails";
 import AdminRoutes from "./AdminRoutes";
 
 const AppRoutes = () => {
@@ -90,6 +92,14 @@ const AppRoutes = () => {
         {
           path: "/shipping",
           element: <Shipping />,
+        },
+        {
+          path: "/orders",
+          element: <Orders />,
+        },
+        {
+          path: "/orders/:id",
+          element: <OrderDetails />,
         },
         {
           path: "/returns",

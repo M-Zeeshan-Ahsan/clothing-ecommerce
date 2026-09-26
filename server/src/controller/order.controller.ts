@@ -134,6 +134,7 @@ export const getOrderById = async (
     const order = await prisma.order.findFirst({
       where: { id: orderId, userId },
       include: {
+        address: true,
         items: {
           include: {
             product: true,

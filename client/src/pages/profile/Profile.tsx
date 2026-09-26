@@ -86,9 +86,9 @@ const Profile = () => {
 
         {/* Account Actions */}
         <section className="profile-page__actions">
-          {/* <button onClick={() => navigate("/orders")}>My Orders</button>
+          <button onClick={() => navigate("/orders")}>My Orders</button>
 
-          <button onClick={() => navigate("/wishlist")}>My Wishlist</button> */}
+          {/* <button onClick={() => navigate("/wishlist")}>My Wishlist</button> */}
 
           <button onClick={() => navigate("/")}>Continue Shopping</button>
         </section>
