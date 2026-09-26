@@ -25,6 +25,7 @@ import Orders from "../pages/orders/Orders";
 import OrderDetails from "../pages/orders/OrderDetails";
 
 import AdminRoutes from "./AdminRoutes";
+import AdminLogin from "../pages/admin/auth/AdminLogin";
 import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes = () => {
@@ -124,7 +125,8 @@ const AppRoutes = () => {
         },
       ],
     },
-
+    // Admin Login
+    { path: "/admin/login", element: <AdminLogin /> },
     // Admin Routes
     ...AdminRoutes,
 
