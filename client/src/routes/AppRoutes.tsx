@@ -1,6 +1,7 @@
 import { useRoutes } from "react-router-dom";
 
 import MainLayout from "../layouts/MainLayout";
+
 import Home from "../pages/Home/Home";
 import Shop from "../pages/shop/Shop";
 import ProductDetails from "../pages/product-details/ProductDetails";
@@ -16,12 +17,15 @@ import Terms from "../pages/terms/Terms";
 import Privacy from "../pages/privacy/Privacy";
 import Shipping from "../pages/shipping/Shipping";
 import ReturnExchange from "../pages/return-exchange/ReturnExchange";
+
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import Profile from "../pages/profile/Profile";
 import Orders from "../pages/orders/Orders";
 import OrderDetails from "../pages/orders/OrderDetails";
+
 import AdminRoutes from "./AdminRoutes";
+import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes = () => {
   const routes = useRoutes([
@@ -37,10 +41,27 @@ const AppRoutes = () => {
           path: "/login",
           element: <Login />,
         },
+
+        // Protected Customer Routes
         {
-          path: "/profile",
-          element: <Profile />,
+          element: <ProtectedRoute />,
+          children: [
+            {
+              path: "/profile",
+              element: <Profile />,
+            },
+            {
+              path: "/orders",
+              element: <Orders />,
+            },
+            {
+              path: "/orders/:id",
+              element: <OrderDetails />,
+            },
+          ],
         },
+
+        // Public Customer Routes
         {
           path: "/",
           element: <Home />,
@@ -92,14 +113,6 @@ const AppRoutes = () => {
         {
           path: "/shipping",
           element: <Shipping />,
-        },
-        {
-          path: "/orders",
-          element: <Orders />,
-        },
-        {
-          path: "/orders/:id",
-          element: <OrderDetails />,
         },
         {
           path: "/returns",
