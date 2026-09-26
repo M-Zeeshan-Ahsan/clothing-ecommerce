@@ -1,21 +1,54 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
+import { useLoginMutation } from "../../../store/api/authApi";
+import { login } from "../../../store/slices/authSlice";
+import { showToast } from "../../../utils/toast";
+import { getApiErrorMessage } from "../../../utils/apiError";
 
 import "./AdminLogin.scss";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [loginUser, { isLoading }] = useLoginMutation();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log({
-      email,
-      password,
-    });
+    try {
+      const response = await loginUser({
+        email,
+        password,
+      }).unwrap();
+
+      const { user, accessToken } = response.data;
+
+      // Only ADMIN can access admin panel
+      if (user.role !== "ADMIN") {
+        showToast("Access denied. Admin account required.", "error");
+
+        return;
+      }
+
+      dispatch(
+        login({
+          user,
+          accessToken,
+        }),
+      );
+
+      showToast("Admin logged in successfully", "success");
+
+      navigate("/admin");
+    } catch (error) {
+      showToast(getApiErrorMessage(error), "error");
+    }
   };
 
   return (
@@ -42,6 +75,7 @@ const AdminLogin = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -55,11 +89,16 @@ const AdminLogin = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
 
-          <button type="submit" className="admin-login__button">
-            Sign In
+          <button
+            type="submit"
+            className="admin-login__button"
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing In..." : "Sign In"}
           </button>
         </form>
 
@@ -67,6 +106,7 @@ const AdminLogin = () => {
           type="button"
           className="admin-login__back"
           onClick={() => navigate("/")}
+          disabled={isLoading}
         >
           ← Back to Store
         </button>
