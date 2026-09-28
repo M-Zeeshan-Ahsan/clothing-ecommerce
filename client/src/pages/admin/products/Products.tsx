@@ -7,11 +7,12 @@ import {
   useGetProductsQuery,
   useDeleteProductMutation,
 } from "../../../store/api/productApi";
-
+import useDebounce from "../../../hooks/useDebounce";
 import { useGetCategoriesQuery } from "../../../store/api/categoryApi";
 
 import { showToast } from "../../../utils/toast";
 import { getApiErrorMessage } from "../../../utils/apiError";
+import Loader from "../../../components/common/loader/Loader";
 
 import "./Product.scss";
 
@@ -25,7 +26,7 @@ const Products = () => {
   // =========================
 
   const [searchTerm, setSearchTerm] = useState("");
-
+  const debouncedSearch = useDebounce(searchTerm, 500);
   const [selectedCategoryId, setSelectedCategoryId] = useState<
     number | undefined
   >(undefined);
@@ -53,7 +54,7 @@ const Products = () => {
   } = useGetProductsQuery({
     page: currentPage,
     limit: PRODUCTS_PER_PAGE,
-    search: searchTerm.trim(),
+    search: debouncedSearch.trim(),
     categoryId: selectedCategoryId,
   });
 
@@ -120,11 +121,7 @@ const Products = () => {
   // =========================
 
   if (productsLoading || categoriesLoading) {
-    return (
-      <div className="admin-products">
-        <p>Loading products...</p>
-      </div>
-    );
+    return <Loader />;
   }
 
   // =========================

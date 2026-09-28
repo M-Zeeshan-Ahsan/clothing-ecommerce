@@ -59,7 +59,12 @@ export const updateProductSchema = Joi.object({
     "any.required": "Product name is required",
     "string.base": "Product name must be a string",
   }),
-
+  product_image: Joi.string().trim().uri().required().messages({
+    "string.empty": "Product image URL is required",
+    "string.uri": "Product image must be a valid URL",
+    "any.required": "Product image URL is required",
+    "string.base": "Product image must be a string",
+  }),
   categoryId: Joi.number().integer().positive().required().messages({
     "number.base": "Category ID must be a number",
     "number.integer": "Category ID must be an integer",
