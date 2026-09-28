@@ -29,7 +29,19 @@ export const getCategory = async (
   next: NextFunction,
 ) => {
   try {
-    const result = await prisma.category.findMany();
+    const result = await prisma.category.findMany({
+      include: {
+        _count: {
+          select: {
+            products: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
     return handleResponse(res, 200, "Category fetched successfully", result);
   } catch (error) {
     next(error);
@@ -83,18 +95,9 @@ export const updateCategory = async (
   try {
     const { id } = req.params;
     const categoryId = Number(id);
-    const products = await prisma.product.findMany({
-      where: {
-        categoryId: categoryId,
-      },
-    });
-    if (products.length > 0) {
-      throw new ApiError(
-        400,
-        "Cannot update category with associated products",
-      );
-    }
+
     const { category_name, category_image, category_slogan } = req.body;
+
     const result = await prisma.category.findUnique({
       where: {
         id: categoryId,

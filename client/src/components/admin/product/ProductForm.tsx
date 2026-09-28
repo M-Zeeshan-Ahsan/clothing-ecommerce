@@ -3,38 +3,49 @@ import { useNavigate } from "react-router-dom";
 
 import ImageUpload from "../../common/image-upload/ImageUpload";
 
+import { useGetCategoriesQuery } from "../../../store/api/categoryApi";
+
 import "./ProductForm.scss";
 
 export interface ProductFormData {
   name: string;
   category: string;
   price: string;
-  stock: string;
+  salePrice: string;
   imageUrl: string;
   imageFile: File | null;
-  description: string;
 }
 
 interface ProductFormProps {
   mode: "add" | "edit";
   initialData?: ProductFormData;
   onSubmit: (data: ProductFormData) => void;
+  isSubmitting?: boolean;
 }
 
 const emptyForm: ProductFormData = {
   name: "",
   category: "",
   price: "",
-  stock: "",
+  salePrice: "",
   imageUrl: "",
   imageFile: null,
-  description: "",
 };
 
-const ProductForm = ({ mode, initialData, onSubmit }: ProductFormProps) => {
+const ProductForm = ({
+  mode,
+  initialData,
+  onSubmit,
+  isSubmitting = false,
+}: ProductFormProps) => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<ProductFormData>(emptyForm);
+
+  const { data: categoriesResponse, isLoading: isCategoriesLoading } =
+    useGetCategoriesQuery();
+
+  const categories = categoriesResponse?.data ?? [];
 
   useEffect(() => {
     if (initialData) {
@@ -45,9 +56,7 @@ const ProductForm = ({ mode, initialData, onSubmit }: ProductFormProps) => {
   }, [initialData]);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
 
@@ -123,14 +132,19 @@ const ProductForm = ({ mode, initialData, onSubmit }: ProductFormProps) => {
               value={formData.category}
               onChange={handleChange}
               required
+              disabled={isCategoriesLoading}
             >
-              <option value="">Select category</option>
+              <option value="">
+                {isCategoriesLoading
+                  ? "Loading categories..."
+                  : "Select category"}
+              </option>
 
-              <option value="Lawn">Lawn</option>
-              <option value="Boski">Boski</option>
-              <option value="Cotton">Cotton</option>
-              <option value="Men">Men</option>
-              <option value="Wash Wear">Wash Wear</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.category_name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -142,7 +156,7 @@ const ProductForm = ({ mode, initialData, onSubmit }: ProductFormProps) => {
               type="number"
               name="price"
               placeholder="Enter price"
-              min="0"
+              min="1"
               value={formData.price}
               onChange={handleChange}
               required
@@ -150,20 +164,21 @@ const ProductForm = ({ mode, initialData, onSubmit }: ProductFormProps) => {
           </div>
         </div>
 
-        {/* Stock */}
+        {/* Sale Price */}
         <div className="product-form__group">
-          <label htmlFor="stock">Stock</label>
+          <label htmlFor="salePrice">Sale Price</label>
 
           <input
-            id="stock"
+            id="salePrice"
             type="number"
-            name="stock"
-            placeholder="Enter stock quantity"
-            min="0"
-            value={formData.stock}
+            name="salePrice"
+            placeholder="Enter sale price (optional)"
+            min="1"
+            value={formData.salePrice}
             onChange={handleChange}
-            required
           />
+
+          <small>Sale price must be less than the original price.</small>
         </div>
 
         {/* Image */}
@@ -171,20 +186,6 @@ const ProductForm = ({ mode, initialData, onSubmit }: ProductFormProps) => {
           <label>Product Image</label>
 
           <ImageUpload value={formData.imageUrl} onChange={handleImageChange} />
-        </div>
-
-        {/* Description */}
-        <div className="product-form__group">
-          <label htmlFor="description">Description</label>
-
-          <textarea
-            id="description"
-            name="description"
-            placeholder="Enter product description"
-            value={formData.description}
-            onChange={handleChange}
-            rows={6}
-          />
         </div>
 
         {/* Actions */}
@@ -197,8 +198,16 @@ const ProductForm = ({ mode, initialData, onSubmit }: ProductFormProps) => {
             Cancel
           </button>
 
-          <button type="submit" className="product-form__submit">
-            {mode === "add" ? "Add Product" : "Update Product"}
+          <button
+            type="submit"
+            className="product-form__submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting
+              ? "Saving..."
+              : mode === "add"
+                ? "Add Product"
+                : "Update Product"}
           </button>
         </div>
       </form>

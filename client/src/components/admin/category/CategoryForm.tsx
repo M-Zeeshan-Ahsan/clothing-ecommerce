@@ -4,26 +4,30 @@ import { useNavigate } from "react-router-dom";
 import "./CategoryForm.scss";
 
 export interface CategoryFormData {
-  name: string;
-  slug: string;
-  status: "Active" | "Inactive";
-  description: string;
+  category_name: string;
+  category_image: string;
+  category_slogan: string;
 }
 
 interface CategoryFormProps {
   mode: "add" | "edit";
   initialData?: CategoryFormData;
   onSubmit: (data: CategoryFormData) => void;
+  isLoading?: boolean;
 }
 
 const emptyForm: CategoryFormData = {
-  name: "",
-  slug: "",
-  status: "Active",
-  description: "",
+  category_name: "",
+  category_image: "",
+  category_slogan: "",
 };
 
-const CategoryForm = ({ mode, initialData, onSubmit }: CategoryFormProps) => {
+const CategoryForm = ({
+  mode,
+  initialData,
+  onSubmit,
+  isLoading = false,
+}: CategoryFormProps) => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<CategoryFormData>(emptyForm);
@@ -37,9 +41,7 @@ const CategoryForm = ({ mode, initialData, onSubmit }: CategoryFormProps) => {
   }, [initialData]);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
 
@@ -88,71 +90,60 @@ const CategoryForm = ({ mode, initialData, onSubmit }: CategoryFormProps) => {
           </div>
 
           <div className="category-form__row">
-            {/* Name */}
+            {/* Category Name */}
             <div className="category-form__group">
-              <label htmlFor="name">
+              <label htmlFor="category_name">
                 Category Name
                 <span>*</span>
               </label>
 
               <input
-                id="name"
-                name="name"
+                id="category_name"
+                name="category_name"
                 type="text"
                 placeholder="e.g. Lawn"
-                value={formData.name}
+                value={formData.category_name}
                 onChange={handleChange}
                 required
               />
             </div>
 
-            {/* Slug */}
+            {/* Category Image */}
             <div className="category-form__group">
-              <label htmlFor="slug">
-                Slug
+              <label htmlFor="category_image">
+                Category Image
                 <span>*</span>
               </label>
 
               <input
-                id="slug"
-                name="slug"
+                id="category_image"
+                name="category_image"
                 type="text"
-                placeholder="e.g. lawn"
-                value={formData.slug}
+                placeholder="Enter image URL"
+                value={formData.category_image}
                 onChange={handleChange}
                 required
               />
 
-              <small>Used in URLs. Example: lawn, cotton, boski</small>
+              <small>Example: https://example.com/lawn.jpg</small>
             </div>
           </div>
 
-          {/* Status */}
+          {/* Category Slogan */}
           <div className="category-form__group">
-            <label htmlFor="status">Status</label>
+            <label htmlFor="category_slogan">
+              Category Slogan
+              <span>*</span>
+            </label>
 
-            <select
-              id="status"
-              name="status"
-              value={formData.status}
+            <input
+              id="category_slogan"
+              name="category_slogan"
+              type="text"
+              placeholder="e.g. Elegant lawn collection"
+              value={formData.category_slogan}
               onChange={handleChange}
-            >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
-          </div>
-
-          {/* Description */}
-          <div className="category-form__group">
-            <label htmlFor="description">Description</label>
-
-            <textarea
-              id="description"
-              name="description"
-              rows={5}
-              placeholder="Write a short description..."
-              value={formData.description}
-              onChange={handleChange}
+              required
             />
           </div>
         </div>
@@ -163,12 +154,23 @@ const CategoryForm = ({ mode, initialData, onSubmit }: CategoryFormProps) => {
             type="button"
             className="category-form__cancel"
             onClick={() => navigate("/admin/categories")}
+            disabled={isLoading}
           >
             Cancel
           </button>
 
-          <button type="submit" className="category-form__submit">
-            {mode === "add" ? "Add Category" : "Update Category"}
+          <button
+            type="submit"
+            className="category-form__submit"
+            disabled={isLoading}
+          >
+            {isLoading
+              ? mode === "add"
+                ? "Adding..."
+                : "Updating..."
+              : mode === "add"
+                ? "Add Category"
+                : "Update Category"}
           </button>
         </div>
       </form>

@@ -1,49 +1,145 @@
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 import ProductForm, {
   type ProductFormData,
 } from "../../../components/admin/product/ProductForm";
 
+import {
+  useGetProductByIdQuery,
+  useUpdateProductMutation,
+} from "../../../store/api/productApi";
+
+import { useUploadImageMutation } from "../../../store/api/uploadApi";
+
+import { getApiErrorMessage } from "../../../utils/apiError";
+import { showToast } from "../../../utils/toast";
+
 const EditProduct = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
-  // Temporary data.
-  // Later this product will come from API.
-  const product: ProductFormData = {
-    name: "Nishat Boski Suit",
-    category: "Boski",
-    price: "5480",
-    stock: "12",
+  const productId = Number(id);
 
-    imageUrl:
-      "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=600&q=80",
+  // =========================
+  // GET PRODUCT
+  // =========================
 
-    imageFile: null,
+  const {
+    data: productResponse,
+    isLoading: isProductLoading,
+    isError: isProductError,
+  } = useGetProductByIdQuery(productId, {
+    skip: !id || Number.isNaN(productId),
+  });
 
-    description: "Premium quality Nishat Boski suit.",
+  // =========================
+  // UPLOAD IMAGE
+  // =========================
+
+  const [uploadImage, { isLoading: isUploading }] = useUploadImageMutation();
+
+  // =========================
+  // UPDATE PRODUCT
+  // =========================
+
+  const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
+
+  // =========================
+  // PRODUCT DATA
+  // =========================
+
+  const product = productResponse?.data;
+
+  // =========================
+  // UPDATE
+  // =========================
+
+  const handleUpdateProduct = async (data: ProductFormData) => {
+    try {
+      let imageUrl = data.imageUrl;
+
+      // =========================
+      // NEW IMAGE
+      // =========================
+
+      if (data.imageFile) {
+        const formData = new FormData();
+
+        formData.append("image", data.imageFile);
+
+        const uploadResponse = await uploadImage(formData).unwrap();
+
+        imageUrl = uploadResponse.data.url;
+      }
+
+      // =========================
+      // UPDATE PRODUCT
+      // =========================
+
+      await updateProduct({
+        id: productId,
+
+        product_name: data.name,
+        product_image: imageUrl,
+        categoryId: Number(data.category),
+        price: Number(data.price),
+
+        sale_price: data.salePrice !== "" ? Number(data.salePrice) : null,
+      }).unwrap();
+
+      // =========================
+      // SUCCESS
+      // =========================
+
+      showToast("Product updated successfully", "success");
+
+      navigate("/admin/products");
+    } catch (error) {
+      console.error("Update product error:", error);
+
+      showToast(getApiErrorMessage(error), "error");
+    }
   };
 
-  const handleUpdateProduct = (data: ProductFormData) => {
-    console.log("Product ID:", id);
-    console.log("Update Product Data:", data);
+  // =========================
+  // LOADING
+  // =========================
 
-    if (data.imageFile) {
-      console.log("New Image File:", data.imageFile);
-    }
+  if (isProductLoading) {
+    return <p>Loading product...</p>;
+  }
 
-    // If imageFile exists:
-    // 1. Upload new image to AWS
-    // 2. Get AWS URL
-    // 3. Update product with new URL
+  // =========================
+  // ERROR
+  // =========================
 
-    // PUT /api/admin/products/:id
+  if (isProductError || !product) {
+    return <p>Product not found.</p>;
+  }
+
+  // =========================
+  // INITIAL DATA
+  // =========================
+
+  const initialData: ProductFormData = {
+    name: product.product_name,
+    category: String(product.categoryId),
+    price: String(product.price),
+    salePrice:
+      product.sale_price !== null && product.sale_price !== undefined
+        ? String(product.sale_price)
+        : "",
+    imageUrl: product.product_image,
+    imageFile: null,
   };
 
   return (
     <ProductForm
       mode="edit"
-      initialData={product}
+      initialData={initialData}
       onSubmit={handleUpdateProduct}
+      isSubmitting={isUploading || isUpdating}
     />
   );
 };

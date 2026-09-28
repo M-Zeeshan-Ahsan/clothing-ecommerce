@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useGetDashboardStatsQuery } from "../../../store/api/dashboardApi";
 import { getApiErrorMessage } from "../../../utils/apiError";
+import Loader from "../../../components/common/loader/Loader";
 
 import "./Dashboard.scss";
 
@@ -20,7 +21,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="admin-dashboard__loading">Loading dashboard...</div>
+        {/* <div className="admin-dashboard__loading">Loading dashboard...</div> */}
+        <Loader />
       </div>
     );
   }
