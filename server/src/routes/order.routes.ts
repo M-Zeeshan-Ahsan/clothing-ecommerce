@@ -3,7 +3,6 @@ import {
   createOrder,
   getOrders,
   getOrderById,
-  updateOrderStatus,
   cancelOrder,
   createCheckoutOrder,
 } from "../controller/order.controller.js";
@@ -26,13 +25,7 @@ router.post(
 );
 router.get("/", verifyToken, getOrders);
 router.get("/:id", verifyToken, validate(idSchema), getOrderById);
-router.put(
-  "/:id",
-  verifyToken,
-  validate(idSchema, "params"),
-  validate(orderStatusSchema),
-  updateOrderStatus,
-);
+
 router.put(
   "/:id/cancel",
   verifyToken,

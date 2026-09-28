@@ -1,133 +1,48 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Pagination from "../../../components/common/pagination/Pagination";
 
+import { useGetAdminOrdersQuery } from "../../../store/api/orderApi";
+
+import { showToast } from "../../../utils/toast";
+import { getApiErrorMessage } from "../../../utils/apiError";
+
 import "./Orders.scss";
 
-interface AdminOrder {
-  id: number;
-  orderNumber: string;
-  customer: string;
-  email: string;
-  items: number;
-  total: number;
-  payment: "COD";
-  status: "Pending" | "Confirmed" | "Shipped" | "Delivered" | "Cancelled";
-  date: string;
-}
-
-const dummyOrders: AdminOrder[] = [
-  {
-    id: 1,
-    orderNumber: "#ORD-1001",
-    customer: "Ayesha Khan",
-    email: "ayesha@example.com",
-    items: 2,
-    total: 10960,
-    payment: "COD",
-    status: "Pending",
-    date: "20 Sep 2026",
-  },
-  {
-    id: 2,
-    orderNumber: "#ORD-1002",
-    customer: "Sara Ahmed",
-    email: "sara@example.com",
-    items: 1,
-    total: 4200,
-    payment: "COD",
-    status: "Confirmed",
-    date: "19 Sep 2026",
-  },
-  {
-    id: 3,
-    orderNumber: "#ORD-1003",
-    customer: "Fatima Ali",
-    email: "fatima@example.com",
-    items: 3,
-    total: 14500,
-    payment: "COD",
-    status: "Shipped",
-    date: "18 Sep 2026",
-  },
-  {
-    id: 4,
-    orderNumber: "#ORD-1004",
-    customer: "Hina Malik",
-    email: "hina@example.com",
-    items: 2,
-    total: 8900,
-    payment: "COD",
-    status: "Delivered",
-    date: "17 Sep 2026",
-  },
-  {
-    id: 5,
-    orderNumber: "#ORD-1005",
-    customer: "Maham Raza",
-    email: "maham@example.com",
-    items: 1,
-    total: 5480,
-    payment: "COD",
-    status: "Cancelled",
-    date: "16 Sep 2026",
-  },
-  {
-    id: 6,
-    orderNumber: "#ORD-1006",
-    customer: "Zara Noor",
-    email: "zara@example.com",
-    items: 2,
-    total: 8400,
-    payment: "COD",
-    status: "Pending",
-    date: "15 Sep 2026",
-  },
-  {
-    id: 7,
-    orderNumber: "#ORD-1007",
-    customer: "Sana Iqbal",
-    email: "sana@example.com",
-    items: 1,
-    total: 3450,
-    payment: "COD",
-    status: "Delivered",
-    date: "14 Sep 2026",
-  },
-];
-
-const ORDERS_PER_PAGE = 5;
+const ORDERS_PER_PAGE = 10;
 
 const Orders = () => {
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
+
+  const [statusFilter, setStatusFilter] = useState("ALL");
+
   const [currentPage, setCurrentPage] = useState(1);
 
-  const filteredOrders = useMemo(() => {
-    return dummyOrders.filter((order) => {
-      const search = searchTerm.toLowerCase();
+  const {
+    data: orderData,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+  } = useGetAdminOrdersQuery({
+    page: currentPage,
+    limit: ORDERS_PER_PAGE,
+    search: searchTerm.trim(),
+    status: statusFilter,
+  });
 
-      const matchesSearch =
-        order.orderNumber.toLowerCase().includes(search) ||
-        order.customer.toLowerCase().includes(search) ||
-        order.email.toLowerCase().includes(search);
+  const orders = orderData?.data.orders ?? [];
 
-      const matchesStatus =
-        statusFilter === "All" || order.status === statusFilter;
+  const pagination = orderData?.data.pagination;
 
-      return matchesSearch && matchesStatus;
-    });
-  }, [searchTerm, statusFilter]);
-
-  const totalPages = Math.ceil(filteredOrders.length / ORDERS_PER_PAGE);
-
-  const paginatedOrders = filteredOrders.slice(
-    (currentPage - 1) * ORDERS_PER_PAGE,
-    currentPage * ORDERS_PER_PAGE,
-  );
+  useEffect(() => {
+    if (isError) {
+      showToast(getApiErrorMessage(error), "error");
+    }
+  }, [isError, error]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -139,17 +54,28 @@ const Orders = () => {
     setCurrentPage(1);
   };
 
+  if (isLoading) {
+    return (
+      <div className="admin-orders">
+        <p>Loading orders...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="admin-orders">
       {/* Header */}
+
       <div className="admin-orders__header">
         <div>
           <h1>Orders</h1>
+
           <p>Manage customer orders</p>
         </div>
       </div>
 
       {/* Filters */}
+
       <div className="admin-orders__filters">
         <div className="admin-orders__search">
           <span>⌕</span>
@@ -160,19 +86,45 @@ const Orders = () => {
             value={searchTerm}
             onChange={handleSearch}
           />
+
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm("");
+                setCurrentPage(1);
+              }}
+            >
+              ×
+            </button>
+          )}
         </div>
 
         <select value={statusFilter} onChange={handleStatusFilter}>
-          <option value="All">All Status</option>
-          <option value="Pending">Pending</option>
-          <option value="Confirmed">Confirmed</option>
-          <option value="Shipped">Shipped</option>
-          <option value="Delivered">Delivered</option>
-          <option value="Cancelled">Cancelled</option>
+          <option value="ALL">All Status</option>
+
+          <option value="PENDING">Pending</option>
+
+          <option value="CONFIRMED">Confirmed</option>
+
+          <option value="SHIPPED">Shipped</option>
+
+          <option value="DELIVERED">Delivered</option>
+
+          <option value="CANCELLED">Cancelled</option>
         </select>
       </div>
 
+      {/* Updating */}
+
+      {isFetching && (
+        <div className="admin-orders__loading">
+          <p>Updating orders...</p>
+        </div>
+      )}
+
       {/* Table */}
+
       <div className="admin-orders__table-wrapper">
         <table className="admin-orders__table">
           <thead>
@@ -189,77 +141,95 @@ const Orders = () => {
           </thead>
 
           <tbody>
-            {paginatedOrders.length > 0 ? (
-              paginatedOrders.map((order) => (
-                <tr key={order.id}>
-                  {/* Order */}
-                  <td>
-                    <strong className="admin-orders__order-number">
-                      {order.orderNumber}
-                    </strong>
-                  </td>
+            {orders.length > 0 ? (
+              orders.map((order) => {
+                const customerName =
+                  order.user?.name ?? order.address?.fullName ?? "Guest";
 
-                  {/* Customer */}
-                  <td>
-                    <div className="admin-orders__customer">
-                      <div className="admin-orders__avatar">
-                        {order.customer.charAt(0)}
+                const customerEmail =
+                  order.user?.email ?? order.address?.email ?? "No email";
+
+                const totalItems = order.items.reduce(
+                  (total, item) => total + item.quantity,
+                  0,
+                );
+
+                return (
+                  <tr key={order.id}>
+                    <td>
+                      <strong className="admin-orders__order-number">
+                        #ORD-{order.id}
+                      </strong>
+                    </td>
+
+                    <td>
+                      <div className="admin-orders__customer">
+                        <div className="admin-orders__avatar">
+                          {customerName.charAt(0).toUpperCase()}
+                        </div>
+
+                        <div>
+                          <strong>{customerName}</strong>
+
+                          <span>{customerEmail}</span>
+                        </div>
                       </div>
+                    </td>
 
-                      <div>
-                        <strong>{order.customer}</strong>
-                        <span>{order.email}</span>
-                      </div>
-                    </div>
-                  </td>
+                    <td>{totalItems}</td>
 
-                  {/* Items */}
-                  <td>{order.items}</td>
+                    <td>
+                      <strong>
+                        Rs. {Number(order.totalAmount).toLocaleString()}
+                      </strong>
+                    </td>
 
-                  {/* Total */}
-                  <td>
-                    <strong>Rs. {order.total.toLocaleString()}</strong>
-                  </td>
+                    <td>
+                      <span className="admin-orders__payment">
+                        {order.paymentMethod}
+                      </span>
+                    </td>
 
-                  {/* Payment */}
-                  <td>
-                    <span className="admin-orders__payment">
-                      {order.payment}
-                    </span>
-                  </td>
-
-                  {/* Status */}
-                  <td>
-                    <span
-                      className={`admin-orders__status ${order.status
-                        .toLowerCase()
-                        .replace(" ", "-")}`}
-                    >
-                      {order.status}
-                    </span>
-                  </td>
-
-                  {/* Date */}
-                  <td>{order.date}</td>
-
-                  {/* Actions */}
-                  <td>
-                    <div className="admin-orders__actions">
-                      <button
-                        type="button"
-                        title="View Order"
-                        onClick={() => navigate(`/admin/orders/${order.id}`)}
+                    <td>
+                      <span
+                        className={`admin-orders__status ${order.status
+                          .toLowerCase()
+                          .replace(" ", "-")}`}
                       >
-                        👁
-                      </button>
+                        {order.status}
+                      </span>
+                    </td>
 
-                      <button type="button" title="Edit Status">
-                        ✎
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+                    <td>
+                      {new Date(order.createdAt).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </td>
+
+                    <td>
+                      <div className="admin-orders__actions">
+                        <button
+                          type="button"
+                          title="View Order"
+                          onClick={() => navigate(`/admin/orders/${order.id}`)}
+                        >
+                          👁
+                        </button>
+
+                        <button
+                          type="button"
+                          title="Edit Status"
+                          onClick={() => navigate(`/admin/orders/${order.id}`)}
+                        >
+                          ✎
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan={8} className="admin-orders__empty">
@@ -272,22 +242,20 @@ const Orders = () => {
       </div>
 
       {/* Footer */}
+
       <div className="admin-orders__footer">
-        Showing{" "}
-        {paginatedOrders.length > 0
-          ? `${(currentPage - 1) * ORDERS_PER_PAGE + 1}-${
-              (currentPage - 1) * ORDERS_PER_PAGE + paginatedOrders.length
-            }`
-          : 0}{" "}
-        of {filteredOrders.length} orders
+        Showing {orders.length} of {pagination?.total ?? 0} orders
       </div>
 
       {/* Pagination */}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+
+      {!isFetching && orders.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={pagination?.totalPages ?? 1}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </div>
   );
 };

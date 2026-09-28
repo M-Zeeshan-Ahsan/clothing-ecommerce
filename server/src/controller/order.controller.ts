@@ -151,19 +151,19 @@ export const getOrderById = async (
   }
 };
 
-export const updateOrderStatus = async (
+export const updateAdminOrderStatus = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const { id } = req.params;
-    const orderId = Number(id);
+    const orderId = Number(req.params.id);
     const { status } = req.body;
-    const userId = req.user!.id;
 
-    const order = await prisma.order.findFirst({
-      where: { id: orderId, userId },
+    const order = await prisma.order.findUnique({
+      where: {
+        id: orderId,
+      },
     });
 
     if (!order) {
@@ -171,8 +171,12 @@ export const updateOrderStatus = async (
     }
 
     const updatedOrder = await prisma.order.update({
-      where: { id: orderId },
-      data: { status },
+      where: {
+        id: orderId,
+      },
+      data: {
+        status,
+      },
     });
 
     return handleResponse(
@@ -228,20 +232,150 @@ export const cancelOrder = async (
     next(error);
   }
 };
+
 export const getAllOrders = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    const page = Math.max(Number(req.query.page) || 1, 1);
+
+    const limit = Math.max(Number(req.query.limit) || 10, 1);
+
+    const search =
+      typeof req.query.search === "string" ? req.query.search.trim() : "";
+
+    const status = typeof req.query.status === "string" ? req.query.status : "";
 
     const skip = (page - 1) * limit;
-    const take = limit;
+
+    // =========================
+    // WHERE CONDITION
+    // =========================
+
+    const where: {
+      status?: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+      OR?: Array<{
+        id?: number;
+        user?: {
+          name?: {
+            contains: string;
+            mode: "insensitive";
+          };
+          email?: {
+            contains: string;
+            mode: "insensitive";
+          };
+        };
+        address?: {
+          fullName?: {
+            contains: string;
+            mode: "insensitive";
+          };
+          email?: {
+            contains: string;
+            mode: "insensitive";
+          };
+        };
+      }>;
+    } = {};
+
+    // =========================
+    // STATUS FILTER
+    // =========================
+
+    if (
+      status === "PENDING" ||
+      status === "CONFIRMED" ||
+      status === "SHIPPED" ||
+      status === "DELIVERED" ||
+      status === "CANCELLED"
+    ) {
+      where.status = status;
+    }
+
+    // =========================
+    // SEARCH
+    // =========================
+
+    if (search) {
+      const searchConditions: Array<{
+        id?: number;
+        user?: {
+          name?: {
+            contains: string;
+            mode: "insensitive";
+          };
+          email?: {
+            contains: string;
+            mode: "insensitive";
+          };
+        };
+        address?: {
+          fullName?: {
+            contains: string;
+            mode: "insensitive";
+          };
+          email?: {
+            contains: string;
+            mode: "insensitive";
+          };
+        };
+      }> = [
+        {
+          user: {
+            name: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
+        {
+          user: {
+            email: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
+        {
+          address: {
+            fullName: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
+        {
+          address: {
+            email: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
+      ];
+
+      const orderId = Number(search);
+
+      if (!Number.isNaN(orderId)) {
+        searchConditions.push({
+          id: orderId,
+        });
+      }
+
+      where.OR = searchConditions;
+    }
+
+    // =========================
+    // GET ORDERS + TOTAL
+    // =========================
 
     const [orders, total] = await Promise.all([
       prisma.order.findMany({
+        where,
+
         include: {
           user: {
             select: {
@@ -250,21 +384,27 @@ export const getAllOrders = async (
               email: true,
             },
           },
+
           address: true,
+
           items: {
             include: {
               product: true,
             },
           },
         },
+
         orderBy: {
           createdAt: "desc",
         },
+
         skip,
-        take,
+        take: limit,
       }),
 
-      prisma.order.count(),
+      prisma.order.count({
+        where,
+      }),
     ]);
 
     const totalPages = Math.ceil(total / limit);
@@ -390,6 +530,50 @@ export const createCheckoutOrder = async (
       shippingFee,
       totalAmount,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAdminOrderById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+
+    const orderId = Number(id);
+
+    const order = await prisma.order.findUnique({
+      where: {
+        id: orderId,
+      },
+
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+
+        address: true,
+
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new ApiError(404, "Order not found");
+    }
+
+    return handleResponse(res, 200, "Order fetched successfully", order);
   } catch (error) {
     next(error);
   }
