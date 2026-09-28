@@ -85,20 +85,8 @@
     > strong {
       display: block;
 
-      margin-bottom: 10px;
-
       font-size: 25px;
       font-weight: 500;
-    }
-
-    small {
-      font-size: 10px;
-      color: #888;
-
-      b {
-        color: #16803c;
-        font-weight: 600;
-      }
     }
   }
 
@@ -122,6 +110,10 @@
 
     border: 1px solid #eee;
   }
+
+  // =====================
+  // Section Header
+  // =====================
 
   &__section-header {
     display: flex;
@@ -149,11 +141,24 @@
       font-weight: 500;
     }
 
-    a {
+    button {
+      padding: 0;
+
+      border: none;
+
+      background: transparent;
+
       color: #111;
 
       font-size: 11px;
+
       text-decoration: underline;
+
+      cursor: pointer;
+
+      &:hover {
+        color: #666;
+      }
     }
   }
 
@@ -193,6 +198,53 @@
 
       tbody tr:last-child td {
         border-bottom: none;
+      }
+    }
+  }
+
+  // =====================
+  // Empty Orders
+  // =====================
+
+  &__empty-orders {
+    min-height: 180px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    gap: 12px;
+
+    text-align: center;
+
+    p {
+      margin: 0;
+
+      font-size: 13px;
+
+      color: #888;
+    }
+
+    button {
+      padding: 9px 16px;
+
+      border: 1px solid #222;
+
+      background: #222;
+
+      color: #fff;
+
+      font-size: 11px;
+
+      cursor: pointer;
+
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #fff;
+
+        color: #222;
       }
     }
   }
@@ -257,13 +309,59 @@
 
       span {
         font-size: 12px;
+
         color: #777;
       }
 
       strong {
         font-size: 15px;
+
         font-weight: 500;
       }
+    }
+  }
+
+  // =====================
+  // Loading
+  // =====================
+
+  &__loading {
+    padding: 60px 20px;
+
+    text-align: center;
+
+    font-size: 13px;
+
+    color: #777;
+  }
+
+  // =====================
+  // Error
+  // =====================
+
+  &__error {
+    padding: 40px 20px;
+
+    background: #fff;
+
+    border: 1px solid #eee;
+
+    text-align: center;
+
+    h2 {
+      margin: 0 0 8px;
+
+      font-size: 18px;
+
+      font-weight: 500;
+    }
+
+    p {
+      margin: 0;
+
+      font-size: 13px;
+
+      color: #888;
     }
   }
 
@@ -288,7 +386,9 @@
   @media (max-width: 768px) {
     &__heading {
       align-items: flex-start;
+
       flex-direction: column;
+
       gap: 8px;
     }
 
@@ -299,6 +399,14 @@
     &__orders,
     &__summary {
       padding: 18px;
+    }
+
+    &__section-header {
+      align-items: flex-start;
+    }
+
+    &__table-wrapper {
+      margin: 0 -5px;
     }
   }
 }
