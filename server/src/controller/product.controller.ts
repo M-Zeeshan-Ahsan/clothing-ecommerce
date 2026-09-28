@@ -9,28 +9,43 @@ export const createProduct = async (
   next: NextFunction,
 ) => {
   try {
-    const { product_name, product_image, categoryId, price } = req.body;
+    const { product_name, product_image, categoryId, price, sale_price } =
+      req.body;
+
     const category = await prisma.category.findUnique({
       where: {
         id: categoryId,
       },
     });
+
     if (!category) {
       throw new ApiError(404, "Category not found");
     }
+
+    if (
+      sale_price !== undefined &&
+      sale_price !== null &&
+      sale_price >= price
+    ) {
+      throw new ApiError(400, "Sale price must be less than original price");
+    }
+
     const result = await prisma.product.create({
       data: {
         product_name,
         product_image,
         categoryId,
         price,
+        sale_price,
       },
     });
+
     return handleResponse(res, 201, "Product added successfully", result);
   } catch (error) {
     next(error);
   }
 };
+
 export const getProducts = async (
   req: Request,
   res: Response,
@@ -40,9 +55,67 @@ export const getProducts = async (
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
 
+    const search = String(req.query.search || "").trim();
+
+    const categoryId = Number(req.query.categoryId) || undefined;
+
+    const newOnly = req.query.newOnly === "true";
+    const saleOnly = req.query.saleOnly === "true";
+
+    // =========================
+    // 5 DAYS AGO
+    // =========================
+
+    const fiveDaysAgo = new Date();
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
+    // =========================
+    // WHERE
+    // =========================
+
+    const where = {
+      // Search
+      ...(search && {
+        product_name: {
+          contains: search,
+          mode: "insensitive" as const,
+        },
+      }),
+
+      // Category ID
+      ...(categoryId && {
+        categoryId,
+      }),
+
+      // New products only
+      ...(newOnly && {
+        createdAt: {
+          gte: fiveDaysAgo,
+        },
+      }),
+
+      // Sale products only
+      ...(saleOnly && {
+        sale_price: {
+          not: null,
+        },
+      }),
+    };
+
+    // =========================
+    // GET PRODUCTS
+    // =========================
+
     const products = await prisma.product.findMany({
+      where,
+
       skip: (page - 1) * limit,
       take: limit,
+
+      orderBy: {
+        createdAt: "desc",
+      },
+
       include: {
         category: {
           select: {
@@ -53,10 +126,65 @@ export const getProducts = async (
       },
     });
 
-    const total = await prisma.product.count();
+    // =========================
+    // PRODUCT DETAILS
+    // =========================
+
+    const productsWithDetails = products.map((product) => {
+      const price = Number(product.price);
+
+      const salePrice =
+        product.sale_price !== null ? Number(product.sale_price) : null;
+
+      const isNew = product.createdAt >= fiveDaysAgo;
+
+      const isSale = salePrice !== null;
+
+      const currentPrice = salePrice ?? price;
+
+      const savedAmount = salePrice !== null ? price - salePrice : 0;
+
+      const discountPercentage =
+        salePrice !== null
+          ? Math.round(((price - salePrice) / price) * 100)
+          : 0;
+
+      let badge: string | null = null;
+
+      if (isNew && isSale) {
+        badge = "NEW & SALE";
+      } else if (isNew) {
+        badge = "NEW";
+      } else if (isSale) {
+        badge = "SALE";
+      }
+
+      return {
+        ...product,
+        price,
+        sale_price: salePrice,
+        current_price: currentPrice,
+        saved_amount: savedAmount,
+        discount_percentage: discountPercentage,
+        badge,
+      };
+    });
+
+    // =========================
+    // TOTAL
+    // =========================
+
+    const total = await prisma.product.count({
+      where,
+    });
+
+    // =========================
+    // RESPONSE
+    // =========================
 
     return handleResponse(res, 200, "Products fetched successfully", {
-      products,
+      products: productsWithDetails,
+
       pagination: {
         page,
         limit,
@@ -136,8 +264,17 @@ export const getSpecificProduct = async (
 ) => {
   try {
     const { id } = req.params;
+
     const productId = Number(id);
-    const result = await prisma.product.findUnique({
+
+    if (!productId) {
+      throw new ApiError(400, "Invalid product ID");
+    }
+
+    const fiveDaysAgo = new Date();
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
+    const product = await prisma.product.findUnique({
       where: {
         id: productId,
       },
@@ -151,11 +288,51 @@ export const getSpecificProduct = async (
       },
     });
 
-    if (!result) {
+    if (!product) {
       throw new ApiError(404, "Product not found");
     }
 
-    return handleResponse(res, 200, "Product fetched successfully", result);
+    const price = Number(product.price);
+
+    const salePrice =
+      product.sale_price !== null ? Number(product.sale_price) : null;
+
+    const isNew = product.createdAt >= fiveDaysAgo;
+    const isSale = salePrice !== null;
+
+    const currentPrice = salePrice ?? price;
+
+    const savedAmount = salePrice !== null ? price - salePrice : 0;
+
+    const discountPercentage =
+      salePrice !== null ? Math.round(((price - salePrice) / price) * 100) : 0;
+
+    let badge: string | null = null;
+
+    if (isNew && isSale) {
+      badge = "NEW & SALE";
+    } else if (isNew) {
+      badge = "NEW";
+    } else if (isSale) {
+      badge = "SALE";
+    }
+
+    const productWithDetails = {
+      ...product,
+      price,
+      sale_price: salePrice,
+      current_price: currentPrice,
+      saved_amount: savedAmount,
+      discount_percentage: discountPercentage,
+      badge,
+    };
+
+    return handleResponse(
+      res,
+      200,
+      "Product fetched successfully",
+      productWithDetails,
+    );
   } catch (error) {
     next(error);
   }

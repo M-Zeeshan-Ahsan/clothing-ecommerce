@@ -9,10 +9,12 @@ export const createCategory = async (
   next: NextFunction,
 ) => {
   try {
-    const { category_name } = req.body;
+    const { category_name, category_image, category_slogan } = req.body;
     const result = await prisma.category.create({
       data: {
         category_name,
+        category_image,
+        category_slogan,
       },
     });
     return handleResponse(res, 201, "Category added successfully", result);
@@ -92,7 +94,7 @@ export const updateCategory = async (
         "Cannot update category with associated products",
       );
     }
-    const { category_name } = req.body;
+    const { category_name, category_image, category_slogan } = req.body;
     const result = await prisma.category.findUnique({
       where: {
         id: categoryId,
@@ -109,6 +111,8 @@ export const updateCategory = async (
       },
       data: {
         category_name,
+        category_image,
+        category_slogan,
       },
     });
 

@@ -83,6 +83,11 @@
       font-size: 38px;
       font-weight: 500;
     }
+    p {
+      margin-top: 8px;
+      color: #888;
+      font-size: 14px;
+    }
   }
 }
 
@@ -98,6 +103,11 @@
     cursor: pointer;
 
     &:hover {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+    }
+    &.active {
       background: #111;
       color: #fff;
       border-color: #111;

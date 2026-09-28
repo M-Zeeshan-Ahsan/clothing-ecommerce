@@ -1,12 +1,22 @@
-import type { Product } from "../../data/products";
 import { Link } from "react-router-dom";
 import "./ProductCard.scss";
+import type { Product } from "../../types/product";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { toggleWishlist } from "../../store/slices/wishlistSlice";
 
 interface Props {
   product: Product;
 }
 
 const ProductCard = ({ product }: Props) => {
+  const dispatch = useAppDispatch();
+  const wishlistItems = useAppSelector((state) => state.wishlist.items);
+
+  const isWishlisted = wishlistItems.some((item) => item.id === product.id);
+
+  const isSale =
+    product.sale_price !== null && product.sale_price !== undefined;
+
   return (
     <div className="product-card">
       {/* Product Image */}
@@ -17,16 +27,18 @@ const ProductCard = ({ product }: Props) => {
 
         <button
           type="button"
-          className="product-card__wishlist"
-          aria-label="Add to wishlist"
+          className={`product-card__wishlist ${
+            isWishlisted ? "product-card__wishlist--active" : ""
+          }`}
+          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          onClick={() => dispatch(toggleWishlist(product))}
         >
-          ♡
+          {isWishlisted ? "♥" : "♡"}
         </button>
-
         <Link to={`/product/${product.id}`}>
           <img
-            src={product.image}
-            alt={product.name}
+            src={product.product_image}
+            alt={product.product_name}
             className="product-card__image"
           />
         </Link>
@@ -38,21 +50,48 @@ const ProductCard = ({ product }: Props) => {
 
       {/* Product Content */}
       <div className="product-card__content">
-        <span className="product-card__category">{product.category}</span>
+        <span className="product-card__category">
+          {product.category.category_name}
+        </span>
 
         <Link to={`/product/${product.id}`} className="product-card__name">
-          {product.name}
+          {product.product_name}
         </Link>
 
-        <div className="product-card__bottom">
-          <span className="product-card__price">
-            Rs. {product.price.toLocaleString()}
-          </span>
+        {/* Price */}
+        <div className="product-card__pricing">
+          <div className="product-card__prices">
+            <span className="product-card__price">
+              Rs. {product.current_price.toLocaleString()}
+            </span>
 
+            {isSale && (
+              <span className="product-card__old-price">
+                Rs. {product.price.toLocaleString()}
+              </span>
+            )}
+          </div>
+
+          {isSale && (
+            <span className="product-card__discount">
+              {product.discount_percentage}% OFF
+            </span>
+          )}
+        </div>
+
+        {/* Saved Amount */}
+        {isSale && (
+          <span className="product-card__saving">
+            Save Rs. {product.saved_amount.toLocaleString()}
+          </span>
+        )}
+
+        {/* Bottom */}
+        <div className="product-card__bottom">
           <button
             type="button"
             className="product-card__cart"
-            aria-label={`Add ${product.name} to cart`}
+            aria-label={`Add ${product.product_name} to cart`}
           >
             +
           </button>

@@ -22,6 +22,8 @@
     color: #555;
     text-decoration: none;
 
+    transition: color 0.2s ease;
+
     &:hover {
       color: #111;
     }
@@ -35,7 +37,6 @@
 .product-details__container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-
   gap: 70px;
 
   align-items: start;
@@ -68,6 +69,10 @@
   }
 }
 
+/* =========================
+   Badge
+========================= */
+
 .product-details__badge {
   position: absolute;
 
@@ -82,6 +87,8 @@
   color: #fff;
 
   font-size: 11px;
+  font-weight: 500;
+
   letter-spacing: 1px;
   text-transform: uppercase;
 }
@@ -95,6 +102,8 @@
 }
 
 .product-details__category {
+  display: inline-block;
+
   color: #888;
 
   font-size: 11px;
@@ -112,12 +121,67 @@
   line-height: 1.15;
 }
 
-.product-details__price {
-  font-size: 24px;
-  font-weight: 500;
+/* =========================
+   Price
+========================= */
 
-  margin-bottom: 25px;
+.product-details__price {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  margin-bottom: 8px;
+
+  strong {
+    color: #111;
+
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  del {
+    color: #999;
+
+    font-size: 16px;
+    font-weight: 400;
+  }
 }
+
+/* =========================
+   Discount
+========================= */
+
+.product-details__discount {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 5px 9px;
+
+  background: #f5f5f5;
+  color: #111;
+
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* =========================
+   Saving
+========================= */
+
+.product-details__saving {
+  margin: 0 0 25px;
+
+  color: #555;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* =========================
+   Description
+========================= */
 
 .product-details__description {
   max-width: 550px;
@@ -168,9 +232,13 @@
     border: none;
     background: #fff;
 
+    color: #111;
+
     font-size: 20px;
 
     cursor: pointer;
+
+    transition: background 0.2s ease;
 
     &:hover {
       background: #f5f5f5;
@@ -179,6 +247,8 @@
 
   span {
     width: 45px;
+
+    color: #111;
 
     text-align: center;
 
@@ -197,11 +267,15 @@
 
   margin-bottom: 25px;
 
+  color: #555;
+
   font-size: 15px;
 
   strong {
+    color: #111;
+
     font-size: 20px;
-    font-weight: 500;
+    font-weight: 600;
   }
 }
 
@@ -227,7 +301,9 @@
 
   cursor: pointer;
 
-  transition: 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .product-details__add {
@@ -270,12 +346,15 @@
   border-bottom: 1px solid #eee;
 
   strong {
+    color: #111;
+
     font-size: 13px;
     font-weight: 500;
   }
 
   span {
     color: #888;
+
     font-size: 12px;
   }
 }
@@ -298,23 +377,39 @@
   h2 {
     margin-bottom: 10px;
 
+    color: #111;
+
     font-size: 30px;
     font-weight: 400;
   }
 
   p {
+    max-width: 450px;
+
     color: #777;
+
     margin-bottom: 25px;
+
+    line-height: 1.6;
   }
 
   a {
+    display: inline-block;
+
     background: #111;
     color: #fff;
 
     padding: 13px 25px;
 
     text-decoration: none;
+
     font-size: 13px;
+
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: #333;
+    }
   }
 }
 
@@ -332,6 +427,10 @@
   .product-details__info {
     padding-top: 0;
   }
+
+  .product-details__description {
+    max-width: 100%;
+  }
 }
 
 /* =========================
@@ -347,6 +446,21 @@
     margin-bottom: 25px;
 
     font-size: 11px;
+
+    gap: 7px;
+  }
+
+  .product-details__image {
+    aspect-ratio: 4 / 5;
+  }
+
+  .product-details__badge {
+    top: 12px;
+    left: 12px;
+
+    padding: 7px 10px;
+
+    font-size: 9px;
   }
 
   .product-details__info h1 {
@@ -354,10 +468,31 @@
   }
 
   .product-details__price {
-    font-size: 21px;
+    gap: 9px;
+
+    strong {
+      font-size: 21px;
+    }
+
+    del {
+      font-size: 14px;
+    }
+  }
+
+  .product-details__discount {
+    font-size: 10px;
+  }
+
+  .product-details__description {
+    font-size: 14px;
+    line-height: 1.7;
   }
 
   .product-details__actions {
     grid-template-columns: 1fr;
+  }
+
+  .product-details__features {
+    margin-top: 30px;
   }
 }

@@ -1,0 +1,139 @@
+.order-success {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background: #faf9f7;
+
+  &__container {
+    width: 100%;
+    max-width: 620px;
+    padding: 60px 40px;
+    text-align: center;
+    background: #fff;
+    border: 1px solid #e8e5e0;
+  }
+
+  &__icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #111;
+    color: #fff;
+    font-size: 32px;
+    font-weight: 500;
+  }
+
+  &__subtitle {
+    display: block;
+    margin-bottom: 12px;
+    color: #777;
+    font-size: 11px;
+    letter-spacing: 3px;
+    font-weight: 600;
+  }
+
+  h1 {
+    margin: 0 0 18px;
+    color: #111;
+    font-size: 34px;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  &__message {
+    max-width: 480px;
+    margin: 0 auto 35px;
+    color: #777;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  &__order,
+  &__payment {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 0;
+    border-top: 1px solid #eee;
+    color: #777;
+    font-size: 14px;
+
+    strong {
+      color: #111;
+      font-weight: 600;
+    }
+  }
+
+  &__payment {
+    border-bottom: 1px solid #eee;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 35px;
+  }
+
+  &__shop,
+  &__home {
+    min-width: 170px;
+    padding: 14px 22px;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s ease;
+  }
+
+  &__shop {
+    background: #111;
+    color: #fff;
+
+    &:hover {
+      background: #333;
+    }
+  }
+
+  &__home {
+    border: 1px solid #111;
+    color: #111;
+
+    &:hover {
+      background: #111;
+      color: #fff;
+    }
+  }
+
+  &__note {
+    margin: 28px 0 0;
+    color: #999;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 600px) {
+    padding: 30px 15px;
+
+    &__container {
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+    }
+
+    &__actions {
+      flex-direction: column;
+    }
+
+    &__shop,
+    &__home {
+      width: 100%;
+    }
+  }
+}

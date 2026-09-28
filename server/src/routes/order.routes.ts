@@ -5,14 +5,25 @@ import {
   getOrderById,
   updateOrderStatus,
   cancelOrder,
+  createCheckoutOrder,
 } from "../controller/order.controller.js";
-import verifyToken from "../middleware/auth.middleware.js";
+import verifyToken, { optionalAuth } from "../middleware/auth.middleware.js";
 import validate from "../middleware/validate.js";
-import { orderStatusSchema, idSchema } from "../schemas/order.schema.js";
+import {
+  orderStatusSchema,
+  idSchema,
+  checkoutOrderSchema,
+} from "../schemas/order.schema.js";
 
 const router = Router();
 
 router.post("/", verifyToken, createOrder);
+router.post(
+  "/checkout",
+  optionalAuth,
+  validate(checkoutOrderSchema),
+  createCheckoutOrder,
+);
 router.get("/", verifyToken, getOrders);
 router.get("/:id", verifyToken, validate(idSchema), getOrderById);
 router.put(

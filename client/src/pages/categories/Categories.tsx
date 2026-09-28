@@ -1,46 +1,32 @@
 import { Link } from "react-router-dom";
 
+import { useGetCategoriesQuery } from "../../store/api/categoryApi";
+import Loader from "../../components/common/loader/Loader";
+
 import "./Categories.scss";
 
-const categories = [
-  {
-    id: 1,
-    name: "Lawn",
-    description: "Lightweight styles for every season.",
-    image:
-      "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    id: 2,
-    name: "Boski",
-    description: "Elegant and premium Boski collections.",
-    image:
-      "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    id: 3,
-    name: "Cotton",
-    description: "Comfortable cotton styles for everyday wear.",
-    image:
-      "https://images.unsplash.com/photo-1583743814966-8936f37f4678?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    id: 4,
-    name: "Men",
-    description: "Classic looks for modern men.",
-    image:
-      "https://images.unsplash.com/photo-1603252110481-7ba873bf42ab?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    id: 5,
-    name: "Wash Wear",
-    description: "Smart and effortless everyday fashion.",
-    image:
-      "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=85",
-  },
-];
-
 const Categories = () => {
+  const { data, isLoading, error } = useGetCategoriesQuery();
+
+  const categories = data?.data ?? [];
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return (
+      <main className="categories">
+        <section className="categories__content">
+          <div className="categories__heading">
+            <h2>Unable to load categories</h2>
+            <p>Please try again later.</p>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="categories">
       {/* Hero */}
@@ -71,33 +57,35 @@ const Categories = () => {
         </div>
 
         <div className="categories__grid">
-          {categories.map((category) => (
-            <Link
-              key={category.id}
-              to={`/shop?category=${encodeURIComponent(category.name)}`}
-              className="categories__card"
-            >
-              <div className="categories__image-wrapper">
-                <img
-                  src={category.image}
-                  alt={category.name}
-                  className="categories__image"
-                />
+          {categories.map((category) => {
+            return (
+              <Link
+                key={category.id}
+                to={`/shop?categoryId=${category.id}`}
+                className="categories__card"
+              >
+                <div className="categories__image-wrapper">
+                  <img
+                    src={category.category_image}
+                    alt={category.category_name}
+                    className="categories__image"
+                  />
 
-                <div className="categories__overlay" />
-              </div>
+                  <div className="categories__overlay" />
+                </div>
 
-              <div className="categories__card-content">
-                <span>COLLECTION</span>
+                <div className="categories__card-content">
+                  <span>COLLECTION</span>
 
-                <h3>{category.name}</h3>
+                  <h3>{category.category_name}</h3>
 
-                <p>{category.description}</p>
+                  <p>{category.category_slogan}</p>
 
-                <span className="categories__link">Shop Collection →</span>
-              </div>
-            </Link>
-          ))}
+                  <span className="categories__link">Shop Collection →</span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 

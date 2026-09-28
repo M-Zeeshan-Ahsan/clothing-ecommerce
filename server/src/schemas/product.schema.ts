@@ -26,6 +26,7 @@ export const productSchema = Joi.object({
     "number.positive": "Price must be greater than 0",
     "any.required": "Price is required",
   }),
+  sale_price: Joi.number().less(Joi.ref("price")).allow(null).optional(),
 });
 export const idSchema = Joi.object({
   id: Joi.number().integer().positive().required().messages({

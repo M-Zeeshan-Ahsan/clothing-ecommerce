@@ -1,7 +1,12 @@
 import { useState } from "react";
 import "./Header.scss";
-import { Link } from "react-router-dom";
-import { useAppSelector } from "../../../store/store";
+import { Link, useNavigate } from "react-router-dom";
+
+import { useAppDispatch, useAppSelector } from "../../../store/store";
+
+import { logout } from "../../../store/slices/authSlice";
+import { showToast } from "../../../utils/toast";
+import { baseApi } from "../../../store/api/baseApi";
 
 interface HeaderProps {
   searchTerm: string;
@@ -9,11 +14,22 @@ interface HeaderProps {
 }
 
 const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+
   const cartItems = useAppSelector((state) => state.cart.items);
+  const wishlistItems = useAppSelector((state) => state.wishlist.items);
+
+  const user = useAppSelector((state) => state.auth.user);
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+  const wishlistCount = wishlistItems.length;
+
   const handleSearchToggle = () => {
     setSearchOpen((prev) => !prev);
   };
@@ -23,26 +39,76 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
     setSearchTerm("");
   };
 
+  const closeMobileMenu = () => {
+    setMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    dispatch(baseApi.util.resetApiState());
+    showToast("Logged out successfully", "success");
+
+    setMenuOpen(false);
+    navigate("/login");
+  };
+
   return (
     <header className="header">
       <div className="header__container">
         {/* Logo */}
-        <Link to="/" className="header__logo">
+        <Link to="/" className="header__logo" onClick={closeMobileMenu}>
           LIBAAS
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* Navigation */}
         <nav className={`header__nav ${menuOpen ? "active" : ""}`}>
-          <Link to="/">Home</Link>
-          <Link to="/shop">Shop</Link>
-          <Link to="/categories">Categories</Link>
-          <Link to="/new-arrivals">New Arrivals</Link>
-          <Link to="/sale">Sale</Link>
+          <Link to="/" onClick={closeMobileMenu}>
+            Home
+          </Link>
+
+          <Link to="/shop" onClick={closeMobileMenu}>
+            Shop
+          </Link>
+
+          <Link to="/categories" onClick={closeMobileMenu}>
+            Categories
+          </Link>
+
+          <Link to="/new-arrivals" onClick={closeMobileMenu}>
+            New Arrivals
+          </Link>
+
+          <Link to="/sale" onClick={closeMobileMenu}>
+            Sale
+          </Link>
+
+          {/* Mobile Auth */}
+          <div className="header__mobile-auth">
+            {!isAuthenticated ? (
+              <>
+                <Link to="/login" onClick={closeMobileMenu}>
+                  Login
+                </Link>
+
+                <Link to="/register" onClick={closeMobileMenu}>
+                  Sign Up
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/profile" onClick={closeMobileMenu}>
+                  My Profile
+                </Link>
+
+                <button onClick={handleLogout}>Logout</button>
+              </>
+            )}
+          </div>
         </nav>
 
         {/* Actions */}
         <div className="header__actions">
-          {/* Search Button */}
+          {/* Search */}
           <button
             className="header__action"
             onClick={handleSearchToggle}
@@ -54,20 +120,67 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
             </svg>
           </button>
 
-          {/* Account */}
-          <button className="header__action" aria-label="Account">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7" />
-            </svg>
-          </button>
+          {/* Desktop Account */}
+          {isAuthenticated && user ? (
+            <div className="header__account">
+              <button
+                className="header__action"
+                aria-label="Account"
+                onClick={() => navigate("/profile")}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7" />
+                </svg>
+              </button>
+
+              <div className="header__account-menu">
+                <div className="header__account-name">
+                  <strong>{user.name}</strong>
+                  <span>{user.email}</span>
+                </div>
+
+                <Link to="/profile">My Profile</Link>
+
+                <button onClick={handleLogout}>Logout</button>
+              </div>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="header__action header__desktop-account"
+              aria-label="Login"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7" />
+              </svg>
+            </Link>
+          )}
 
           {/* Wishlist */}
-          <button className="header__action" aria-label="Wishlist">
+          <Link
+            to="/wishlist"
+            className={`header__action header__wishlist ${
+              wishlistCount > 0 ? "header__wishlist--active" : ""
+            }`}
+            aria-label="Wishlist"
+          >
             <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M20.8 8.6c0 5.5-8.8 10.4-8.8 10.4S3.2 14.1 3.2 8.6C3.2 5.5 5.3 3.5 8 3.5c1.7 0 3.2.8 4 2.1.8-1.3 2.3-2.1 4-2.1 2.7 0 4.8 2 4.8 5.1Z" />
+              {wishlistCount > 0 ? (
+                <path
+                  d="M20.8 8.6c0 5.5-8.8 10.4-8.8 10.4S3.2 14.1 3.2 8.6C3.2 5.5 5.3 3.5 8 3.5c1.7 0 3.2.8 4 2.1.8-1.3 2.3-2.1 4-2.1 2.7 0 4.8 2 4.8 5.1Z"
+                  fill="currentColor"
+                />
+              ) : (
+                <path d="M20.8 8.6c0 5.5-8.8 10.4-8.8 10.4S3.2 14.1 3.2 8.6C3.2 5.5 5.3 3.5 8 3.5c1.7 0 3.2.8 4 2.1.8-1.3 2.3-2.1 4-2.1 2.7 0 4.8 2 4.8 5.1Z" />
+              )}
             </svg>
-          </button>
+
+            {wishlistCount > 0 && (
+              <span className="header__wishlist-count">{wishlistCount}</span>
+            )}
+          </Link>
 
           {/* Cart */}
           <Link
@@ -99,10 +212,9 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
         </div>
       </div>
 
-      {/* Navbar Search Bar */}
+      {/* Search Bar */}
       <div className={`header__search ${searchOpen ? "active" : ""}`}>
         <div className="header__search-inner">
-          {/* Search Icon */}
           <svg
             className="header__search-icon"
             viewBox="0 0 24 24"
@@ -112,7 +224,6 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
             <path d="m20 20-4-4" />
           </svg>
 
-          {/* Search Input */}
           <input
             type="text"
             placeholder="Search products..."
@@ -121,7 +232,6 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
             autoFocus={searchOpen}
           />
 
-          {/* Clear Search */}
           {searchTerm && (
             <button
               className="header__search-clear"
@@ -132,7 +242,6 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
             </button>
           )}
 
-          {/* Close Search */}
           <button
             className="header__search-close"
             onClick={handleSearchClose}

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+
 import jwt from "jsonwebtoken";
 import ApiError from "../utils/ApiError.js";
 
@@ -41,6 +42,43 @@ const verifyToken = (req: Request, _res: Response, next: NextFunction) => {
     }
 
     next(error);
+  }
+};
+
+export const optionalAuth = (
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    // Guest user
+    if (!authHeader) {
+      return next();
+    }
+
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : authHeader;
+
+    if (!token) {
+      return next();
+    }
+
+    const secret = process.env.JWT_ACCESS_SECRET;
+
+    if (!secret) {
+      return next();
+    }
+
+    const decoded = jwt.verify(token, secret) as JwtPayload;
+
+    req.user = decoded;
+
+    next();
+  } catch {
+    next();
   }
 };
 

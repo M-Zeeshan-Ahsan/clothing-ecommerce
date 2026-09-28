@@ -1,8 +1,27 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
+import { logout } from "../../store/slices/authSlice";
+import { baseApi } from "../../store/api/baseApi";
+import { showToast } from "../../utils/toast";
 
 import "./AdminSidebar.scss";
 
 const AdminSidebar = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+
+    // Clear RTK Query cache
+    dispatch(baseApi.util.resetApiState());
+
+    showToast("Admin logged out successfully", "success");
+
+    navigate("/admin/login");
+  };
+
   return (
     <aside className="admin-sidebar">
       <div className="admin-sidebar__logo">
@@ -50,7 +69,11 @@ const AdminSidebar = () => {
           ← View Store
         </NavLink>
 
-        <button type="button" className="admin-sidebar__logout">
+        <button
+          type="button"
+          className="admin-sidebar__logout"
+          onClick={handleLogout}
+        >
           Logout
         </button>
       </div>

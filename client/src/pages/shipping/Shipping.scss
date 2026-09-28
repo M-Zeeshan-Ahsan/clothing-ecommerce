@@ -1,0 +1,173 @@
+.shipping {
+  min-height: 100vh;
+  padding-bottom: 100px;
+  background: #faf9f7;
+
+  &__hero {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 90px 20px 70px;
+    text-align: center;
+  }
+
+  &__eyebrow {
+    display: block;
+    margin-bottom: 15px;
+    color: #777;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+  }
+
+  &__hero h1 {
+    margin: 0 0 20px;
+    color: #111;
+    font-size: 48px;
+    font-weight: 500;
+    line-height: 1.15;
+  }
+
+  &__hero p {
+    max-width: 620px;
+    margin: 0 auto;
+    color: #777;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  &__container {
+    width: calc(100% - 40px);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 55px 60px;
+    background: #fff;
+    border: 1px solid #e8e5e0;
+  }
+
+  &__highlight {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+
+    > div {
+      padding: 25px 20px;
+      text-align: center;
+      border-right: 1px solid #eee;
+
+      &:last-child {
+        border-right: none;
+      }
+    }
+
+    span {
+      display: block;
+      margin-bottom: 8px;
+      color: #999;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+    }
+
+    strong {
+      color: #111;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+
+  &__section {
+    display: grid;
+    grid-template-columns: 55px 1fr;
+    gap: 20px;
+    padding: 38px 0;
+    border-bottom: 1px solid #eee;
+
+    &--last {
+      padding-bottom: 5px;
+      border-bottom: none;
+    }
+  }
+
+  &__number {
+    color: #999;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  &__section h2 {
+    margin: 0 0 15px;
+    color: #111;
+    font-size: 22px;
+    font-weight: 500;
+  }
+
+  &__section p {
+    margin: 0 0 14px;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.9;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  @media (max-width: 700px) {
+    &__hero {
+      padding: 60px 20px 45px;
+    }
+
+    &__hero h1 {
+      font-size: 36px;
+    }
+
+    &__container {
+      width: calc(100% - 30px);
+      padding: 40px 25px;
+    }
+
+    &__highlight {
+      grid-template-columns: 1fr;
+
+      > div {
+        border-right: none;
+        border-bottom: 1px solid #eee;
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+
+    &__section {
+      grid-template-columns: 40px 1fr;
+      gap: 12px;
+      padding: 30px 0;
+    }
+
+    &__section h2 {
+      font-size: 20px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    &__hero h1 {
+      font-size: 30px;
+    }
+
+    &__container {
+      padding: 30px 20px;
+    }
+
+    &__section {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    &__number {
+      font-size: 11px;
+    }
+  }
+}

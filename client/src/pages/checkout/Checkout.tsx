@@ -1,12 +1,21 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import { useAppSelector } from "../../store/store";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { clearCart } from "../../store/slices/cartSlice";
+import { useCreateCheckoutOrderMutation } from "../../store/api/orderApi";
+import { getApiErrorMessage } from "../../utils/apiError";
+import { showToast } from "../../utils/toast";
 
 import "./Checkout.scss";
 
 const Checkout = () => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const cartItems = useAppSelector((state) => state.cart.items);
+
+  const [createCheckoutOrder, { isLoading }] = useCreateCheckoutOrderMutation();
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -14,12 +23,16 @@ const Checkout = () => {
     address: "",
     city: "",
     postalCode: "",
+    email: "",
   });
 
   const subtotal = cartItems.reduce(
     (total, item) => total + item.product.price * item.quantity,
     0,
   );
+
+  const shippingFee = 199;
+  const total = subtotal + shippingFee;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -30,15 +43,27 @@ const Checkout = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("Checkout Data:", {
-      address: formData,
-      items: cartItems,
-      total: subtotal,
-      paymentMethod: "COD",
-    });
+    try {
+      const result = await createCheckoutOrder({
+        address: formData,
+        items: cartItems.map((item) => ({
+          productId: item.product.id,
+          quantity: item.quantity,
+        })),
+        paymentMethod: "COD",
+      }).unwrap();
+
+      dispatch(clearCart());
+
+      showToast(result.message, "success");
+
+      navigate(`/order-success/${result.data.order.id}`);
+    } catch (error) {
+      showToast(getApiErrorMessage(error), "error");
+    }
   };
 
   if (cartItems.length === 0) {
@@ -102,7 +127,18 @@ const Checkout = () => {
                 required
               />
             </div>
+            <div className="checkout__field checkout__field--full">
+              <label htmlFor="email">Email Address</label>
 
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </div>
             <div className="checkout__field checkout__field--full">
               <label htmlFor="address">Complete Address</label>
 
@@ -205,7 +241,8 @@ const Checkout = () => {
 
           <div className="checkout__summary-row">
             <span>Shipping</span>
-            <span>Free</span>
+
+            <span>Rs. {shippingFee.toLocaleString()}</span>
           </div>
 
           <div className="checkout__divider" />
@@ -213,11 +250,15 @@ const Checkout = () => {
           <div className="checkout__summary-total">
             <span>Total</span>
 
-            <strong>Rs. {subtotal.toLocaleString()}</strong>
+            <strong>Rs. {total.toLocaleString()}</strong>
           </div>
 
-          <button type="submit" className="checkout__place-order">
-            Place Order
+          <button
+            type="submit"
+            className="checkout__place-order"
+            disabled={isLoading}
+          >
+            {isLoading ? "Placing Order..." : "Place Order"}
           </button>
 
           <p className="checkout__note">
