@@ -170,10 +170,34 @@ export const updateAdminOrderStatus = async (
       throw new ApiError(404, "Order not found");
     }
 
+    // Already completed orders cannot be changed
+    if (order.status === "DELIVERED" || order.status === "CANCELLED") {
+      throw new ApiError(400, `Order is already ${order.status.toLowerCase()}`);
+    }
+
+    // Prevent invalid status transitions
+    const allowedTransitions: Record<string, string[]> = {
+      PENDING: ["CONFIRMED", "CANCELLED"],
+
+      CONFIRMED: ["SHIPPED", "CANCELLED"],
+
+      SHIPPED: ["DELIVERED"],
+    };
+
+    const allowedStatuses = allowedTransitions[order.status] ?? [];
+
+    if (!allowedStatuses.includes(status)) {
+      throw new ApiError(
+        400,
+        `Cannot change order status from ${order.status} to ${status}`,
+      );
+    }
+
     const updatedOrder = await prisma.order.update({
       where: {
         id: orderId,
       },
+
       data: {
         status,
       },
@@ -189,6 +213,7 @@ export const updateAdminOrderStatus = async (
     next(error);
   }
 };
+
 export const cancelOrder = async (
   req: Request,
   res: Response,

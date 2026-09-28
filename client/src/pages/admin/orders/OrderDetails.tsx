@@ -19,6 +19,22 @@ type OrderStatus =
   | "DELIVERED"
   | "CANCELLED";
 
+const getAvailableStatuses = (status: OrderStatus): OrderStatus[] => {
+  const statusMap: Record<OrderStatus, OrderStatus[]> = {
+    PENDING: ["PENDING", "CONFIRMED", "CANCELLED"],
+
+    CONFIRMED: ["CONFIRMED", "SHIPPED", "CANCELLED"],
+
+    SHIPPED: ["SHIPPED", "DELIVERED"],
+
+    DELIVERED: ["DELIVERED"],
+
+    CANCELLED: ["CANCELLED"],
+  };
+
+  return statusMap[status];
+};
+
 const OrderDetails = () => {
   const navigate = useNavigate();
 
@@ -272,15 +288,21 @@ const OrderDetails = () => {
                 }
                 disabled={isUpdatingStatus}
               >
-                <option value="PENDING">Pending</option>
+                {getAvailableStatuses(order.status as OrderStatus).map(
+                  (status) => (
+                    <option key={status} value={status}>
+                      {status === "PENDING" && "Pending"}
 
-                <option value="CONFIRMED">Confirmed</option>
+                      {status === "CONFIRMED" && "Confirmed"}
 
-                <option value="SHIPPED">Shipped</option>
+                      {status === "SHIPPED" && "Shipped"}
 
-                <option value="DELIVERED">Delivered</option>
+                      {status === "DELIVERED" && "Delivered"}
 
-                <option value="CANCELLED">Cancelled</option>
+                      {status === "CANCELLED" && "Cancelled"}
+                    </option>
+                  ),
+                )}
               </select>
 
               <button
