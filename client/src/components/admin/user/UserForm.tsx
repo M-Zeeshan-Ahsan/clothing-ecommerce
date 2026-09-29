@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 import "./UserForm.scss";
 
@@ -41,6 +42,8 @@ const UserForm = ({
   );
 
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -139,7 +142,6 @@ const UserForm = ({
             disabled={isSubmitting}
           >
             <option value="User">User</option>
-
             <option value="Admin">Admin</option>
           </select>
         </div>
@@ -151,34 +153,62 @@ const UserForm = ({
             {mode === "edit" && <span> (optional)</span>}
           </label>
 
-          <input
-            id="password"
-            name="password"
-            type="password"
-            placeholder={
-              mode === "edit"
-                ? "Leave blank to keep current password"
-                : "Enter password"
-            }
-            value={formData.password}
-            onChange={handleChange}
-            disabled={isSubmitting}
-          />
+          <div className="user-form__password">
+            <input
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              placeholder={
+                mode === "edit"
+                  ? "Leave blank to keep current password"
+                  : "Enter password"
+              }
+              value={formData.password}
+              onChange={handleChange}
+              disabled={isSubmitting}
+            />
+
+            <button
+              type="button"
+              className="user-form__password-toggle"
+              onClick={() => setShowPassword((prev) => !prev)}
+              disabled={isSubmitting}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
 
         {/* Confirm Password */}
         <div className="user-form__field">
           <label htmlFor="confirmPassword">Confirm Password</label>
 
-          <input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            placeholder="Confirm password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            disabled={isSubmitting}
-          />
+          <div className="user-form__password">
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirm password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              disabled={isSubmitting}
+            />
+
+            <button
+              type="button"
+              className="user-form__password-toggle"
+              onClick={() => setShowConfirmPassword((prev) => !prev)}
+              disabled={isSubmitting}
+              aria-label={
+                showConfirmPassword
+                  ? "Hide confirm password"
+                  : "Show confirm password"
+              }
+            >
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
       </div>
 
