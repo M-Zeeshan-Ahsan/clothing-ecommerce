@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import ProductCard from "../../components/product/ProductCard";
 import "./Home.scss";
 import { useOutletContext } from "react-router-dom";
@@ -18,6 +18,7 @@ interface SearchContext {
 }
 
 const Home = () => {
+  const productsSectionRef = useRef<HTMLElement | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(12);
 
@@ -96,7 +97,12 @@ const Home = () => {
     setSearchTerm(value);
     setCurrentPage(1);
   };
-
+  const handleShopCollection = () => {
+    productsSectionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
   // =========================
   // LOADING
   // =========================
@@ -120,12 +126,15 @@ const Home = () => {
 
           <p>Discover premium clothing crafted for everyday confidence.</p>
 
-          <button>Shop Collection</button>
+          <button type="button" onClick={handleShopCollection}>
+            {" "}
+            Shop Collection{" "}
+          </button>
         </div>
       </section>
 
       {/* Products */}
-      <section className="products-section">
+      <section className="products-section" ref={productsSectionRef}>
         <div className="products-section__header">
           <div>
             <span>OUR COLLECTION</span>
