@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Pencil, Trash2, UserPlus } from "lucide-react";
-
+import useDebounce from "../../../hooks/useDebounce";
 import Pagination from "../../../components/common/pagination/Pagination";
 import { showToast } from "../../../utils/toast";
 import { getApiErrorMessage } from "../../../utils/apiError";
@@ -12,6 +12,7 @@ import {
 } from "../../../store/api/userApi";
 
 import "./Users.scss";
+import Loader from "../../../components/common/loader/Loader";
 
 type UserRole = "Admin" | "User";
 
@@ -19,7 +20,7 @@ const USERS_PER_PAGE = 5;
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
-
+  const debouncedSearch = useDebounce(searchTerm, 500);
   const [roleFilter, setRoleFilter] = useState<"All" | UserRole>("All");
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,7 +35,7 @@ const Users = () => {
   const { data, isLoading, isFetching, isError } = useGetAdminUsersQuery({
     page: currentPage,
     limit: USERS_PER_PAGE,
-    search: searchTerm.trim(),
+    search: debouncedSearch.trim(),
     role: apiRole,
   });
   const [deleteAdminUser, { isLoading: isDeleting }] =
@@ -61,7 +62,9 @@ const Users = () => {
       showToast(getApiErrorMessage(error), "error");
     }
   };
-
+  if (isLoading || isDeleting) {
+    return <Loader />;
+  }
   return (
     <div className="admin-users">
       {/* Header */}

@@ -1,3 +1,7 @@
+import { useSelector } from "react-redux";
+
+import type { RootState } from "../../store/store";
+
 import "./AdminHeader.scss";
 
 interface AdminHeaderProps {
@@ -5,6 +9,12 @@ interface AdminHeaderProps {
 }
 
 const AdminHeader = ({ onMenuClick }: AdminHeaderProps) => {
+  const user = useSelector((state: RootState) => state.auth.user);
+
+  const userName = user?.name || "Admin";
+
+  const avatarLetter = userName.charAt(0).toUpperCase();
+
   return (
     <header className="admin-header">
       <button
@@ -21,10 +31,10 @@ const AdminHeader = ({ onMenuClick }: AdminHeaderProps) => {
         <span className="admin-header__notification">♢</span>
 
         <div className="admin-header__user">
-          <div className="admin-header__avatar">A</div>
+          <div className="admin-header__avatar">{avatarLetter}</div>
 
           <div>
-            <strong>Admin</strong>
+            <strong>{userName}</strong>
             <span>Administrator</span>
           </div>
         </div>
