@@ -456,7 +456,24 @@ export const createCheckoutOrder = async (
   try {
     const userId = req.user?.id ?? null;
 
-    const { address, items, paymentMethod } = req.body;
+    const { address, items } = req.body;
+
+    // =========================
+    // Guest Email
+    // =========================
+
+    const customerEmail =
+      typeof address.email === "string"
+        ? address.email.trim().toLowerCase()
+        : "";
+
+    if (!userId && !customerEmail) {
+      throw new ApiError(400, "Email is required for guest checkout");
+    }
+
+    // =========================
+    // Product IDs
+    // =========================
 
     const productIds = items.map((item: { productId: number }) =>
       Number(item.productId),
@@ -473,6 +490,10 @@ export const createCheckoutOrder = async (
     if (products.length !== productIds.length) {
       throw new ApiError(400, "One or more products are no longer available");
     }
+
+    // =========================
+    // Order Items
+    // =========================
 
     let subtotal = 0;
 
@@ -505,20 +526,34 @@ export const createCheckoutOrder = async (
       };
     });
 
+    // =========================
+    // Total
+    // =========================
+
     const shippingFee = 199;
 
     const totalAmount = subtotal + shippingFee;
+
+    // =========================
+    // Create Order
+    // =========================
 
     const order = await prisma.$transaction(async (tx) => {
       // Create Address
       const newAddress = await tx.address.create({
         data: {
           userId,
+
           fullName: address.fullName,
+
           phone: address.phone,
-          email: address.email || null,
+
+          email: customerEmail || null,
+
           address: address.address,
+
           city: address.city,
+
           postalCode: address.postalCode || null,
         },
       });
@@ -549,7 +584,10 @@ export const createCheckoutOrder = async (
 
     return handleResponse(res, 201, "Order placed successfully", {
       order,
-      shippingAddress: address,
+      shippingAddress: {
+        ...address,
+        email: customerEmail || null,
+      },
       paymentMethod: "COD",
       subtotal,
       shippingFee,

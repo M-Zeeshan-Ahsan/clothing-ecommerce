@@ -11,22 +11,76 @@ export const createUser = async (
 ) => {
   try {
     const { name, email, password } = req.body;
+
+    const normalizedEmail = email.trim().toLowerCase();
+
     const existingUser = await prisma.user.findUnique({
       where: {
-        email,
+        email: normalizedEmail,
       },
     });
+
     if (existingUser) {
       throw new ApiError(400, "User with this email already exists");
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const result = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-      },
+
+    const result = await prisma.$transaction(async (tx) => {
+      // Create user
+      const user = await tx.user.create({
+        data: {
+          name,
+          email: normalizedEmail,
+          password: hashedPassword,
+        },
+
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+
+      // Find guest orders through Address.email
+      const guestOrders = await tx.order.findMany({
+        where: {
+          userId: null,
+          address: {
+            email: {
+              equals: normalizedEmail,
+              mode: "insensitive",
+            },
+          },
+        },
+
+        select: {
+          id: true,
+        },
+      });
+
+      // Attach guest orders to newly created user
+      if (guestOrders.length > 0) {
+        await tx.order.updateMany({
+          where: {
+            id: {
+              in: guestOrders.map((order) => order.id),
+            },
+            userId: null,
+          },
+
+          data: {
+            userId: user.id,
+          },
+        });
+      }
+
+      return user;
     });
+
     return handleResponse(res, 201, "User added successfully", result);
   } catch (error) {
     next(error);
