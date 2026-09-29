@@ -1,13 +1,38 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import UserForm, {
   type UserFormData,
 } from "../../../components/admin/user/UserForm";
+
+import { useCreateAdminUserMutation } from "../../../store/api/userApi";
+
+import { getApiErrorMessage } from "../../../utils/apiError";
+
+import { showToast } from "../../../utils/toast";
+
 import "./AddUser.scss";
 
 const AddUser = () => {
-  const handleSubmit = (data: UserFormData) => {
-    console.log("Add User:", data);
+  const navigate = useNavigate();
+
+  const [createAdminUser, { isLoading: isCreating }] =
+    useCreateAdminUserMutation();
+
+  const handleSubmit = async (data: UserFormData) => {
+    try {
+      await createAdminUser({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        role: data.role === "Admin" ? "ADMIN" : "USER",
+      }).unwrap();
+
+      showToast("User created successfully", "success");
+
+      navigate("/admin/users");
+    } catch (error) {
+      showToast(getApiErrorMessage(error), "error");
+    }
   };
 
   return (
@@ -22,7 +47,7 @@ const AddUser = () => {
         <p>Create a new user account and assign account settings.</p>
       </div>
 
-      <UserForm mode="add" onSubmit={handleSubmit} />
+      <UserForm mode="add" onSubmit={handleSubmit} isSubmitting={isCreating} />
     </div>
   );
 };
