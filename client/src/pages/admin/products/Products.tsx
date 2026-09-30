@@ -1,105 +1,156 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Product.scss";
+
 import Pagination from "../../../components/common/pagination/Pagination";
 
-interface AdminProduct {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-  stock: number;
-  image: string;
-  status: "Active" | "Out of Stock";
-}
+import {
+  useGetProductsQuery,
+  useDeleteProductMutation,
+} from "../../../store/api/productApi";
+import useDebounce from "../../../hooks/useDebounce";
+import { useGetCategoriesQuery } from "../../../store/api/categoryApi";
 
-const dummyProducts: AdminProduct[] = [
-  {
-    id: 1,
-    name: "Nishat Boski Suit",
-    category: "Boski",
-    price: 5480,
-    stock: 12,
-    image:
-      "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=200&q=80",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Premium Cotton Suit",
-    category: "Cotton",
-    price: 4200,
-    stock: 8,
-    image:
-      "https://images.unsplash.com/photo-1583743814966-8936f37f4678?auto=format&fit=crop&w=200&q=80",
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "Nishat China Boski",
-    category: "Boski",
-    price: 5480,
-    stock: 5,
-    image:
-      "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=200&q=80",
-    status: "Active",
-  },
-  {
-    id: 4,
-    name: "Edenrobe Premium",
-    category: "Men",
-    price: 3450,
-    stock: 0,
-    image:
-      "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&w=200&q=80",
-    status: "Out of Stock",
-  },
-  {
-    id: 5,
-    name: "Men Wash Wear",
-    category: "Wash Wear",
-    price: 5500,
-    stock: 15,
-    image:
-      "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=200&q=80",
-    status: "Active",
-  },
-];
+import { showToast } from "../../../utils/toast";
+import { getApiErrorMessage } from "../../../utils/apiError";
+import Loader from "../../../components/common/loader/Loader";
+
+import "./Product.scss";
+
+const PRODUCTS_PER_PAGE = 10;
 
 const Products = () => {
   const navigate = useNavigate();
+
+  // =========================
+  // FILTER STATES
+  // =========================
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [category, setCategory] = useState("All");
+  const debouncedSearch = useDebounce(searchTerm, 500);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<
+    number | undefined
+  >(undefined);
+
   const [currentPage, setCurrentPage] = useState(1);
-  const PRODUCTS_PER_PAGE = 2;
-  const filteredProducts = useMemo(() => {
-    return dummyProducts.filter((product) => {
-      const matchesSearch = product.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
 
-      const matchesCategory =
-        category === "All" || product.category === category;
+  // =========================
+  // GET CATEGORIES
+  // =========================
 
-      return matchesSearch && matchesCategory;
-    });
-  }, [searchTerm, category]);
-  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+  const { data: categoryData, isLoading: categoriesLoading } =
+    useGetCategoriesQuery();
 
-  const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * PRODUCTS_PER_PAGE,
-    currentPage * PRODUCTS_PER_PAGE,
-  );
+  const categories = categoryData?.data ?? [];
+
+  // =========================
+  // GET PRODUCTS
+  // =========================
+
+  const {
+    data: productData,
+    isLoading: productsLoading,
+    isFetching,
+    isError: productsError,
+  } = useGetProductsQuery({
+    page: currentPage,
+    limit: PRODUCTS_PER_PAGE,
+    search: debouncedSearch.trim(),
+    categoryId: selectedCategoryId,
+  });
+
+  // =========================
+  // PRODUCTS
+  // =========================
+
+  const products = productData?.data.products ?? [];
+
+  const pagination = productData?.data.pagination;
+
+  // =========================
+  // DELETE PRODUCT
+  // =========================
+
+  const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
+
+  // =========================
+  // SEARCH CHANGE
+  // =========================
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  // =========================
+  // CATEGORY CHANGE
+  // =========================
+
+  const handleCategoryChange = (value: string) => {
+    const categoryId = value === "All" ? undefined : Number(value);
+
+    setSelectedCategoryId(categoryId);
+    setCurrentPage(1);
+  };
+
+  // =========================
+  // DELETE
+  // =========================
+
+  const handleDelete = async (id: number) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this product?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteProduct(id).unwrap();
+
+      showToast("Product deleted successfully", "success");
+    } catch (error) {
+      console.error("Delete product error:", error);
+
+      showToast(getApiErrorMessage(error), "error");
+    }
+  };
+
+  // =========================
+  // LOADING
+  // =========================
+
+  if (productsLoading || categoriesLoading) {
+    return <Loader />;
+  }
+
+  // =========================
+  // ERROR
+  // =========================
+
+  if (productsError) {
+    return (
+      <div className="admin-products">
+        <p>Failed to load products.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="admin-products">
-      {/* Page Header */}
+      {/* =========================
+          HEADER
+      ========================= */}
+
       <div className="admin-products__header">
         <div>
           <h1>Products</h1>
+
           <p>Manage your store products</p>
         </div>
 
         <button
+          type="button"
           className="admin-products__add-btn"
           onClick={() => navigate("/admin/products/add")}
         >
@@ -107,8 +158,13 @@ const Products = () => {
         </button>
       </div>
 
-      {/* Filters */}
+      {/* =========================
+          FILTERS
+      ========================= */}
+
       <div className="admin-products__filters">
+        {/* Search */}
+
         <div className="admin-products__search">
           <span>⌕</span>
 
@@ -116,100 +172,162 @@ const Products = () => {
             type="text"
             placeholder="Search products..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
           />
+
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => handleSearchChange("")}
+              aria-label="Clear search"
+            >
+              ×
+            </button>
+          )}
         </div>
 
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+        {/* Category */}
+
+        <select
+          value={selectedCategoryId ?? "All"}
+          onChange={(e) => handleCategoryChange(e.target.value)}
+        >
           <option value="All">All Categories</option>
-          <option value="Boski">Boski</option>
-          <option value="Cotton">Cotton</option>
-          <option value="Lawn">Lawn</option>
-          <option value="Men">Men</option>
-          <option value="Wash Wear">Wash Wear</option>
+
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.category_name}
+            </option>
+          ))}
         </select>
       </div>
 
-      {/* Products Table */}
-      <div className="admin-products__table-wrapper">
-        <table className="admin-products__table">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+      {/* =========================
+          FETCHING
+      ========================= */}
 
-          <tbody>
-            {paginatedProducts.length > 0 ? (
-              paginatedProducts.map((product) => (
-                <tr key={product.id}>
-                  <td>
-                    <div className="admin-products__product">
-                      <img src={product.image} alt={product.name} />
+      {isFetching && !productsLoading && (
+        <div className="admin-products__loading">
+          <p>Updating products...</p>
+        </div>
+      )}
 
-                      <div>
-                        <strong>{product.name}</strong>
-                        <span>#{product.id}</span>
+      {/* =========================
+          PRODUCTS TABLE
+      ========================= */}
+
+      {!isFetching && (
+        <div className="admin-products__table-wrapper">
+          <table className="admin-products__table">
+            <thead>
+              <tr>
+                <th>Product</th>
+
+                <th>Category</th>
+
+                <th>Price</th>
+
+                <th>Sale Price</th>
+
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {products.length > 0 ? (
+                products.map((product) => (
+                  <tr key={product.id}>
+                    {/* Product */}
+
+                    <td>
+                      <div className="admin-products__product">
+                        <img
+                          src={product.product_image}
+                          alt={product.product_name}
+                        />
+
+                        <div>
+                          <strong>{product.product_name}</strong>
+
+                          <span>#{product.id}</span>
+                        </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  <td>{product.category}</td>
+                    {/* Category */}
 
-                  <td>Rs. {product.price.toLocaleString()}</td>
+                    <td>{product.category?.category_name}</td>
 
-                  <td>{product.stock}</td>
+                    {/* Price */}
 
-                  <td>
-                    <span
-                      className={`admin-products__status ${
-                        product.status === "Active" ? "active" : "out-of-stock"
-                      }`}
-                    >
-                      {product.status}
-                    </span>
-                  </td>
+                    <td>Rs. {Number(product.price).toLocaleString()}</td>
 
-                  <td>
-                    <div className="admin-products__actions">
-                      <button
-                        title="Edit"
-                        onClick={() =>
-                          navigate(`/admin/products/edit/${product.id}`)
-                        }
-                      >
-                        ✎
-                      </button>
-                      <button title="Delete">🗑</button>
-                    </div>
+                    {/* Sale Price */}
+
+                    <td>
+                      {product.sale_price !== null &&
+                      product.sale_price !== undefined
+                        ? `Rs. ${Number(product.sale_price).toLocaleString()}`
+                        : "-"}
+                    </td>
+
+                    {/* Actions */}
+
+                    <td>
+                      <div className="admin-products__actions">
+                        <button
+                          type="button"
+                          title="Edit"
+                          onClick={() =>
+                            navigate(`/admin/products/edit/${product.id}`)
+                          }
+                        >
+                          ✎
+                        </button>
+
+                        <button
+                          type="button"
+                          title="Delete"
+                          disabled={isDeleting}
+                          onClick={() => handleDelete(product.id)}
+                        >
+                          🗑
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="admin-products__empty">
+                    No products found
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={6} className="admin-products__empty">
-                  No products found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* =========================
+          FOOTER
+      ========================= */}
+
+      <div className="admin-products__footer">
+        Showing {products.length} of {pagination?.total ?? 0} products
       </div>
 
-      {/* Footer */}
-      <div className="admin-products__footer">
-        Showing {filteredProducts.length} of {dummyProducts.length} products
-      </div>
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+      {/* =========================
+          PAGINATION
+      ========================= */}
+
+      {!isFetching && products.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={pagination?.totalPages ?? 1}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </div>
   );
 };

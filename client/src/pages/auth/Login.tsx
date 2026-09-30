@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { Eye, EyeOff } from "lucide-react";
 
 import { useLoginMutation } from "../../store/api/authApi";
 import { login } from "../../store/slices/authSlice";
@@ -14,6 +15,8 @@ const Login = () => {
   const dispatch = useDispatch();
 
   const [loginUser, { isLoading }] = useLoginMutation();
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -39,7 +42,6 @@ const Login = () => {
         login({
           user: result.data.user,
           accessToken: result.data.accessToken,
-          refreshToken: result.data.refreshToken,
         }),
       );
 
@@ -80,15 +82,26 @@ const Login = () => {
           <div className="auth-page__field">
             <label htmlFor="password">Password</label>
 
-            <input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
+            <div className="auth-page__password">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+
+              <button
+                type="button"
+                className="auth-page__password-toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
 
           <button

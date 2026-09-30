@@ -2,6 +2,7 @@ import prisma from "../prisma/client.js";
 import { Request, Response, NextFunction } from "express";
 import handleResponse from "../utils/response.js";
 import ApiError from "../utils/ApiError.js";
+import { uploadImage } from "../utils/cloudinaryUpload.js";
 
 export const createProduct = async (
   req: Request,
@@ -12,9 +13,13 @@ export const createProduct = async (
     const { product_name, product_image, categoryId, price, sale_price } =
       req.body;
 
+    // =========================
+    // CHECK CATEGORY
+    // =========================
+
     const category = await prisma.category.findUnique({
       where: {
-        id: categoryId,
+        id: Number(categoryId),
       },
     });
 
@@ -22,21 +27,32 @@ export const createProduct = async (
       throw new ApiError(404, "Category not found");
     }
 
-    if (
-      sale_price !== undefined &&
-      sale_price !== null &&
-      sale_price >= price
-    ) {
+    // =========================
+    // PRICE
+    // =========================
+
+    const productPrice = Number(price);
+
+    const productSalePrice =
+      sale_price !== undefined && sale_price !== null && sale_price !== ""
+        ? Number(sale_price)
+        : null;
+
+    if (productSalePrice !== null && productSalePrice >= productPrice) {
       throw new ApiError(400, "Sale price must be less than original price");
     }
+
+    // =========================
+    // CREATE PRODUCT
+    // =========================
 
     const result = await prisma.product.create({
       data: {
         product_name,
         product_image,
-        categoryId,
-        price,
-        sale_price,
+        categoryId: Number(categoryId),
+        price: productPrice,
+        sale_price: productSalePrice,
       },
     });
 
@@ -205,7 +221,14 @@ export const updateProduct = async (
   try {
     const { id } = req.params;
     const productId = Number(id);
-    const { product_name, product_image, categoryId } = req.body;
+
+    const { product_name, product_image, categoryId, price, sale_price } =
+      req.body;
+
+    // =========================
+    // FIND PRODUCT
+    // =========================
+
     const result = await prisma.product.findUnique({
       where: {
         id: productId,
@@ -215,6 +238,11 @@ export const updateProduct = async (
     if (!result) {
       throw new ApiError(404, "Product not found");
     }
+
+    // =========================
+    // CHECK DUPLICATE NAME
+    // =========================
+
     const existingProduct = await prisma.product.findFirst({
       where: {
         product_name,
@@ -227,23 +255,51 @@ export const updateProduct = async (
     if (existingProduct) {
       throw new ApiError(409, "Product name already exists");
     }
+
+    // =========================
+    // CHECK CATEGORY
+    // =========================
+
     const category = await prisma.category.findUnique({
       where: {
-        id: categoryId,
+        id: Number(categoryId),
       },
     });
+
     if (!category) {
       throw new ApiError(404, "Category not found");
     }
+
+    // =========================
+    // PRICE
+    // =========================
+
+    const productPrice = Number(price);
+
+    const productSalePrice =
+      sale_price !== undefined && sale_price !== null && sale_price !== ""
+        ? Number(sale_price)
+        : null;
+
+    if (productSalePrice !== null && productSalePrice >= productPrice) {
+      throw new ApiError(400, "Sale price must be less than original price");
+    }
+
+    // =========================
+    // UPDATE PRODUCT
+    // =========================
 
     const updatedProduct = await prisma.product.update({
       where: {
         id: productId,
       },
+
       data: {
         product_name,
         product_image,
-        categoryId,
+        categoryId: Number(categoryId),
+        price: productPrice,
+        sale_price: productSalePrice,
       },
     });
 
@@ -257,6 +313,7 @@ export const updateProduct = async (
     next(error);
   }
 };
+
 export const getSpecificProduct = async (
   req: Request,
   res: Response,
@@ -337,6 +394,7 @@ export const getSpecificProduct = async (
     next(error);
   }
 };
+
 export const deleteProduct = async (
   req: Request,
   res: Response,
@@ -344,22 +402,68 @@ export const deleteProduct = async (
 ) => {
   try {
     const { id } = req.params;
+
     const productId = Number(id);
-    const result = await prisma.product.findUnique({
+
+    // =========================
+    // CHECK PRODUCT
+    // =========================
+
+    const product = await prisma.product.findUnique({
       where: {
         id: productId,
       },
     });
 
-    if (!result) {
+    if (!product) {
       throw new ApiError(404, "Product not found");
     }
-    await prisma.product.delete({
+
+    // =========================
+    // CHECK CART
+    // =========================
+
+    const cartItem = await prisma.cartItem.findFirst({
+      where: {
+        productId,
+      },
+    });
+
+    if (cartItem) {
+      throw new ApiError(
+        409,
+        "Product is already in cart. Cannot delete product.",
+      );
+    }
+
+    // =========================
+    // CHECK ORDERS
+    // =========================
+
+    const orderItem = await prisma.orderItem.findFirst({
+      where: {
+        productId,
+      },
+    });
+
+    if (orderItem) {
+      throw new ApiError(
+        409,
+        "Product is already associated with an order. Cannot delete product.",
+      );
+    }
+
+    // =========================
+    // DELETE PRODUCT
+    // =========================
+
+    const result = await prisma.product.delete({
       where: {
         id: productId,
       },
     });
-    return handleResponse(res, 200, "Product delete successfully", result);
+
+    return handleResponse(res, 200, "Product deleted successfully", result);
   } catch (error) {
     next(error);
   }

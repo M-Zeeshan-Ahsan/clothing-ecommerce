@@ -12,6 +12,8 @@ import orderRoutes from "./routes/order.routes.js";
 import addressRoutes from "./routes/address.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import contactRoutes from "./routes/contact.routes.js";
+import uploadRoutes from "./routes/upload.routes.js";
+import newsletterRoutes from "./routes/newsletter.routes.js";
 
 const app = express();
 
@@ -28,5 +30,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/address", addressRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/upload", uploadRoutes);
+app.use("/api/newsletter", newsletterRoutes);
 app.use(errorHandler);
 export default app;

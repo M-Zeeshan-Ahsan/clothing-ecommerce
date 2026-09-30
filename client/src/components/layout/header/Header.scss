@@ -21,6 +21,35 @@
   }
 
   // ==========================
+  // User Avatar
+  // ==========================
+
+  &__avatar-button {
+    padding: 0;
+  }
+
+  &__avatar {
+    width: 25px;
+    height: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #111;
+    color: #fff;
+
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    line-height: 1;
+
+    user-select: none;
+  }
+
+  // ==========================
   // Logo
   // ==========================
 
@@ -72,6 +101,13 @@
       &:hover {
         color: #777;
 
+        &::after {
+          width: 100%;
+        }
+      }
+      &.active {
+        color: #111;
+        font-weight: 600;
         &::after {
           width: 100%;
         }
@@ -149,8 +185,8 @@
   &__cart-count {
     position: absolute;
 
-    top: -5px;
-    right: -5px;
+    top: 0px;
+    right: 0px;
 
     min-width: 17px;
     height: 17px;

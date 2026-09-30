@@ -1,49 +1,150 @@
+import { useEffect, useState } from "react";
+
 import { useNavigate, useParams } from "react-router-dom";
+
+import {
+  useGetAdminOrderByIdQuery,
+  useUpdateAdminOrderStatusMutation,
+} from "../../../store/api/orderApi";
+
+import { getApiErrorMessage } from "../../../utils/apiError";
+import { showToast } from "../../../utils/toast";
 
 import "./OrderDetails.scss";
 
-interface OrderItem {
-  id: number;
-  name: string;
-  image: string;
-  price: number;
-  quantity: number;
-}
+type OrderStatus =
+  | "PENDING"
+  | "CONFIRMED"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELLED";
 
-const orderItems: OrderItem[] = [
-  {
-    id: 1,
-    name: "Nishat Boski Suit",
-    image:
-      "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=200&q=80",
-    price: 5480,
-    quantity: 1,
-  },
-  {
-    id: 2,
-    name: "Premium Cotton Suit",
-    image:
-      "https://images.unsplash.com/photo-1583743814966-8936f37f4678?auto=format&fit=crop&w=200&q=80",
-    price: 4200,
-    quantity: 1,
-  },
-];
+const getAvailableStatuses = (status: OrderStatus): OrderStatus[] => {
+  const statusMap: Record<OrderStatus, OrderStatus[]> = {
+    PENDING: ["PENDING", "CONFIRMED", "CANCELLED"],
+
+    CONFIRMED: ["CONFIRMED", "SHIPPED", "CANCELLED"],
+
+    SHIPPED: ["SHIPPED", "DELIVERED"],
+
+    DELIVERED: ["DELIVERED"],
+
+    CANCELLED: ["CANCELLED"],
+  };
+
+  return statusMap[status];
+};
 
 const OrderDetails = () => {
   const navigate = useNavigate();
+
   const { id } = useParams();
 
-  const subtotal = orderItems.reduce(
-    (total, item) => total + item.price * item.quantity,
+  const orderId = Number(id);
+
+  const {
+    data: orderResponse,
+    isLoading,
+    isError,
+    error,
+  } = useGetAdminOrderByIdQuery(orderId, {
+    skip: !id || Number.isNaN(orderId),
+  });
+
+  const [updateAdminOrderStatus, { isLoading: isUpdatingStatus }] =
+    useUpdateAdminOrderStatusMutation();
+
+  const order = orderResponse?.data;
+
+  const [selectedStatus, setSelectedStatus] = useState<OrderStatus>("PENDING");
+
+  useEffect(() => {
+    if (order) {
+      setSelectedStatus(order.status as OrderStatus);
+    }
+  }, [order]);
+
+  useEffect(() => {
+    if (isError) {
+      showToast(getApiErrorMessage(error), "error");
+    }
+  }, [isError, error]);
+
+  const handleStatusUpdate = async () => {
+    if (!order) {
+      return;
+    }
+
+    if (selectedStatus === order.status) {
+      showToast("Please select a different status", "error");
+
+      return;
+    }
+
+    try {
+      await updateAdminOrderStatus({
+        id: order.id,
+        status: selectedStatus,
+      }).unwrap();
+
+      showToast("Order status updated successfully", "success");
+    } catch (error) {
+      showToast(getApiErrorMessage(error), "error");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="admin-order-details">
+        <p>Loading order...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="admin-order-details">
+        <p>Failed to load order.</p>
+
+        <button type="button" onClick={() => navigate("/admin/orders")}>
+          ← Back to Orders
+        </button>
+      </div>
+    );
+  }
+
+  if (!order) {
+    return (
+      <div className="admin-order-details">
+        <p>Order not found.</p>
+
+        <button type="button" onClick={() => navigate("/admin/orders")}>
+          ← Back to Orders
+        </button>
+      </div>
+    );
+  }
+
+  const customerName = order.user?.name ?? order.address?.fullName ?? "Guest";
+
+  const customerEmail = order.user?.email ?? order.address?.email ?? "No email";
+
+  const totalItems = order.items.reduce(
+    (total, item) => total + item.quantity,
     0,
   );
 
-  const deliveryCharges = 250;
-  const total = subtotal + deliveryCharges;
+  const subtotal = order.items.reduce(
+    (total, item) => total + Number(item.price) * item.quantity,
+    0,
+  );
+
+  const deliveryCharges = Number(order.totalAmount) - subtotal;
 
   return (
     <div className="admin-order-details">
       {/* Header */}
+
       <div className="admin-order-details__header">
         <div>
           <button
@@ -56,50 +157,71 @@ const OrderDetails = () => {
 
           <div className="admin-order-details__title">
             <div>
-              <h1>Order #ORD-1001</h1>
-              <p>Order ID: {id}</p>
+              <h1>Order #ORD-{order.id}</h1>
+
+              <p>Order ID: {order.id}</p>
             </div>
 
-            <span className="admin-order-details__status">Pending</span>
+            <span
+              className={`admin-order-details__status ${order.status
+                .toLowerCase()
+                .replace(" ", "-")}`}
+            >
+              {order.status}
+            </span>
           </div>
         </div>
       </div>
 
       <div className="admin-order-details__layout">
         {/* Main Content */}
+
         <div className="admin-order-details__main">
           {/* Customer */}
+
           <section className="admin-order-details__card">
             <div className="admin-order-details__card-header">
               <h2>Customer Information</h2>
             </div>
 
             <div className="admin-order-details__customer">
-              <div className="admin-order-details__avatar">A</div>
+              <div className="admin-order-details__avatar">
+                {customerName.charAt(0).toUpperCase()}
+              </div>
 
               <div>
-                <strong>Ayesha Khan</strong>
-                <span>ayesha@example.com</span>
-                <span>+92 300 1234567</span>
+                <strong>{customerName}</strong>
+
+                <span>{customerEmail}</span>
+
+                <span>{order.address.phone}</span>
               </div>
             </div>
           </section>
 
           {/* Products */}
+
           <section className="admin-order-details__card">
             <div className="admin-order-details__card-header">
               <h2>Order Items</h2>
-              <span>{orderItems.length} Items</span>
+
+              <span>
+                {totalItems} {totalItems === 1 ? "Item" : "Items"}
+              </span>
             </div>
 
             <div className="admin-order-details__items">
-              {orderItems.map((item) => (
+              {order.items.map((item) => (
                 <div className="admin-order-details__item" key={item.id}>
-                  <img src={item.image} alt={item.name} />
+                  <img
+                    src={item.product.product_image}
+                    alt={item.product.product_name}
+                  />
 
                   <div className="admin-order-details__item-info">
-                    <strong>{item.name}</strong>
-                    <span>Rs. {item.price.toLocaleString()}</span>
+                    <strong>{item.product.product_name}</strong>
+
+                    <span>Rs. {Number(item.price).toLocaleString()}</span>
                   </div>
 
                   <span className="admin-order-details__quantity">
@@ -107,7 +229,7 @@ const OrderDetails = () => {
                   </span>
 
                   <strong className="admin-order-details__item-total">
-                    Rs. {(item.price * item.quantity).toLocaleString()}
+                    Rs. {(Number(item.price) * item.quantity).toLocaleString()}
                   </strong>
                 </div>
               ))}
@@ -115,50 +237,86 @@ const OrderDetails = () => {
           </section>
 
           {/* Shipping Address */}
+
           <section className="admin-order-details__card">
             <div className="admin-order-details__card-header">
               <h2>Shipping Address</h2>
             </div>
 
             <div className="admin-order-details__address">
-              <strong>Ayesha Khan</strong>
+              <strong>{order.address.fullName}</strong>
+
               <p>
-                House 123, Street 5
+                {order.address.address}
                 <br />
-                F-10, Islamabad
-                <br />
-                Pakistan
+
+                {order.address.city}
+
+                {order.address.postalCode && (
+                  <>
+                    <br />
+                    {order.address.postalCode}
+                  </>
+                )}
               </p>
 
-              <span>Phone: +92 300 1234567</span>
+              <span>Phone: {order.address.phone}</span>
+
+              {order.address.email && <span>Email: {order.address.email}</span>}
             </div>
           </section>
         </div>
 
         {/* Sidebar */}
+
         <aside className="admin-order-details__sidebar">
           {/* Order Status */}
+
           <section className="admin-order-details__card">
             <div className="admin-order-details__card-header">
               <h2>Order Status</h2>
             </div>
 
             <div className="admin-order-details__status-form">
-              <label htmlFor="status">Update Status</label>
+              <label htmlFor="status">Current Status</label>
 
-              <select id="status" defaultValue="Pending">
-                <option value="Pending">Pending</option>
-                <option value="Confirmed">Confirmed</option>
-                <option value="Shipped">Shipped</option>
-                <option value="Delivered">Delivered</option>
-                <option value="Cancelled">Cancelled</option>
+              <select
+                id="status"
+                value={selectedStatus}
+                onChange={(e) =>
+                  setSelectedStatus(e.target.value as OrderStatus)
+                }
+                disabled={isUpdatingStatus}
+              >
+                {getAvailableStatuses(order.status as OrderStatus).map(
+                  (status) => (
+                    <option key={status} value={status}>
+                      {status === "PENDING" && "Pending"}
+
+                      {status === "CONFIRMED" && "Confirmed"}
+
+                      {status === "SHIPPED" && "Shipped"}
+
+                      {status === "DELIVERED" && "Delivered"}
+
+                      {status === "CANCELLED" && "Cancelled"}
+                    </option>
+                  ),
+                )}
               </select>
 
-              <button type="button">Update Status</button>
+              <button
+                type="button"
+                onClick={handleStatusUpdate}
+                disabled={isUpdatingStatus || selectedStatus === order.status}
+              >
+                {isUpdatingStatus ? "Updating..." : "Update Status"}
+              </button>
             </div>
           </section>
 
           {/* Payment */}
+
           <section className="admin-order-details__card">
             <div className="admin-order-details__card-header">
               <h2>Payment</h2>
@@ -167,17 +325,20 @@ const OrderDetails = () => {
             <div className="admin-order-details__payment">
               <div>
                 <span>Method</span>
+
                 <strong>Cash on Delivery</strong>
               </div>
 
               <div>
                 <span>Status</span>
+
                 <strong className="unpaid">Unpaid</strong>
               </div>
             </div>
           </section>
 
           {/* Summary */}
+
           <section className="admin-order-details__card">
             <div className="admin-order-details__card-header">
               <h2>Order Summary</h2>
@@ -186,17 +347,22 @@ const OrderDetails = () => {
             <div className="admin-order-details__summary">
               <div>
                 <span>Subtotal</span>
+
                 <strong>Rs. {subtotal.toLocaleString()}</strong>
               </div>
 
               <div>
                 <span>Delivery</span>
+
                 <strong>Rs. {deliveryCharges.toLocaleString()}</strong>
               </div>
 
               <div className="total">
                 <span>Total</span>
-                <strong>Rs. {total.toLocaleString()}</strong>
+
+                <strong>
+                  Rs. {Number(order.totalAmount).toLocaleString()}
+                </strong>
               </div>
             </div>
           </section>

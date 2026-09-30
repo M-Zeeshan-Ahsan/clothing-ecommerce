@@ -8,7 +8,7 @@ export const baseApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_URL,
 
-    prepareHeaders: (headers, { getState }) => {
+    prepareHeaders: (headers, { getState, arg }) => {
       const state = getState() as RootState;
 
       const token = state.auth.accessToken;
@@ -17,13 +17,27 @@ export const baseApi = createApi({
         headers.set("Authorization", `Bearer ${token}`);
       }
 
-      headers.set("Content-Type", "application/json");
+      // =========================
+      // JSON REQUEST
+      // =========================
+      //
+      // FormData ke liye Content-Type
+      // manually set nahi karna.
+      //
+
+      if (
+        typeof arg !== "object" ||
+        !("body" in arg) ||
+        !(arg.body instanceof FormData)
+      ) {
+        headers.set("Content-Type", "application/json");
+      }
 
       return headers;
     },
   }),
 
-  tagTypes: ["Product", "Category", "Profile", "Order"],
+  tagTypes: ["Product", "Category", "Profile", "Order", "User"],
 
   endpoints: () => ({}),
 });

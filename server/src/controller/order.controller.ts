@@ -2,6 +2,7 @@ import prisma from "../prisma/client.js";
 import { Request, Response, NextFunction } from "express";
 import handleResponse from "../utils/response.js";
 import ApiError from "../utils/ApiError.js";
+import { sendOrderConfirmationEmail } from "../services/email.service.js";
 
 export const createOrder = async (
   req: Request,
@@ -151,28 +152,56 @@ export const getOrderById = async (
   }
 };
 
-export const updateOrderStatus = async (
+export const updateAdminOrderStatus = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const { id } = req.params;
-    const orderId = Number(id);
+    const orderId = Number(req.params.id);
     const { status } = req.body;
-    const userId = req.user!.id;
 
-    const order = await prisma.order.findFirst({
-      where: { id: orderId, userId },
+    const order = await prisma.order.findUnique({
+      where: {
+        id: orderId,
+      },
     });
 
     if (!order) {
       throw new ApiError(404, "Order not found");
     }
 
+    // Already completed orders cannot be changed
+    if (order.status === "DELIVERED" || order.status === "CANCELLED") {
+      throw new ApiError(400, `Order is already ${order.status.toLowerCase()}`);
+    }
+
+    // Prevent invalid status transitions
+    const allowedTransitions: Record<string, string[]> = {
+      PENDING: ["CONFIRMED", "CANCELLED"],
+
+      CONFIRMED: ["SHIPPED", "CANCELLED"],
+
+      SHIPPED: ["DELIVERED"],
+    };
+
+    const allowedStatuses = allowedTransitions[order.status] ?? [];
+
+    if (!allowedStatuses.includes(status)) {
+      throw new ApiError(
+        400,
+        `Cannot change order status from ${order.status} to ${status}`,
+      );
+    }
+
     const updatedOrder = await prisma.order.update({
-      where: { id: orderId },
-      data: { status },
+      where: {
+        id: orderId,
+      },
+
+      data: {
+        status,
+      },
     });
 
     return handleResponse(
@@ -185,6 +214,7 @@ export const updateOrderStatus = async (
     next(error);
   }
 };
+
 export const cancelOrder = async (
   req: Request,
   res: Response,
@@ -228,20 +258,150 @@ export const cancelOrder = async (
     next(error);
   }
 };
+
 export const getAllOrders = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    const page = Math.max(Number(req.query.page) || 1, 1);
+
+    const limit = Math.max(Number(req.query.limit) || 10, 1);
+
+    const search =
+      typeof req.query.search === "string" ? req.query.search.trim() : "";
+
+    const status = typeof req.query.status === "string" ? req.query.status : "";
 
     const skip = (page - 1) * limit;
-    const take = limit;
+
+    // =========================
+    // WHERE CONDITION
+    // =========================
+
+    const where: {
+      status?: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+      OR?: Array<{
+        id?: number;
+        user?: {
+          name?: {
+            contains: string;
+            mode: "insensitive";
+          };
+          email?: {
+            contains: string;
+            mode: "insensitive";
+          };
+        };
+        address?: {
+          fullName?: {
+            contains: string;
+            mode: "insensitive";
+          };
+          email?: {
+            contains: string;
+            mode: "insensitive";
+          };
+        };
+      }>;
+    } = {};
+
+    // =========================
+    // STATUS FILTER
+    // =========================
+
+    if (
+      status === "PENDING" ||
+      status === "CONFIRMED" ||
+      status === "SHIPPED" ||
+      status === "DELIVERED" ||
+      status === "CANCELLED"
+    ) {
+      where.status = status;
+    }
+
+    // =========================
+    // SEARCH
+    // =========================
+
+    if (search) {
+      const searchConditions: Array<{
+        id?: number;
+        user?: {
+          name?: {
+            contains: string;
+            mode: "insensitive";
+          };
+          email?: {
+            contains: string;
+            mode: "insensitive";
+          };
+        };
+        address?: {
+          fullName?: {
+            contains: string;
+            mode: "insensitive";
+          };
+          email?: {
+            contains: string;
+            mode: "insensitive";
+          };
+        };
+      }> = [
+        {
+          user: {
+            name: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
+        {
+          user: {
+            email: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
+        {
+          address: {
+            fullName: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
+        {
+          address: {
+            email: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
+      ];
+
+      const orderId = Number(search);
+
+      if (!Number.isNaN(orderId)) {
+        searchConditions.push({
+          id: orderId,
+        });
+      }
+
+      where.OR = searchConditions;
+    }
+
+    // =========================
+    // GET ORDERS + TOTAL
+    // =========================
 
     const [orders, total] = await Promise.all([
       prisma.order.findMany({
+        where,
+
         include: {
           user: {
             select: {
@@ -250,21 +410,27 @@ export const getAllOrders = async (
               email: true,
             },
           },
+
           address: true,
+
           items: {
             include: {
               product: true,
             },
           },
         },
+
         orderBy: {
           createdAt: "desc",
         },
+
         skip,
-        take,
+        take: limit,
       }),
 
-      prisma.order.count(),
+      prisma.order.count({
+        where,
+      }),
     ]);
 
     const totalPages = Math.ceil(total / limit);
@@ -291,7 +457,24 @@ export const createCheckoutOrder = async (
   try {
     const userId = req.user?.id ?? null;
 
-    const { address, items, paymentMethod } = req.body;
+    const { address, items } = req.body;
+
+    // =========================
+    // Guest Email
+    // =========================
+
+    const customerEmail =
+      typeof address.email === "string"
+        ? address.email.trim().toLowerCase()
+        : "";
+
+    if (!userId && !customerEmail) {
+      throw new ApiError(400, "Email is required for guest checkout");
+    }
+
+    // =========================
+    // Product IDs
+    // =========================
 
     const productIds = items.map((item: { productId: number }) =>
       Number(item.productId),
@@ -308,6 +491,10 @@ export const createCheckoutOrder = async (
     if (products.length !== productIds.length) {
       throw new ApiError(400, "One or more products are no longer available");
     }
+
+    // =========================
+    // Order Items
+    // =========================
 
     let subtotal = 0;
 
@@ -340,20 +527,34 @@ export const createCheckoutOrder = async (
       };
     });
 
+    // =========================
+    // Total
+    // =========================
+
     const shippingFee = 199;
 
     const totalAmount = subtotal + shippingFee;
+
+    // =========================
+    // Create Order
+    // =========================
 
     const order = await prisma.$transaction(async (tx) => {
       // Create Address
       const newAddress = await tx.address.create({
         data: {
           userId,
+
           fullName: address.fullName,
+
           phone: address.phone,
-          email: address.email || null,
+
+          email: customerEmail || null,
+
           address: address.address,
+
           city: address.city,
+
           postalCode: address.postalCode || null,
         },
       });
@@ -382,14 +583,79 @@ export const createCheckoutOrder = async (
       return newOrder;
     });
 
+    // =========================
+    // Order Confirmation Email
+    // =========================
+
+    if (customerEmail) {
+      try {
+        await sendOrderConfirmationEmail({
+          to: customerEmail,
+          customerName: address.fullName,
+          orderId: order.id,
+          totalAmount: totalAmount.toLocaleString(),
+          paymentMethod: "COD",
+        });
+      } catch (emailError) {
+        console.error("Order confirmation email failed:", emailError);
+      }
+    }
+
     return handleResponse(res, 201, "Order placed successfully", {
       order,
-      shippingAddress: address,
+      shippingAddress: {
+        ...address,
+        email: customerEmail || null,
+      },
       paymentMethod: "COD",
       subtotal,
       shippingFee,
       totalAmount,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAdminOrderById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+
+    const orderId = Number(id);
+
+    const order = await prisma.order.findUnique({
+      where: {
+        id: orderId,
+      },
+
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+
+        address: true,
+
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new ApiError(404, "Order not found");
+    }
+
+    return handleResponse(res, 200, "Order fetched successfully", order);
   } catch (error) {
     next(error);
   }

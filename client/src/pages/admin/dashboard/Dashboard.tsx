@@ -1,59 +1,95 @@
+import { useNavigate } from "react-router-dom";
+
+import { useGetDashboardStatsQuery } from "../../../store/api/dashboardApi";
+import { getApiErrorMessage } from "../../../utils/apiError";
+import Loader from "../../../components/common/loader/Loader";
+
 import "./Dashboard.scss";
 
 const Dashboard = () => {
-  const stats = [
+  const navigate = useNavigate();
+
+  const { data, isLoading, isError, error } = useGetDashboardStatsQuery();
+
+  if (isLoading) {
+    return (
+      <div className="admin-dashboard">
+        <div className="admin-dashboard__heading">
+          <div>
+            <span>OVERVIEW</span>
+            <h1>Dashboard</h1>
+          </div>
+        </div>
+
+        {/* <div className="admin-dashboard__loading">Loading dashboard...</div> */}
+        <Loader />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="admin-dashboard">
+        <div className="admin-dashboard__heading">
+          <div>
+            <span>OVERVIEW</span>
+            <h1>Dashboard</h1>
+          </div>
+        </div>
+
+        <div className="admin-dashboard__error">
+          <h2>Unable to load dashboard</h2>
+          <p>{getApiErrorMessage(error)}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const stats = data?.data;
+
+  if (!stats) {
+    return null;
+  }
+
+  const statCards = [
     {
       title: "Total Users",
-      value: "1,240",
-      change: "+12.5%",
+      value: stats.totalUsers.toLocaleString(),
     },
     {
       title: "Total Products",
-      value: "86",
-      change: "+8.2%",
+      value: stats.totalProducts.toLocaleString(),
     },
     {
       title: "Total Orders",
-      value: "342",
-      change: "+18.4%",
+      value: stats.totalOrders.toLocaleString(),
     },
     {
       title: "Total Sales",
-      value: "Rs. 842,500",
-      change: "+15.7%",
+      value: `Rs. ${Number(stats.totalSales).toLocaleString()}`,
     },
   ];
 
-  const recentOrders = [
+  const orderStatuses = [
     {
-      id: "#1001",
-      customer: "Ali Ahmed",
-      amount: "Rs. 8,500",
-      status: "Pending",
+      label: "Pending",
+      value: stats.orders.pending,
     },
     {
-      id: "#1002",
-      customer: "Ahmed Khan",
-      amount: "Rs. 5,200",
-      status: "Shipped",
+      label: "Confirmed",
+      value: stats.orders.confirmed,
     },
     {
-      id: "#1003",
-      customer: "Sara Malik",
-      amount: "Rs. 12,400",
-      status: "Delivered",
+      label: "Shipped",
+      value: stats.orders.shipped,
     },
     {
-      id: "#1004",
-      customer: "Hassan Ali",
-      amount: "Rs. 6,800",
-      status: "Confirmed",
+      label: "Delivered",
+      value: stats.orders.delivered,
     },
     {
-      id: "#1005",
-      customer: "Ayesha Noor",
-      amount: "Rs. 4,500",
-      status: "Pending",
+      label: "Cancelled",
+      value: stats.orders.cancelled,
     },
   ];
 
@@ -71,7 +107,7 @@ const Dashboard = () => {
 
       {/* Stats */}
       <div className="admin-dashboard__stats">
-        {stats.map((stat) => (
+        {statCards.map((stat) => (
           <div key={stat.title} className="admin-dashboard__stat">
             <div className="admin-dashboard__stat-top">
               <span>{stat.title}</span>
@@ -80,10 +116,6 @@ const Dashboard = () => {
             </div>
 
             <strong>{stat.value}</strong>
-
-            <small>
-              <b>{stat.change}</b> from last month
-            </small>
           </div>
         ))}
       </div>
@@ -98,37 +130,52 @@ const Dashboard = () => {
               <h2>Recent Orders</h2>
             </div>
 
-            <a href="/admin/orders">View All</a>
+            <button type="button" onClick={() => navigate("/admin/orders")}>
+              View All
+            </button>
           </div>
 
           <div className="admin-dashboard__table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Order</th>
-                  <th>Customer</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
+            {stats.recentOrders.length === 0 ? (
+              <div className="admin-dashboard__empty-orders">
+                <p>No orders found.</p>
 
-              <tbody>
-                {recentOrders.map((order) => (
-                  <tr key={order.id}>
-                    <td>{order.id}</td>
-                    <td>{order.customer}</td>
-                    <td>{order.amount}</td>
-                    <td>
-                      <span
-                        className={`status status--${order.status.toLowerCase()}`}
-                      >
-                        {order.status}
-                      </span>
-                    </td>
+                <button type="button" onClick={() => navigate("/admin/orders")}>
+                  View Orders
+                </button>
+              </div>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Amount</th>
+                    <th>Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody>
+                  {stats.recentOrders.map((order) => (
+                    <tr key={order.id}>
+                      <td>#{order.id}</td>
+
+                      <td>{order.address.fullName}</td>
+
+                      <td>Rs. {Number(order.totalAmount).toLocaleString()}</td>
+
+                      <td>
+                        <span
+                          className={`status status--${order.status.toLowerCase()}`}
+                        >
+                          {order.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </section>
 
@@ -142,30 +189,13 @@ const Dashboard = () => {
           </div>
 
           <div className="admin-dashboard__summary-list">
-            <div>
-              <span>Pending</span>
-              <strong>42</strong>
-            </div>
+            {orderStatuses.map((status) => (
+              <div key={status.label}>
+                <span>{status.label}</span>
 
-            <div>
-              <span>Confirmed</span>
-              <strong>65</strong>
-            </div>
-
-            <div>
-              <span>Shipped</span>
-              <strong>38</strong>
-            </div>
-
-            <div>
-              <span>Delivered</span>
-              <strong>187</strong>
-            </div>
-
-            <div>
-              <span>Cancelled</span>
-              <strong>10</strong>
-            </div>
+                <strong>{status.value}</strong>
+              </div>
+            ))}
           </div>
         </section>
       </div>

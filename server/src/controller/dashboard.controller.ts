@@ -1,7 +1,7 @@
-import prisma from "../prisma/client.js";
 import { Request, Response, NextFunction } from "express";
+
+import prisma from "../prisma/client.js";
 import handleResponse from "../utils/response.js";
-import ApiError from "../utils/ApiError.js";
 
 export const getDashboardStats = async (
   req: Request,
@@ -20,6 +20,7 @@ export const getDashboardStats = async (
       deliveredOrders,
       cancelledOrders,
       sales,
+      recentOrders,
     ] = await Promise.all([
       prisma.user.count(),
 
@@ -69,6 +70,20 @@ export const getDashboardStats = async (
           },
         },
       }),
+
+      prisma.order.findMany({
+        take: 5,
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          address: {
+            select: {
+              fullName: true,
+            },
+          },
+        },
+      }),
     ]);
 
     return handleResponse(res, 200, "Dashboard stats fetched successfully", {
@@ -86,6 +101,8 @@ export const getDashboardStats = async (
       },
 
       totalSales: sales._sum.totalAmount || 0,
+
+      recentOrders,
     });
   } catch (error) {
     next(error);

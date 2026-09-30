@@ -44,3 +44,19 @@ export const userRoleSchema = Joi.object({
     "any.required": "Role is required",
   }),
 });
+export const createUserSchema = Joi.object({
+  name: Joi.string().trim().min(2).max(100).required(),
+  email: Joi.string().trim().email().required(),
+  password: Joi.string().min(6).required(),
+  role: Joi.string().valid("USER", "ADMIN").required(),
+});
+
+export const updateUserSchema = Joi.object({
+  name: Joi.string().trim().min(2).max(100).required(),
+
+  email: Joi.string().trim().email().required(),
+
+  password: Joi.string().min(6).allow("").optional(),
+
+  role: Joi.string().valid("USER", "ADMIN").required(),
+});

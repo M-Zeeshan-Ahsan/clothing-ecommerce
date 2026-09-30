@@ -3,6 +3,8 @@ import "./ProductCard.scss";
 import type { Product } from "../../types/product";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { toggleWishlist } from "../../store/slices/wishlistSlice";
+import { showToast } from "../../utils/toast";
+import { addToCart } from "../../store/slices/cartSlice";
 
 interface Props {
   product: Product;
@@ -16,7 +18,20 @@ const ProductCard = ({ product }: Props) => {
 
   const isSale =
     product.sale_price !== null && product.sale_price !== undefined;
+  const handleAddToCart = () => {
+    dispatch(
+      addToCart({
+        id: product.id,
+        name: product.product_name,
+        price: product.current_price,
+        image: product.product_image,
+        category: product.category.category_name,
+        badge: product.badge ?? undefined,
+      }),
+    );
 
+    showToast("Product added to cart", "success");
+  };
   return (
     <div className="product-card">
       {/* Product Image */}
@@ -92,6 +107,7 @@ const ProductCard = ({ product }: Props) => {
             type="button"
             className="product-card__cart"
             aria-label={`Add ${product.product_name} to cart`}
+            onClick={handleAddToCart}
           >
             +
           </button>

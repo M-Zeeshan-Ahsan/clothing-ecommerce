@@ -50,3 +50,40 @@ export const multipleIdsSchema = Joi.object({
       "number.positive": "Each ID must be a positive number",
     }),
 });
+
+export const updateProductSchema = Joi.object({
+  product_name: Joi.string().trim().min(3).max(50).required().messages({
+    "string.empty": "Product name is required",
+    "string.min": "Product name must be at least 3 characters",
+    "string.max": "Product name must not exceed 50 characters",
+    "any.required": "Product name is required",
+    "string.base": "Product name must be a string",
+  }),
+  product_image: Joi.string().trim().uri().required().messages({
+    "string.empty": "Product image URL is required",
+    "string.uri": "Product image must be a valid URL",
+    "any.required": "Product image URL is required",
+    "string.base": "Product image must be a string",
+  }),
+  categoryId: Joi.number().integer().positive().required().messages({
+    "number.base": "Category ID must be a number",
+    "number.integer": "Category ID must be an integer",
+    "number.positive": "Category ID must be a positive number",
+    "any.required": "Category ID is required",
+  }),
+
+  price: Joi.number().positive().required().messages({
+    "number.base": "Price must be a number",
+    "number.positive": "Price must be greater than 0",
+    "any.required": "Price is required",
+  }),
+
+  sale_price: Joi.number()
+    .less(Joi.ref("price"))
+    .allow(null, "")
+    .optional()
+    .messages({
+      "number.base": "Sale price must be a number",
+      "number.less": "Sale price must be less than original price",
+    }),
+});

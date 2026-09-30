@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./Header.scss";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 
@@ -29,6 +29,20 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   const wishlistCount = wishlistItems.length;
+
+  // =========================
+  // USER INITIALS
+  // =========================
+
+  const getUserInitials = (name: string) => {
+    const words = name.trim().split(/\s+/);
+
+    if (words.length >= 2) {
+      return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+    }
+
+    return name.trim().slice(0, 2).toUpperCase();
+  };
 
   const handleSearchToggle = () => {
     setSearchOpen((prev) => !prev);
@@ -62,26 +76,26 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
 
         {/* Navigation */}
         <nav className={`header__nav ${menuOpen ? "active" : ""}`}>
-          <Link to="/" onClick={closeMobileMenu}>
-            Home
-          </Link>
-
-          <Link to="/shop" onClick={closeMobileMenu}>
-            Shop
-          </Link>
-
-          <Link to="/categories" onClick={closeMobileMenu}>
-            Categories
-          </Link>
-
-          <Link to="/new-arrivals" onClick={closeMobileMenu}>
-            New Arrivals
-          </Link>
-
-          <Link to="/sale" onClick={closeMobileMenu}>
-            Sale
-          </Link>
-
+          <NavLink to="/" end onClick={closeMobileMenu}>
+            {" "}
+            Home{" "}
+          </NavLink>{" "}
+          <NavLink to="/shop" onClick={closeMobileMenu}>
+            {" "}
+            Shop{" "}
+          </NavLink>{" "}
+          <NavLink to="/categories" onClick={closeMobileMenu}>
+            {" "}
+            Categories{" "}
+          </NavLink>{" "}
+          <NavLink to="/new-arrivals" onClick={closeMobileMenu}>
+            {" "}
+            New Arrivals{" "}
+          </NavLink>{" "}
+          <NavLink to="/sale" onClick={closeMobileMenu}>
+            {" "}
+            Sale{" "}
+          </NavLink>
           {/* Mobile Auth */}
           <div className="header__mobile-auth">
             {!isAuthenticated ? (
@@ -124,14 +138,13 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
           {isAuthenticated && user ? (
             <div className="header__account">
               <button
-                className="header__action"
+                className="header__action header__avatar-button"
                 aria-label="Account"
                 onClick={() => navigate("/profile")}
               >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="12" cy="8" r="4" />
-                  <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7" />
-                </svg>
+                <span className="header__avatar">
+                  {getUserInitials(user.name)}
+                </span>
               </button>
 
               <div className="header__account-menu">

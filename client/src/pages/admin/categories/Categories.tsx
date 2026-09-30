@@ -3,67 +3,15 @@ import { useNavigate } from "react-router-dom";
 
 import Pagination from "../../../components/common/pagination/Pagination";
 
+import {
+  useDeleteCategoryMutation,
+  useGetCategoriesQuery,
+} from "../../../store/api/categoryApi";
+
+import { showToast } from "../../../utils/toast";
+import { getApiErrorMessage } from "../../../utils/apiError";
+
 import "./Categories.scss";
-
-interface AdminCategory {
-  id: number;
-  name: string;
-  slug: string;
-  products: number;
-  status: "Active" | "Inactive";
-  createdAt: string;
-}
-
-const dummyCategories: AdminCategory[] = [
-  {
-    id: 1,
-    name: "Lawn",
-    slug: "lawn",
-    products: 18,
-    status: "Active",
-    createdAt: "20 Sep 2026",
-  },
-  {
-    id: 2,
-    name: "Cotton",
-    slug: "cotton",
-    products: 12,
-    status: "Active",
-    createdAt: "18 Sep 2026",
-  },
-  {
-    id: 3,
-    name: "Boski",
-    slug: "boski",
-    products: 15,
-    status: "Active",
-    createdAt: "15 Sep 2026",
-  },
-  {
-    id: 4,
-    name: "Wash Wear",
-    slug: "wash-wear",
-    products: 8,
-    status: "Active",
-    createdAt: "12 Sep 2026",
-  },
-  {
-    id: 5,
-    name: "Men",
-    slug: "men",
-    products: 10,
-    status: "Active",
-    createdAt: "10 Sep 2026",
-  },
-  {
-    id: 6,
-    name: "Winter Collection",
-    slug: "winter-collection",
-    products: 0,
-    status: "Inactive",
-    createdAt: "05 Sep 2026",
-  },
-];
 
 const CATEGORIES_PER_PAGE = 5;
 
@@ -73,11 +21,18 @@ const Categories = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
+  const { data, isLoading, isError, error } = useGetCategoriesQuery();
+
+  const [deleteCategory, { isLoading: isDeleting }] =
+    useDeleteCategoryMutation();
+
+  const categories = data?.data ?? [];
+
   const filteredCategories = useMemo(() => {
-    return dummyCategories.filter((category) =>
-      category.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    return categories.filter((category) =>
+      category.category_name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-  }, [searchTerm]);
+  }, [categories, searchTerm]);
 
   const totalPages = Math.ceil(filteredCategories.length / CATEGORIES_PER_PAGE);
 
@@ -91,6 +46,62 @@ const Categories = () => {
     setCurrentPage(1);
   };
 
+  const handleDelete = async (id: number) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this category?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteCategory(id).unwrap();
+
+      showToast("Category deleted successfully", "success");
+
+      // Agar last item delete hone ke baad
+      // current page empty ho jaye
+      if (paginatedCategories.length === 1 && currentPage > 1) {
+        setCurrentPage((prev) => prev - 1);
+      }
+    } catch (error) {
+      showToast(getApiErrorMessage(error), "error");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="admin-categories">
+        <div className="admin-categories__header">
+          <div>
+            <h1>Categories</h1>
+            <p>Manage your product categories</p>
+          </div>
+        </div>
+
+        <div className="admin-categories__empty">Loading categories...</div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="admin-categories">
+        <div className="admin-categories__header">
+          <div>
+            <h1>Categories</h1>
+            <p>Manage your product categories</p>
+          </div>
+        </div>
+
+        <div className="admin-categories__empty">
+          {getApiErrorMessage(error)}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="admin-categories">
       {/* Page Header */}
@@ -101,6 +112,7 @@ const Categories = () => {
         </div>
 
         <button
+          type="button"
           className="admin-categories__add-btn"
           onClick={() => navigate("/admin/categories/add")}
         >
@@ -143,11 +155,12 @@ const Categories = () => {
                   <td>
                     <div className="admin-categories__category">
                       <div className="admin-categories__icon">
-                        {category.name.charAt(0)}
+                        {category.category_name.charAt(0)}
                       </div>
 
                       <div>
-                        <strong>{category.name}</strong>
+                        <strong>{category.category_name}</strong>
+
                         <span>#{category.id}</span>
                       </div>
                     </div>
@@ -155,23 +168,27 @@ const Categories = () => {
 
                   <td>
                     <span className="admin-categories__slug">
-                      {category.slug}
+                      {category.category_name
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")}
                     </span>
                   </td>
 
-                  <td>{category.products}</td>
+                  <td>{category._count?.products ?? 0}</td>
 
                   <td>
-                    <span
-                      className={`admin-categories__status ${
-                        category.status === "Active" ? "active" : "inactive"
-                      }`}
-                    >
-                      {category.status}
+                    <span className="admin-categories__status active">
+                      Active
                     </span>
                   </td>
 
-                  <td>{category.createdAt}</td>
+                  <td>
+                    {new Date(category.createdAt).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </td>
 
                   <td>
                     <div className="admin-categories__actions">
@@ -185,7 +202,12 @@ const Categories = () => {
                         ✎
                       </button>
 
-                      <button type="button" title="Delete">
+                      <button
+                        type="button"
+                        title="Delete"
+                        disabled={isDeleting}
+                        onClick={() => handleDelete(category.id)}
+                      >
                         🗑
                       </button>
                     </div>

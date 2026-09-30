@@ -1,117 +1,226 @@
 .user-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  background: #ffffff;
+  border: 1px solid #e9e9e9;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 
-  &__card {
-    background: #fff;
-    border: 1px solid #e8e8e8;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-
-  &__card-header {
-    padding: 18px 20px;
-    border-bottom: 1px solid #eee;
-
-    h2 {
-      margin: 0;
-      font-size: 17px;
-      font-weight: 650;
-    }
-  }
-
-  &__fields {
+  &__grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    padding: 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
   }
 
-  &__group {
+  &__field {
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 8px;
 
     label {
-      color: #333;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
+      color: #252525;
+
+      span {
+        font-size: 12px;
+        font-weight: 400;
+        color: #888888;
+      }
     }
 
     input,
     select {
       width: 100%;
-      height: 42px;
-      padding: 0 12px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background: #fff;
-      color: #222;
+      height: 46px;
+      padding: 0 14px;
+      border: 1px solid #dddddd;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #222222;
       font-size: 14px;
       outline: none;
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+
+      &::placeholder {
+        color: #999999;
+      }
 
       &:focus {
-        border-color: #222;
+        border-color: #222222;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+      }
+
+      &:disabled {
+        background: #f6f6f6;
+        color: #999999;
+        cursor: not-allowed;
       }
     }
 
-    small {
-      color: #888;
-      font-size: 12px;
-      line-height: 1.4;
+    select {
+      cursor: pointer;
+
+      &:disabled {
+        cursor: not-allowed;
+      }
     }
+  }
+
+  &__error {
+    margin: 20px 0 0;
+    padding: 11px 14px;
+    border-radius: 7px;
+    background: #fff1f1;
+    border: 1px solid #ffd4d4;
+    color: #d93025;
+    font-size: 13px;
+    line-height: 1.4;
   }
 
   &__actions {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     gap: 12px;
+    margin-top: 28px;
+    padding-top: 22px;
+    border-top: 1px solid #eeeeee;
   }
 
   &__cancel,
   &__submit {
-    height: 42px;
-    padding: 0 20px;
-    border-radius: 6px;
+    height: 44px;
+    padding: 0 22px;
+    border-radius: 8px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
+    transition:
+      background 0.2s ease,
+      border-color 0.2s ease,
+      opacity 0.2s ease,
+      transform 0.2s ease;
   }
 
   &__cancel {
-    border: 1px solid #ddd;
-    background: #fff;
-    color: #333;
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    color: #333333;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background: #f7f7f7;
+      border-color: #cccccc;
     }
   }
 
   &__submit {
-    border: none;
-    background: #111;
-    color: #fff;
+    background: #111111;
+    border: 1px solid #111111;
+    color: #ffffff;
 
-    &:hover {
-      background: #333;
+    &:hover:not(:disabled) {
+      background: #2a2a2a;
+      border-color: #2a2a2a;
     }
+  }
+
+  &__cancel:disabled,
+  &__submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
   .user-form {
-    &__fields {
+    padding: 20px;
+
+    &__grid {
       grid-template-columns: 1fr;
+      gap: 18px;
     }
 
     &__actions {
       flex-direction: column-reverse;
+      align-items: stretch;
+    }
 
-      button {
-        width: 100%;
+    &__cancel,
+    &__submit {
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .user-form {
+    padding: 16px;
+    border-radius: 9px;
+
+    &__field {
+      gap: 6px;
+
+      label {
+        font-size: 13px;
       }
+
+      input,
+      select {
+        height: 44px;
+        font-size: 13px;
+      }
+    }
+
+    &__actions {
+      margin-top: 22px;
+      padding-top: 18px;
+    }
+  }
+}
+
+.user-form {
+  &__password {
+    position: relative;
+
+    input {
+      padding-right: 45px;
+    }
+  }
+
+  &__password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 13px;
+    transform: translateY(-50%);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 28px;
+    height: 28px;
+    padding: 0;
+
+    border: none;
+    background: transparent;
+    color: #777777;
+
+    cursor: pointer;
+
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #111111;
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
     }
   }
 }
