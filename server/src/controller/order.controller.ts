@@ -2,6 +2,7 @@ import prisma from "../prisma/client.js";
 import { Request, Response, NextFunction } from "express";
 import handleResponse from "../utils/response.js";
 import ApiError from "../utils/ApiError.js";
+import { sendOrderConfirmationEmail } from "../services/email.service.js";
 
 export const createOrder = async (
   req: Request,
@@ -581,6 +582,24 @@ export const createCheckoutOrder = async (
 
       return newOrder;
     });
+
+    // =========================
+    // Order Confirmation Email
+    // =========================
+
+    if (customerEmail) {
+      try {
+        await sendOrderConfirmationEmail({
+          to: customerEmail,
+          customerName: address.fullName,
+          orderId: order.id,
+          totalAmount: totalAmount.toLocaleString(),
+          paymentMethod: "COD",
+        });
+      } catch (emailError) {
+        console.error("Order confirmation email failed:", emailError);
+      }
+    }
 
     return handleResponse(res, 201, "Order placed successfully", {
       order,
