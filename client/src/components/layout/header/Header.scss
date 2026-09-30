@@ -105,6 +105,13 @@
           width: 100%;
         }
       }
+      &.active {
+        color: #111;
+        font-weight: 600;
+        &::after {
+          width: 100%;
+        }
+      }
     }
   }
 

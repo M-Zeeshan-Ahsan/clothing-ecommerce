@@ -1,7 +1,43 @@
 import "./Footer.scss";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useSubscribeNewsletterMutation } from "../../../store/api/newsletterApi";
+import { showToast } from "../../../utils/toast";
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+
+  const [subscribeNewsletter, { isLoading }] = useSubscribeNewsletterMutation();
+  const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!email.trim()) {
+      showToast("Please enter your email", "error");
+      return;
+    }
+
+    try {
+      const response = await subscribeNewsletter({
+        email: email.trim(),
+      }).unwrap();
+
+      showToast(response.message, "success");
+      setEmail("");
+    } catch (error) {
+      const message =
+        typeof error === "object" && error !== null && "data" in error
+          ? (
+              error as {
+                data?: {
+                  message?: string;
+                };
+              }
+            ).data?.message
+          : "Something went wrong";
+
+      showToast(message || "Something went wrong", "error");
+    }
+  };
   return (
     <footer className="footer">
       <div className="footer__container">
@@ -62,14 +98,18 @@ const Footer = () => {
             more.
           </p>
 
-          <form className="footer__form">
+          <form className="footer__form" onSubmit={handleSubscribe}>
             <input
               type="email"
-              placeholder="Your email address"
-              aria-label="Email address"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
             />
 
-            <button type="submit">Subscribe</button>
+            <button type="submit" disabled={isLoading}>
+              {isLoading ? "Subscribing..." : "Subscribe"}
+            </button>
           </form>
         </div>
       </div>

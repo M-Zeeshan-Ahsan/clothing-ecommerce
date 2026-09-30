@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./Header.scss";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 
@@ -76,26 +76,26 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
 
         {/* Navigation */}
         <nav className={`header__nav ${menuOpen ? "active" : ""}`}>
-          <Link to="/" onClick={closeMobileMenu}>
-            Home
-          </Link>
-
-          <Link to="/shop" onClick={closeMobileMenu}>
-            Shop
-          </Link>
-
-          <Link to="/categories" onClick={closeMobileMenu}>
-            Categories
-          </Link>
-
-          <Link to="/new-arrivals" onClick={closeMobileMenu}>
-            New Arrivals
-          </Link>
-
-          <Link to="/sale" onClick={closeMobileMenu}>
-            Sale
-          </Link>
-
+          <NavLink to="/" end onClick={closeMobileMenu}>
+            {" "}
+            Home{" "}
+          </NavLink>{" "}
+          <NavLink to="/shop" onClick={closeMobileMenu}>
+            {" "}
+            Shop{" "}
+          </NavLink>{" "}
+          <NavLink to="/categories" onClick={closeMobileMenu}>
+            {" "}
+            Categories{" "}
+          </NavLink>{" "}
+          <NavLink to="/new-arrivals" onClick={closeMobileMenu}>
+            {" "}
+            New Arrivals{" "}
+          </NavLink>{" "}
+          <NavLink to="/sale" onClick={closeMobileMenu}>
+            {" "}
+            Sale{" "}
+          </NavLink>
           {/* Mobile Auth */}
           <div className="header__mobile-auth">
             {!isAuthenticated ? (
