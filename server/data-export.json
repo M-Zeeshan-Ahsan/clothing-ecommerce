@@ -1,0 +1,122 @@
+{
+  "categories": [
+    {
+      "id": 2,
+      "createdAt": "2026-08-31T06:41:38.339Z",
+      "updatedAt": "2026-08-31T07:24:55.327Z",
+      "category_name": "Men",
+      "category_image": "https://images.unsplash.com/photo-1603252110481-7ba873bf42ab?auto=format&fit=crop&w=900&q=85",
+      "category_slogan": "Classic looks for modern men."
+    },
+    {
+      "id": 3,
+      "createdAt": "2026-08-31T06:41:51.652Z",
+      "updatedAt": "2026-09-28T06:05:11.858Z",
+      "category_name": "Women",
+      "category_image": "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=900&q=85",
+      "category_slogan": "Elegant styles designed for every occasion."
+    }
+  ],
+  "products": [
+    {
+      "id": 13,
+      "product_name": "Women Elegant Outfit",
+      "product_image": "https://images.unsplash.com/photo-1610030469983-98e550d6193c",
+      "createdAt": "2026-09-23T06:00:43.901Z",
+      "updatedAt": "2026-09-23T06:00:43.901Z",
+      "categoryId": 3,
+      "price": "4200",
+      "sale_price": null
+    },
+    {
+      "id": 14,
+      "product_name": "Women Printed Kurti",
+      "product_image": "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446",
+      "createdAt": "2026-09-23T06:00:57.001Z",
+      "updatedAt": "2026-09-23T06:07:37.559Z",
+      "categoryId": 3,
+      "price": "2400",
+      "sale_price": null
+    },
+    {
+      "id": 16,
+      "product_name": "Women Casual Dress",
+      "product_image": "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446",
+      "createdAt": "2026-09-23T06:01:20.944Z",
+      "updatedAt": "2026-09-23T06:01:20.944Z",
+      "categoryId": 3,
+      "price": "3500",
+      "sale_price": null
+    },
+    {
+      "id": 17,
+      "product_name": "Women Casual Tops",
+      "product_image": "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446",
+      "createdAt": "2026-09-23T06:01:32.296Z",
+      "updatedAt": "2026-09-23T06:05:49.850Z",
+      "categoryId": 3,
+      "price": "3200",
+      "sale_price": null
+    },
+    {
+      "id": 18,
+      "product_name": "Men Polo Shirt",
+      "product_image": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf",
+      "createdAt": "2026-09-23T06:01:40.903Z",
+      "updatedAt": "2026-09-23T06:11:29.000Z",
+      "categoryId": 2,
+      "price": "2200",
+      "sale_price": null
+    },
+    {
+      "id": 19,
+      "product_name": "Men Denim Jacket",
+      "product_image": "https://images.unsplash.com/photo-1551028719-00167b16eac5",
+      "createdAt": "2026-09-23T06:01:48.738Z",
+      "updatedAt": "2026-09-23T06:01:48.738Z",
+      "categoryId": 2,
+      "price": "3500",
+      "sale_price": null
+    },
+    {
+      "id": 20,
+      "product_name": "Men Casual Shirt",
+      "product_image": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf",
+      "createdAt": "2026-09-23T06:01:57.536Z",
+      "updatedAt": "2026-09-23T06:01:57.536Z",
+      "categoryId": 2,
+      "price": "2500",
+      "sale_price": null
+    },
+    {
+      "id": 21,
+      "product_name": "Men Cotton T-Shirt",
+      "product_image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab",
+      "createdAt": "2026-09-23T06:02:05.976Z",
+      "updatedAt": "2026-09-23T06:02:05.976Z",
+      "categoryId": 2,
+      "price": "1800",
+      "sale_price": null
+    },
+    {
+      "id": 29,
+      "product_name": "Men Casual",
+      "product_image": "https://images.unsplash.com/photo-1521369909029-2afed882baee",
+      "createdAt": "2026-09-23T07:05:42.564Z",
+      "updatedAt": "2026-09-23T07:05:42.564Z",
+      "categoryId": 2,
+      "price": "1200",
+      "sale_price": "999"
+    },
+    {
+      "id": 30,
+      "product_name": "Men Premium Casual Cap",
+      "product_image": "https://images.unsplash.com/photo-1521369909029-2afed882baee",
+      "createdAt": "2026-09-23T07:05:57.963Z",
+      "updatedAt": "2026-09-23T07:05:57.963Z",
+      "categoryId": 2,
+      "price": "1200",
+      "sale_price": "999"
+    }
+  ]
+}
