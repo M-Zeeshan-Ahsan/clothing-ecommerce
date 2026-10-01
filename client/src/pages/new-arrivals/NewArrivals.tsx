@@ -98,7 +98,7 @@ const NewArrivals = () => {
 
           <h1>New Arrivals</h1>
 
-          <p>Explore the latest additions to the LIBAAS collection.</p>
+          <p>Explore the latest additions to the ESHANI collection.</p>
         </div>
       </section>
 
@@ -107,7 +107,7 @@ const NewArrivals = () => {
         {/* Header */}
         <div className="new-arrivals__header">
           <div>
-            <span>FRESH FROM LIBAAS</span>
+            <span>FRESH FROM ESHANI</span>
 
             <h2>Latest Collection</h2>
           </div>

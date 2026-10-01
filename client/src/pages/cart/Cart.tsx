@@ -122,7 +122,7 @@ const Cart = () => {
 
           <div className="cart__summary-row">
             <span>Shipping</span>
-            <span>Free</span>
+            <span>199</span>
           </div>
 
           <div className="cart__summary-divider" />

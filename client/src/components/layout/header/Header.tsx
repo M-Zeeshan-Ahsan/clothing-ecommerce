@@ -71,7 +71,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
       <div className="header__container">
         {/* Logo */}
         <Link to="/" className="header__logo" onClick={closeMobileMenu}>
-          LIBAAS
+          ESHANI
         </Link>
 
         {/* Navigation */}

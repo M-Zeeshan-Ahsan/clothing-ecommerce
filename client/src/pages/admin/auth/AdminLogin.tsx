@@ -55,7 +55,7 @@ const AdminLogin = () => {
     <main className="admin-login">
       <div className="admin-login__card">
         <div className="admin-login__brand">
-          <h1>LIBAAS</h1>
+          <h1>ESHANI</h1>
           <span>ADMIN PANEL</span>
         </div>
 

@@ -59,7 +59,7 @@ const Login = () => {
         <div className="auth-page__header">
           <span className="auth-page__eyebrow">WELCOME BACK</span>
 
-          <h1>Login to LIBAAS</h1>
+          <h1>Login to ESHANI</h1>
 
           <p>Sign in to your account to continue shopping.</p>
         </div>

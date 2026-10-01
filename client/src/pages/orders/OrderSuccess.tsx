@@ -10,12 +10,12 @@ const OrderSuccess = () => {
       <div className="order-success__container">
         <div className="order-success__icon">✓</div>
 
-        <span className="order-success__subtitle">LIBAAS ORDER</span>
+        <span className="order-success__subtitle">ESHANI ORDER</span>
 
         <h1>Order Placed Successfully!</h1>
 
         <p className="order-success__message">
-          Thank you for shopping with LIBAAS. Your order has been received and
+          Thank you for shopping with ESHANI. Your order has been received and
           will be processed shortly.
         </p>
 

@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&display=swap");
 .footer {
   background: #111;
   color: #fff;
@@ -29,6 +30,9 @@
     letter-spacing: 5px;
 
     margin-bottom: 20px;
+    font-family: "Cinzel", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
   }
 
   &__brand p {

@@ -2,7 +2,10 @@ import prisma from "../prisma/client.js";
 import { Request, Response, NextFunction } from "express";
 import handleResponse from "../utils/response.js";
 import ApiError from "../utils/ApiError.js";
-import { sendOrderConfirmationEmail } from "../services/email.service.js";
+import {
+  sendOrderConfirmationEmail,
+  sendNewOrderNotificationEmail,
+} from "../services/email.service.js";
 
 export const createOrder = async (
   req: Request,
@@ -584,7 +587,7 @@ export const createCheckoutOrder = async (
     });
 
     // =========================
-    // Order Confirmation Email
+    // Customer Confirmation Email
     // =========================
 
     if (customerEmail) {
@@ -593,12 +596,67 @@ export const createCheckoutOrder = async (
           to: customerEmail,
           customerName: address.fullName,
           orderId: order.id,
+
+          items: orderItems.map((item) => {
+            const product = products.find(
+              (product) => product.id === item.productId,
+            );
+
+            return {
+              productName: product?.product_name || "Unknown Product",
+              quantity: item.quantity,
+              price: Number(item.price).toLocaleString(),
+            };
+          }),
+
+          subtotal: subtotal.toLocaleString(),
+          shippingFee: shippingFee.toLocaleString(),
           totalAmount: totalAmount.toLocaleString(),
-          paymentMethod: "COD",
+
+          paymentMethod: "Cash on Delivery",
+
+          address: address.address,
+          city: address.city,
         });
       } catch (emailError) {
-        console.error("Order confirmation email failed:", emailError);
+        console.error("Customer confirmation email failed:", emailError);
       }
+    }
+
+    // =========================
+    // ESHANI New Order Notification
+    // =========================
+
+    try {
+      await sendNewOrderNotificationEmail({
+        orderId: order.id,
+        customerName: address.fullName,
+        customerEmail: customerEmail || "Guest",
+        phone: address.phone,
+        address: address.address,
+        city: address.city,
+        postalCode: address.postalCode,
+
+        items: orderItems.map((item) => {
+          const product = products.find(
+            (product) => product.id === item.productId,
+          );
+
+          return {
+            productName: product?.product_name || "Unknown Product",
+            quantity: item.quantity,
+            price: Number(item.price).toLocaleString(),
+          };
+        }),
+
+        subtotal: subtotal.toLocaleString(),
+        shippingFee: shippingFee.toLocaleString(),
+        totalAmount: totalAmount.toLocaleString(),
+
+        paymentMethod: "Cash on Delivery",
+      });
+    } catch (emailError) {
+      console.error("New order notification email failed:", emailError);
     }
 
     return handleResponse(res, 201, "Order placed successfully", {

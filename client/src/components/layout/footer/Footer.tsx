@@ -44,7 +44,7 @@ const Footer = () => {
         {/* Brand */}
         <div className="footer__brand">
           <Link to="/" className="footer__logo">
-            LIBAAS
+            ESHANI
           </Link>
 
           <p>
@@ -116,7 +116,7 @@ const Footer = () => {
 
       {/* Bottom */}
       <div className="footer__bottom">
-        <p>© 2026 LIBAAS. All rights reserved.</p>
+        <p>© 2026 ESHANI. All rights reserved.</p>
 
         <p>Premium Fashion Store</p>
       </div>

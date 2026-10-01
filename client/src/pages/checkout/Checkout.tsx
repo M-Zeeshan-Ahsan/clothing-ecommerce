@@ -83,7 +83,7 @@ const Checkout = () => {
   return (
     <main className="checkout">
       <div className="checkout__header">
-        <span>LIBAAS CHECKOUT</span>
+        <span>ESHANI CHECKOUT</span>
         <h1>Checkout</h1>
       </div>
 

@@ -4,7 +4,7 @@ const ReturnExchange = () => {
   return (
     <main className="return-exchange">
       <section className="return-exchange__hero">
-        <span className="return-exchange__eyebrow">LIBAAS</span>
+        <span className="return-exchange__eyebrow">ESHANI</span>
 
         <h1>Return & Exchange</h1>
 
@@ -136,7 +136,7 @@ const ReturnExchange = () => {
 
             <p>
               If the product is damaged, defective, or incorrectly delivered due
-              to an error on our side, LIBAAS will review the case and determine
+              to an error on our side, ESHANI will review the case and determine
               the applicable solution.
             </p>
           </div>
@@ -154,7 +154,7 @@ const ReturnExchange = () => {
             </p>
 
             <p>
-              Since LIBAAS currently offers Cash on Delivery, refund
+              Since ESHANI currently offers Cash on Delivery, refund
               arrangements will be communicated to the customer separately when
               applicable.
             </p>

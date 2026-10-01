@@ -55,7 +55,7 @@ const Contact = () => {
   return (
     <main className="contact">
       <section className="contact__hero">
-        <span className="contact__eyebrow">LIBAAS CONTACT</span>
+        <span className="contact__eyebrow">ESHANI CONTACT</span>
 
         <h1>We’d Love To Hear From You</h1>
 
@@ -79,12 +79,12 @@ const Contact = () => {
           <div className="contact__details">
             <div className="contact__detail">
               <span>Email</span>
-              <strong>support@libaas.com</strong>
+              <strong>eshani.support@gmail.com</strong>
             </div>
 
             <div className="contact__detail">
               <span>Phone</span>
-              <strong>+92 300 8608881</strong>
+              <strong>+92 317 7489578</strong>
             </div>
 
             <div className="contact__detail">

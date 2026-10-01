@@ -32,7 +32,7 @@ const Categories = () => {
       {/* Hero */}
       <section className="categories__hero">
         <div className="categories__hero-content">
-          <span>EXPLORE LIBAAS</span>
+          <span>EXPLORE ESHANI</span>
 
           <h1>Categories</h1>
 
@@ -92,7 +92,7 @@ const Categories = () => {
       {/* Bottom CTA */}
       <section className="categories__cta">
         <div className="categories__cta-content">
-          <span>LIBAAS COLLECTION</span>
+          <span>ESHANI COLLECTION</span>
 
           <h2>
             Something for

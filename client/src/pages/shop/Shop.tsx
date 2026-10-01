@@ -182,7 +182,7 @@ const Shop = () => {
       {/* Shop Hero */}
       <section className="shop-hero">
         <div className="shop-hero__content">
-          <span>LIBAAS COLLECTION</span>
+          <span>ESHANI COLLECTION</span>
 
           <h1>Shop</h1>
 

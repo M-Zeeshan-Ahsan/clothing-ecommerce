@@ -4,13 +4,13 @@ const Terms = () => {
   return (
     <main className="terms">
       <section className="terms__hero">
-        <span className="terms__eyebrow">LIBAAS</span>
+        <span className="terms__eyebrow">ESHANI</span>
 
         <h1>Terms & Conditions</h1>
 
         <p>
           Please read these terms carefully before using our website or placing
-          an order with LIBAAS.
+          an order with ESHANI.
         </p>
       </section>
 
@@ -24,7 +24,7 @@ const Terms = () => {
             <h2>Introduction</h2>
 
             <p>
-              Welcome to LIBAAS. By accessing or using our website, you agree to
+              Welcome to ESHANI. By accessing or using our website, you agree to
               comply with and be bound by these Terms & Conditions. If you do
               not agree with any part of these terms, please do not use our
               website.
@@ -60,7 +60,7 @@ const Terms = () => {
             </p>
 
             <p>
-              LIBAAS reserves the right to cancel or refuse an order in
+              ESHANI reserves the right to cancel or refuse an order in
               situations including product unavailability, incorrect pricing,
               incomplete information, or suspected fraudulent activity.
             </p>
@@ -79,7 +79,7 @@ const Terms = () => {
             </p>
 
             <p>
-              Currently, LIBAAS offers Cash on Delivery (COD) as the available
+              Currently, ESHANI offers Cash on Delivery (COD) as the available
               payment method. Payment is collected when the order is delivered
               to the customer.
             </p>
@@ -119,7 +119,7 @@ const Terms = () => {
             </p>
 
             <p>
-              Return and exchange requests are subject to LIBAAS's applicable
+              Return and exchange requests are subject to ESHANI's applicable
               return policy and product-specific conditions.
             </p>
           </div>
@@ -166,7 +166,7 @@ const Terms = () => {
 
             <p>
               All website content, including logos, branding, text, graphics,
-              images, and design elements, belongs to LIBAAS or its respective
+              images, and design elements, belongs to ESHANI or its respective
               content owners and may not be copied, reproduced, or used without
               permission.
             </p>
@@ -180,7 +180,7 @@ const Terms = () => {
             <h2>Changes to These Terms</h2>
 
             <p>
-              LIBAAS may update these Terms & Conditions from time to time. Any
+              ESHANI may update these Terms & Conditions from time to time. Any
               changes will be reflected on this page. Continued use of the
               website after changes are posted means you accept the updated
               terms.

@@ -55,7 +55,7 @@ const Register = () => {
     <main className="auth-page">
       <div className="auth-page__container">
         <div className="auth-page__header">
-          <span className="auth-page__eyebrow">JOIN LIBAAS</span>
+          <span className="auth-page__eyebrow">JOIN ESHANI</span>
 
           <h1>Create Your Account</h1>
 

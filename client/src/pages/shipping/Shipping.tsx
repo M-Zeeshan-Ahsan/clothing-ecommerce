@@ -4,13 +4,13 @@ const Shipping = () => {
   return (
     <main className="shipping">
       <section className="shipping__hero">
-        <span className="shipping__eyebrow">LIBAAS</span>
+        <span className="shipping__eyebrow">ESHANI</span>
 
         <h1>Shipping & Delivery</h1>
 
         <p>
           Everything you need to know about order processing, delivery times,
-          shipping charges, and receiving your LIBAAS order.
+          shipping charges, and receiving your ESHANI order.
         </p>
       </section>
 
@@ -95,7 +95,7 @@ const Shipping = () => {
             <h2>Cash on Delivery</h2>
 
             <p>
-              LIBAAS currently offers Cash on Delivery (COD) as the available
+              ESHANI currently offers Cash on Delivery (COD) as the available
               payment method.
             </p>
 
@@ -118,7 +118,7 @@ const Shipping = () => {
             </p>
 
             <p>
-              LIBAAS is not responsible for delivery issues caused by incomplete
+              ESHANI is not responsible for delivery issues caused by incomplete
               or incorrect information provided by the customer.
             </p>
           </div>

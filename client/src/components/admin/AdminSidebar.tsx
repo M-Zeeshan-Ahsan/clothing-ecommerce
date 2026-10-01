@@ -25,7 +25,7 @@ const AdminSidebar = () => {
   return (
     <aside className="admin-sidebar">
       <div className="admin-sidebar__logo">
-        LIBAAS
+        ESHANI
         <span>ADMIN</span>
       </div>
 
