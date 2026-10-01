@@ -61,11 +61,11 @@ export const getProducts = async (
     const saleOnly = req.query.saleOnly === "true";
 
     // =========================
-    // 5 DAYS AGO
+    // 20 DAYS AGO
     // =========================
 
-    const fiveDaysAgo = new Date();
-    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+    const twentyDaysAgo = new Date();
+    twentyDaysAgo.setDate(twentyDaysAgo.getDate() - 20);
 
     // =========================
     // WHERE
@@ -88,7 +88,7 @@ export const getProducts = async (
       // New products only
       ...(newOnly && {
         createdAt: {
-          gte: fiveDaysAgo,
+          gte: twentyDaysAgo,
         },
       }),
 
@@ -134,7 +134,7 @@ export const getProducts = async (
       const salePrice =
         product.sale_price !== null ? Number(product.sale_price) : null;
 
-      const isNew = product.createdAt >= fiveDaysAgo;
+      const isNew = product.createdAt >= twentyDaysAgo;
 
       const isSale = salePrice !== null;
 
