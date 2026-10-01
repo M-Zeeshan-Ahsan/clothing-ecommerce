@@ -9,6 +9,7 @@ import {
 
 import { getApiErrorMessage } from "../../../utils/apiError";
 import { showToast } from "../../../utils/toast";
+import Loader from "../../../components/common/loader/Loader";
 
 import "./OrderDetails.scss";
 
@@ -96,7 +97,7 @@ const OrderDetails = () => {
   if (isLoading) {
     return (
       <div className="admin-order-details">
-        <p>Loading order...</p>
+        <Loader />
       </div>
     );
   }

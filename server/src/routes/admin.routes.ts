@@ -24,6 +24,13 @@ import {
 import { getAllProductsAdmin } from "../controller/product.controller.js";
 import { getDashboardStats } from "../controller/dashboard.controller.js";
 import { orderStatusSchema, idSchema } from "../schemas/order.schema.js";
+import {
+  getAllContactMessages,
+  deleteContactMessage,
+  getContactMessageById,
+  markContactMessageAsRead,
+  getUnreadContactMessageCount,
+} from "../controller/contact.controller.js";
 
 const router = Router();
 router.get("/orders", verifyToken, verifyAdmin, getAllOrders);
@@ -72,4 +79,31 @@ router.delete(
 );
 router.get("/products", verifyToken, verifyAdmin, getAllProductsAdmin);
 router.get("/dashboard", verifyToken, verifyAdmin, getDashboardStats);
+router.get(
+  "/contact-messages",
+  verifyToken,
+  verifyAdmin,
+  getAllContactMessages,
+);
+
+router.get(
+  "/contact-messages/:id",
+  verifyToken,
+  verifyAdmin,
+  getContactMessageById,
+);
+
+router.patch(
+  "/contact-messages/:id/read",
+  verifyToken,
+  verifyAdmin,
+  markContactMessageAsRead,
+);
+
+router.delete(
+  "/contact-messages/:id",
+  verifyToken,
+  verifyAdmin,
+  deleteContactMessage,
+);
 export default router;
