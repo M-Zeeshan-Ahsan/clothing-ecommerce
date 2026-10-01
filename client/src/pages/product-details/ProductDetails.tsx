@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { useAppDispatch } from "../../store/store";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 import { addToCart } from "../../store/slices/cartSlice";
 
 import { useGetProductByIdQuery } from "../../store/api/productApi";
 
 import Loader from "../../components/common/loader/Loader";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+import { showToast } from "../../utils/toast";
 
 import "./ProductDetails.scss";
 
@@ -29,7 +32,15 @@ const ProductDetails = () => {
   const product = data?.data;
 
   const [quantity, setQuantity] = useState(1);
+  const cartItems = useAppSelector((state) => state.cart.items);
 
+  const cartItem = product
+    ? cartItems.find((item) => item.product.id === product.id)
+    : undefined;
+
+  const cartQuantity = cartItem?.quantity ?? 0;
+
+  const isOutOfStock = product?.stock === 0;
   if (isLoading || isFetching) {
     return <Loader />;
   }
@@ -50,6 +61,21 @@ const ProductDetails = () => {
   }
 
   const increaseQuantity = () => {
+    if (isOutOfStock) {
+      showToast(`${product.product_name} is out of stock`, "error");
+      return;
+    }
+
+    if (cartQuantity + quantity >= product.stock) {
+      showToast(
+        `${product.product_name}: Only ${product.stock} item${
+          product.stock > 1 ? "s" : ""
+        } available`,
+        "error",
+      );
+      return;
+    }
+
     setQuantity((prev) => prev + 1);
   };
 
@@ -58,6 +84,21 @@ const ProductDetails = () => {
   };
 
   const handleAddToCart = () => {
+    if (isOutOfStock) {
+      showToast(`${product.product_name} is out of stock`, "error");
+      return;
+    }
+
+    if (cartQuantity + quantity > product.stock) {
+      showToast(
+        `${product.product_name}: Only ${product.stock - cartQuantity} item${
+          product.stock - cartQuantity > 1 ? "s" : ""
+        } available`,
+        "error",
+      );
+      return;
+    }
+
     for (let i = 0; i < quantity; i++) {
       dispatch(
         addToCart({
@@ -71,10 +112,26 @@ const ProductDetails = () => {
       );
     }
 
+    showToast("Product added to cart", "success");
     setQuantity(1);
   };
 
   const handleBuyNow = () => {
+    if (isOutOfStock) {
+      showToast(`${product.product_name} is out of stock`, "error");
+      return;
+    }
+
+    if (cartQuantity + quantity > product.stock) {
+      showToast(
+        `${product.product_name}: Only ${product.stock - cartQuantity} item${
+          product.stock - cartQuantity > 1 ? "s" : ""
+        } available`,
+        "error",
+      );
+      return;
+    }
+
     for (let i = 0; i < quantity; i++) {
       dispatch(
         addToCart({
@@ -111,8 +168,14 @@ const ProductDetails = () => {
 
       <section className="product-details__container">
         <div className="product-details__image-wrapper">
-          {product.badge && (
-            <span className="product-details__badge">{product.badge}</span>
+          {isOutOfStock ? (
+            <span className="product-details__badge product-details__badge--out">
+              OUT OF STOCK
+            </span>
+          ) : (
+            product.badge && (
+              <span className="product-details__badge">{product.badge}</span>
+            )
           )}
 
           <img
@@ -165,9 +228,24 @@ const ProductDetails = () => {
 
               <span>{quantity}</span>
 
-              <button type="button" onClick={increaseQuantity}>
-                +
-              </button>
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip id={`increase-quantity-${product.id}`}>
+                    {isOutOfStock
+                      ? `${product.product_name} is out of stock`
+                      : cartQuantity + quantity >= product.stock
+                        ? `${product.product_name}: Only ${product.stock} item${
+                            product.stock > 1 ? "s" : ""
+                          } available`
+                        : "Increase Quantity"}
+                  </Tooltip>
+                }
+              >
+                <button type="button" onClick={increaseQuantity}>
+                  +
+                </button>
+              </OverlayTrigger>
             </div>
           </div>
 
@@ -178,21 +256,51 @@ const ProductDetails = () => {
           </div>
 
           <div className="product-details__actions">
-            <button
-              type="button"
-              className="product-details__add"
-              onClick={handleAddToCart}
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id={`add-to-cart-${product.id}`}>
+                  {isOutOfStock
+                    ? `${product.product_name} is out of stock`
+                    : cartQuantity + quantity > product.stock
+                      ? `Only ${product.stock - cartQuantity} item${
+                          product.stock - cartQuantity > 1 ? "s" : ""
+                        } available`
+                      : "Add to Cart"}
+                </Tooltip>
+              }
             >
-              Add to Cart
-            </button>
+              <button
+                type="button"
+                className="product-details__add"
+                onClick={handleAddToCart}
+              >
+                Add to Cart
+              </button>
+            </OverlayTrigger>
 
-            <button
-              type="button"
-              className="product-details__buy"
-              onClick={handleBuyNow}
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id={`buy-now-${product.id}`}>
+                  {isOutOfStock
+                    ? `${product.product_name} is out of stock`
+                    : cartQuantity + quantity > product.stock
+                      ? `Only ${product.stock - cartQuantity} item${
+                          product.stock - cartQuantity > 1 ? "s" : ""
+                        } available`
+                      : "Buy Now"}
+                </Tooltip>
+              }
             >
-              Buy Now
-            </button>
+              <button
+                type="button"
+                className="product-details__buy"
+                onClick={handleBuyNow}
+              >
+                Buy Now
+              </button>
+            </OverlayTrigger>
           </div>
 
           <div className="product-details__features">
