@@ -463,6 +463,18 @@ export const createCheckoutOrder = async (
     const { address, items } = req.body;
 
     // =========================
+    // BASIC VALIDATION
+    // =========================
+
+    if (!address) {
+      throw new ApiError(400, "Shipping address is required");
+    }
+
+    if (!Array.isArray(items) || items.length === 0) {
+      throw new ApiError(400, "Checkout items are required");
+    }
+
+    // =========================
     // Guest Email
     // =========================
 
@@ -476,27 +488,53 @@ export const createCheckoutOrder = async (
     }
 
     // =========================
-    // Product IDs
+    // Validate Product IDs
     // =========================
 
     const productIds = items.map((item: { productId: number }) =>
       Number(item.productId),
     );
 
+    const uniqueProductIds = [...new Set(productIds)];
+
+    if (
+      uniqueProductIds.some(
+        (productId) => !Number.isInteger(productId) || productId <= 0,
+      )
+    ) {
+      throw new ApiError(400, "Invalid product ID");
+    }
+
+    // =========================
+    // Get Products
+    // =========================
+
     const products = await prisma.product.findMany({
       where: {
         id: {
-          in: productIds,
+          in: uniqueProductIds,
         },
       },
     });
 
-    if (products.length !== productIds.length) {
+    if (products.length !== uniqueProductIds.length) {
       throw new ApiError(400, "One or more products are no longer available");
     }
 
     // =========================
-    // Order Items
+    // Validate Quantities
+    // =========================
+
+    for (const item of items) {
+      const quantity = Number(item.quantity);
+
+      if (!Number.isInteger(quantity) || quantity <= 0) {
+        throw new ApiError(400, "Product quantity must be a positive integer");
+      }
+    }
+
+    // =========================
+    // Prepare Order Items
     // =========================
 
     let subtotal = 0;
@@ -539,11 +577,56 @@ export const createCheckoutOrder = async (
     const totalAmount = subtotal + shippingFee;
 
     // =========================
-    // Create Order
+    // CREATE ORDER TRANSACTION
     // =========================
 
     const order = await prisma.$transaction(async (tx) => {
-      // Create Address
+      // =========================
+      // ATOMIC STOCK CHECK + DECREMENT
+      // =========================
+
+      for (const item of orderItems) {
+        const updatedProduct = await tx.product.updateMany({
+          where: {
+            id: item.productId,
+
+            // IMPORTANT:
+            // Only update if enough stock is available
+            stock: {
+              gte: item.quantity,
+            },
+          },
+
+          data: {
+            // Atomic decrement
+            stock: {
+              decrement: item.quantity,
+            },
+          },
+        });
+
+        // =========================
+        // STOCK NOT AVAILABLE
+        // =========================
+
+        if (updatedProduct.count === 0) {
+          const product = products.find(
+            (product) => product.id === item.productId,
+          );
+
+          throw new ApiError(
+            400,
+            `${product?.product_name || "Product"}: Only ${
+              product?.stock ?? 0
+            } item${(product?.stock ?? 0) > 1 ? "s" : ""} available`,
+          );
+        }
+      }
+
+      // =========================
+      // CREATE ADDRESS
+      // =========================
+
       const newAddress = await tx.address.create({
         data: {
           userId,
@@ -562,23 +645,36 @@ export const createCheckoutOrder = async (
         },
       });
 
-      // Create Order
+      // =========================
+      // CREATE ORDER
+      // =========================
+
       const newOrder = await tx.order.create({
         data: {
           userId,
+
           addressId: newAddress.id,
+
           totalAmount,
-          status: "PENDING",
+
+          status: "CONFIRMED",
+
           paymentMethod: "COD",
         },
       });
 
-      // Create Order Items
+      // =========================
+      // CREATE ORDER ITEMS
+      // =========================
+
       await tx.orderItem.createMany({
         data: orderItems.map((item) => ({
           orderId: newOrder.id,
+
           productId: item.productId,
+
           quantity: item.quantity,
+
           price: item.price,
         })),
       });
@@ -587,14 +683,16 @@ export const createCheckoutOrder = async (
     });
 
     // =========================
-    // Customer Confirmation Email
+    // CUSTOMER CONFIRMATION EMAIL
     // =========================
 
     if (customerEmail) {
       try {
         await sendOrderConfirmationEmail({
           to: customerEmail,
+
           customerName: address.fullName,
+
           orderId: order.id,
 
           items: orderItems.map((item) => {
@@ -604,18 +702,23 @@ export const createCheckoutOrder = async (
 
             return {
               productName: product?.product_name || "Unknown Product",
+
               quantity: item.quantity,
+
               price: Number(item.price).toLocaleString(),
             };
           }),
 
           subtotal: subtotal.toLocaleString(),
+
           shippingFee: shippingFee.toLocaleString(),
+
           totalAmount: totalAmount.toLocaleString(),
 
           paymentMethod: "Cash on Delivery",
 
           address: address.address,
+
           city: address.city,
         });
       } catch (emailError) {
@@ -624,17 +727,23 @@ export const createCheckoutOrder = async (
     }
 
     // =========================
-    // ESHANI New Order Notification
+    // ESHANI NEW ORDER NOTIFICATION
     // =========================
 
     try {
       await sendNewOrderNotificationEmail({
         orderId: order.id,
+
         customerName: address.fullName,
+
         customerEmail: customerEmail || "Guest",
+
         phone: address.phone,
+
         address: address.address,
+
         city: address.city,
+
         postalCode: address.postalCode,
 
         items: orderItems.map((item) => {
@@ -644,13 +753,17 @@ export const createCheckoutOrder = async (
 
           return {
             productName: product?.product_name || "Unknown Product",
+
             quantity: item.quantity,
+
             price: Number(item.price).toLocaleString(),
           };
         }),
 
         subtotal: subtotal.toLocaleString(),
+
         shippingFee: shippingFee.toLocaleString(),
+
         totalAmount: totalAmount.toLocaleString(),
 
         paymentMethod: "Cash on Delivery",
@@ -659,15 +772,24 @@ export const createCheckoutOrder = async (
       console.error("New order notification email failed:", emailError);
     }
 
+    // =========================
+    // RESPONSE
+    // =========================
+
     return handleResponse(res, 201, "Order placed successfully", {
       order,
+
       shippingAddress: {
         ...address,
         email: customerEmail || null,
       },
+
       paymentMethod: "COD",
+
       subtotal,
+
       shippingFee,
+
       totalAmount,
     });
   } catch (error) {
