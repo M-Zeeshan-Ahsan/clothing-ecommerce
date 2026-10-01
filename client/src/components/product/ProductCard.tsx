@@ -5,6 +5,8 @@ import { useAppDispatch, useAppSelector } from "../../store/store";
 import { toggleWishlist } from "../../store/slices/wishlistSlice";
 import { showToast } from "../../utils/toast";
 import { addToCart } from "../../store/slices/cartSlice";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
 
 interface Props {
   product: Product;
@@ -12,13 +14,50 @@ interface Props {
 
 const ProductCard = ({ product }: Props) => {
   const dispatch = useAppDispatch();
+
   const wishlistItems = useAppSelector((state) => state.wishlist.items);
+  const cartItems = useAppSelector((state) => state.cart.items);
 
   const isWishlisted = wishlistItems.some((item) => item.id === product.id);
 
+  const cartItem = cartItems.find((item) => item.product.id === product.id);
+
+  const cartQuantity = cartItem?.quantity ?? 0;
+
   const isSale =
     product.sale_price !== null && product.sale_price !== undefined;
+
+  const isOutOfStock = product.stock === 0;
+
   const handleAddToCart = () => {
+    // =========================
+    // OUT OF STOCK
+    // =========================
+
+    if (isOutOfStock) {
+      showToast("Product is out of stock", "error");
+      return;
+    }
+
+    // =========================
+    // STOCK LIMIT
+    // =========================
+
+    if (cartQuantity >= product.stock) {
+      showToast(
+        `${product.product_name}: Only ${product.stock} item${
+          product.stock > 1 ? "s" : ""
+        } available`,
+        "error",
+      );
+
+      return;
+    }
+
+    // =========================
+    // ADD TO CART
+    // =========================
+
     dispatch(
       addToCart({
         id: product.id,
@@ -32,12 +71,19 @@ const ProductCard = ({ product }: Props) => {
 
     showToast("Product added to cart", "success");
   };
+
   return (
     <div className="product-card">
       {/* Product Image */}
       <div className="product-card__image-wrapper">
-        {product.badge && (
-          <span className="product-card__badge">{product.badge}</span>
+        {isOutOfStock ? (
+          <span className="product-card__badge product-card__badge--out">
+            OUT OF STOCK
+          </span>
+        ) : (
+          product.badge && (
+            <span className="product-card__badge">{product.badge}</span>
+          )
         )}
 
         <button
@@ -50,6 +96,7 @@ const ProductCard = ({ product }: Props) => {
         >
           {isWishlisted ? "♥" : "♡"}
         </button>
+
         <Link to={`/product/${product.id}`}>
           <img
             src={product.product_image}
@@ -103,14 +150,40 @@ const ProductCard = ({ product }: Props) => {
 
         {/* Bottom */}
         <div className="product-card__bottom">
-          <button
-            type="button"
-            className="product-card__cart"
-            aria-label={`Add ${product.product_name} to cart`}
-            onClick={handleAddToCart}
-          >
-            +
-          </button>
+          {isOutOfStock ? (
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id={`out-of-stock-${product.id}`}>
+                  {product.product_name} is out of stock
+                </Tooltip>
+              }
+            >
+              <span className="product-card__out-of-stock">Out of Stock</span>
+            </OverlayTrigger>
+          ) : (
+            <OverlayTrigger
+              placement="top"
+              overlay={
+                <Tooltip id={`add-to-cart-${product.id}`}>
+                  {cartQuantity >= product.stock
+                    ? `${product.product_name}: Only ${product.stock} item${
+                        product.stock > 1 ? "s" : ""
+                      } available`
+                    : "Add to Cart"}
+                </Tooltip>
+              }
+            >
+              <button
+                type="button"
+                className="product-card__cart"
+                aria-label={`Add ${product.product_name} to cart`}
+                onClick={handleAddToCart}
+              >
+                +
+              </button>
+            </OverlayTrigger>
+          )}
         </div>
       </div>
     </div>

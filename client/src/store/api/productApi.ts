@@ -17,6 +17,7 @@ interface CreateProductRequest {
   categoryId: number;
   price: number;
   sale_price?: number | null;
+  stock: number;
 }
 
 interface UpdateProductRequest {
@@ -26,6 +27,7 @@ interface UpdateProductRequest {
   categoryId: number;
   price: number;
   sale_price?: number | null;
+  stock: number;
 }
 
 interface AdminProductsParams {

@@ -83,7 +83,7 @@ const EditProduct = () => {
         product_image: imageUrl,
         categoryId: Number(data.category),
         price: Number(data.price),
-
+        stock: Number(data.stock),
         sale_price: data.salePrice !== "" ? Number(data.salePrice) : null,
       }).unwrap();
 
@@ -130,6 +130,7 @@ const EditProduct = () => {
         ? String(product.sale_price)
         : "",
     imageUrl: product.product_image,
+    stock: String(product.stock),
     imageFile: null,
   };
 

@@ -13,6 +13,7 @@ export interface ProductFormData {
   price: string;
   salePrice: string;
   imageUrl: string;
+  stock: string;
   imageFile: File | null;
 }
 
@@ -29,6 +30,7 @@ const emptyForm: ProductFormData = {
   price: "",
   salePrice: "",
   imageUrl: "",
+  stock: "",
   imageFile: null,
 };
 
@@ -180,7 +182,23 @@ const ProductForm = ({
 
           <small>Sale price must be less than the original price.</small>
         </div>
+        <div className="product-form__group">
+          <label htmlFor="stock">Stock Quantity</label>
 
+          <input
+            id="stock"
+            type="number"
+            name="stock"
+            placeholder="Enter stock quantity"
+            min="0"
+            step="1"
+            value={formData.stock}
+            onChange={handleChange}
+            required
+          />
+
+          <small>Enter 0 if the product is currently out of stock.</small>
+        </div>
         {/* Image */}
         <div className="product-form__group">
           <label>Product Image</label>

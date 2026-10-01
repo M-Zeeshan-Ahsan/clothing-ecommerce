@@ -9,6 +9,7 @@ export interface Product {
   saved_amount: number;
   discount_percentage: number;
   badge: string;
+  stock: number;
   createdAt: string;
   updatedAt: string;
   category: Category;

@@ -56,7 +56,7 @@ const AddProduct = () => {
         product_image: imageUrl,
         categoryId: Number(data.category),
         price: Number(data.price),
-
+        stock: Number(data.stock),
         sale_price: data.salePrice !== "" ? Number(data.salePrice) : null,
       }).unwrap();
 

@@ -10,53 +10,35 @@ export const createProduct = async (
   next: NextFunction,
 ) => {
   try {
-    const { product_name, product_image, categoryId, price, sale_price } =
-      req.body;
-
-    // =========================
-    // CHECK CATEGORY
-    // =========================
+    const {
+      product_name,
+      product_image,
+      categoryId,
+      price,
+      sale_price,
+      stock,
+    } = req.body;
 
     const category = await prisma.category.findUnique({
-      where: {
-        id: Number(categoryId),
-      },
+      where: { id: categoryId },
     });
 
     if (!category) {
       throw new ApiError(404, "Category not found");
     }
 
-    // =========================
-    // PRICE
-    // =========================
-
-    const productPrice = Number(price);
-
-    const productSalePrice =
-      sale_price !== undefined && sale_price !== null && sale_price !== ""
-        ? Number(sale_price)
-        : null;
-
-    if (productSalePrice !== null && productSalePrice >= productPrice) {
-      throw new ApiError(400, "Sale price must be less than original price");
-    }
-
-    // =========================
-    // CREATE PRODUCT
-    // =========================
-
-    const result = await prisma.product.create({
+    const product = await prisma.product.create({
       data: {
         product_name,
         product_image,
-        categoryId: Number(categoryId),
-        price: productPrice,
-        sale_price: productSalePrice,
+        categoryId,
+        price,
+        sale_price,
+        stock,
       },
     });
 
-    return handleResponse(res, 201, "Product added successfully", result);
+    return handleResponse(res, 201, "Product added successfully", product);
   } catch (error) {
     next(error);
   }
@@ -219,36 +201,37 @@ export const updateProduct = async (
   next: NextFunction,
 ) => {
   try {
-    const { id } = req.params;
-    const productId = Number(id);
+    const productId = Number(req.params.id);
 
-    const { product_name, product_image, categoryId, price, sale_price } =
-      req.body;
+    const {
+      product_name,
+      product_image,
+      categoryId,
+      price,
+      sale_price,
+      stock,
+    } = req.body;
 
     // =========================
     // FIND PRODUCT
     // =========================
 
-    const result = await prisma.product.findUnique({
-      where: {
-        id: productId,
-      },
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
     });
 
-    if (!result) {
+    if (!product) {
       throw new ApiError(404, "Product not found");
     }
 
     // =========================
-    // CHECK DUPLICATE NAME
+    // DUPLICATE NAME
     // =========================
 
     const existingProduct = await prisma.product.findFirst({
       where: {
         product_name,
-        NOT: {
-          id: productId,
-        },
+        NOT: { id: productId },
       },
     });
 
@@ -261,9 +244,7 @@ export const updateProduct = async (
     // =========================
 
     const category = await prisma.category.findUnique({
-      where: {
-        id: Number(categoryId),
-      },
+      where: { id: categoryId },
     });
 
     if (!category) {
@@ -271,35 +252,18 @@ export const updateProduct = async (
     }
 
     // =========================
-    // PRICE
-    // =========================
-
-    const productPrice = Number(price);
-
-    const productSalePrice =
-      sale_price !== undefined && sale_price !== null && sale_price !== ""
-        ? Number(sale_price)
-        : null;
-
-    if (productSalePrice !== null && productSalePrice >= productPrice) {
-      throw new ApiError(400, "Sale price must be less than original price");
-    }
-
-    // =========================
     // UPDATE PRODUCT
     // =========================
 
     const updatedProduct = await prisma.product.update({
-      where: {
-        id: productId,
-      },
-
+      where: { id: productId },
       data: {
         product_name,
         product_image,
-        categoryId: Number(categoryId),
-        price: productPrice,
-        sale_price: productSalePrice,
+        categoryId,
+        price,
+        sale_price,
+        stock,
       },
     });
 
