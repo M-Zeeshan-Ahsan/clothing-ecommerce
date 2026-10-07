@@ -7,6 +7,7 @@ import { useGetAdminOrdersQuery } from "../../../store/api/orderApi";
 
 import { showToast } from "../../../utils/toast";
 import { getApiErrorMessage } from "../../../utils/apiError";
+import Loader from "../../../components/common/loader/Loader";
 
 import "./Orders.scss";
 
@@ -57,7 +58,7 @@ const Orders = () => {
   if (isLoading) {
     return (
       <div className="admin-orders">
-        <p>Loading orders...</p>
+        <Loader />
       </div>
     );
   }

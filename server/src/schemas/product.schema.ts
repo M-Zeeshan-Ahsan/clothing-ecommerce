@@ -44,6 +44,7 @@ export const productSchema = Joi.object({
     "number.min": "Stock cannot be negative",
     "any.required": "Stock is required",
   }),
+  brand: Joi.string().trim().min(2).max(50).optional().allow(""),
 });
 export const idSchema = Joi.object({
   id: Joi.number().integer().positive().required().messages({
@@ -112,4 +113,5 @@ export const updateProductSchema = Joi.object({
     "number.min": "Stock cannot be negative",
     "any.required": "Stock is required",
   }),
+  brand: Joi.string().trim().min(2).max(50).optional().allow(""),
 });

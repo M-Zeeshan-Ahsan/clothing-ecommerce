@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 
 import { logout } from "../../store/slices/authSlice";
 import { baseApi } from "../../store/api/baseApi";
+import { useGetUnreadContactMessageCountQuery } from "../../store/api/contactApi";
 import { showToast } from "../../utils/toast";
 
 import "./AdminSidebar.scss";
@@ -10,6 +11,10 @@ import "./AdminSidebar.scss";
 const AdminSidebar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const { data: unreadData } = useGetUnreadContactMessageCountQuery();
+
+  const unreadCount = unreadData?.data.unreadCount ?? 0;
 
   const handleLogout = () => {
     dispatch(logout());
@@ -61,6 +66,16 @@ const AdminSidebar = () => {
         <NavLink to="/admin/users" className="admin-sidebar__link">
           <span>♙</span>
           Users
+        </NavLink>
+
+        <NavLink to="/admin/contact-messages" className="admin-sidebar__link">
+          <span>✉</span>
+          Customer Queries
+          {unreadCount > 0 && (
+            <span className="admin-sidebar__badge">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
         </NavLink>
       </nav>
 

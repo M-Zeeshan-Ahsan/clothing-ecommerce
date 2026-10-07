@@ -10,6 +10,7 @@ import "./ProductForm.scss";
 export interface ProductFormData {
   name: string;
   category: string;
+  brand: string;
   price: string;
   salePrice: string;
   imageUrl: string;
@@ -27,6 +28,7 @@ interface ProductFormProps {
 const emptyForm: ProductFormData = {
   name: "",
   category: "",
+  brand: "",
   price: "",
   salePrice: "",
   imageUrl: "",
@@ -107,7 +109,6 @@ const ProductForm = ({
 
           <p>Enter the basic details of your product.</p>
         </div>
-
         {/* Product Name */}
         <div className="product-form__group">
           <label htmlFor="name">Product Name</label>
@@ -122,7 +123,21 @@ const ProductForm = ({
             required
           />
         </div>
-
+        {/* Brand */}{" "}
+        <div className="product-form__group">
+          {" "}
+          <label htmlFor="brand">Brand</label>{" "}
+          <input
+            id="brand"
+            type="text"
+            name="brand"
+            placeholder="Enter brand name"
+            value={formData.brand}
+            onChange={handleChange}
+            required
+          />{" "}
+          <small> Example: Khaadi, Dae, TP, etc. </small>{" "}
+        </div>
         {/* Category + Price */}
         <div className="product-form__row">
           <div className="product-form__group">
@@ -165,7 +180,6 @@ const ProductForm = ({
             />
           </div>
         </div>
-
         {/* Sale Price */}
         <div className="product-form__group">
           <label htmlFor="salePrice">Sale Price</label>
@@ -205,7 +219,6 @@ const ProductForm = ({
 
           <ImageUpload value={formData.imageUrl} onChange={handleImageChange} />
         </div>
-
         {/* Actions */}
         <div className="product-form__actions">
           <button

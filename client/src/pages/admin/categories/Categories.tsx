@@ -10,6 +10,7 @@ import {
 
 import { showToast } from "../../../utils/toast";
 import { getApiErrorMessage } from "../../../utils/apiError";
+import Loader from "../../../components/common/loader/Loader";
 
 import "./Categories.scss";
 
@@ -80,7 +81,7 @@ const Categories = () => {
           </div>
         </div>
 
-        <div className="admin-categories__empty">Loading categories...</div>
+        <Loader />
       </div>
     );
   }

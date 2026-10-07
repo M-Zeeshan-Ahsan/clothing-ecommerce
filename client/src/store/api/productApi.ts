@@ -6,6 +6,7 @@ interface GetProductsParams {
   page?: number;
   limit?: number;
   search?: string;
+  brand?: string;
   categoryId?: number;
   newOnly?: boolean;
   saleOnly?: boolean;
@@ -14,6 +15,7 @@ interface GetProductsParams {
 interface CreateProductRequest {
   product_name: string;
   product_image: string;
+  brand: string;
   categoryId: number;
   price: number;
   sale_price?: number | null;
@@ -26,6 +28,7 @@ interface UpdateProductRequest {
   product_image: string;
   categoryId: number;
   price: number;
+  brand: string;
   sale_price?: number | null;
   stock: number;
 }
@@ -52,7 +55,7 @@ export const productApi = baseApi.injectEndpoints({
           ...(params?.search && {
             search: params.search,
           }),
-
+          ...(params?.brand && { brand: params.brand }),
           ...(params?.categoryId && {
             categoryId: params.categoryId,
           }),

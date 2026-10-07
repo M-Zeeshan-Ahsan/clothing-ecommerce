@@ -19,6 +19,8 @@ import OrderDetails from "../pages/admin/orders/OrderDetails";
 import Users from "../pages/admin/users/Users";
 import AddUser from "../pages/admin/users/AddUser";
 import EditUser from "../pages/admin/users/EditUser";
+import ContactMessages from "../pages/admin/contact/AdminContactMessages";
+import ContactMessageDetail from "../pages/admin/contact/AdminContactMessageDetail";
 
 const AdminRoutes: RouteObject[] = [
   {
@@ -84,7 +86,15 @@ const AdminRoutes: RouteObject[] = [
             path: "users/edit/:id",
             element: <EditUser />,
           },
-
+          // Contact Messages
+          {
+            path: "contact-messages",
+            element: <ContactMessages />,
+          },
+          {
+            path: "contact-messages/:id",
+            element: <ContactMessageDetail />,
+          },
           // Admin 404
           {
             path: "*",

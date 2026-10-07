@@ -54,6 +54,7 @@ const AddProduct = () => {
       await createProduct({
         product_name: data.name,
         product_image: imageUrl,
+        brand: data.brand,
         categoryId: Number(data.category),
         price: Number(data.price),
         stock: Number(data.stock),
