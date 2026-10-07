@@ -15,6 +15,7 @@ export const createProduct = async (
       product_image,
       categoryId,
       price,
+      brand,
       sale_price,
       stock,
     } = req.body;
@@ -33,6 +34,7 @@ export const createProduct = async (
         product_image,
         categoryId,
         price,
+        brand,
         sale_price,
         stock,
       },
@@ -59,7 +61,7 @@ export const getProducts = async (
 
     const newOnly = req.query.newOnly === "true";
     const saleOnly = req.query.saleOnly === "true";
-
+    const brand = String(req.query.brand || "").trim();
     // =========================
     // 20 DAYS AGO
     // =========================
@@ -79,7 +81,13 @@ export const getProducts = async (
           mode: "insensitive" as const,
         },
       }),
-
+      // Brand
+      ...(brand && {
+        brand: {
+          equals: brand,
+          mode: "insensitive" as const,
+        },
+      }),
       // Category ID
       ...(categoryId && {
         categoryId,
@@ -208,6 +216,7 @@ export const updateProduct = async (
       product_image,
       categoryId,
       price,
+      brand,
       sale_price,
       stock,
     } = req.body;
@@ -262,6 +271,7 @@ export const updateProduct = async (
         product_image,
         categoryId,
         price,
+        brand,
         sale_price,
         stock,
       },

@@ -5,6 +5,7 @@ export interface Product {
   categoryId: number;
   price: number;
   sale_price: number;
+  brand: string;
   current_price: number;
   saved_amount: number;
   discount_percentage: number;
