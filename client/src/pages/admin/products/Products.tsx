@@ -228,7 +228,7 @@ const Products = () => {
                 <th>Price</th>
 
                 <th>Sale Price</th>
-
+                <th>Stock</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -270,7 +270,7 @@ const Products = () => {
                         ? `Rs. ${Number(product.sale_price).toLocaleString()}`
                         : "-"}
                     </td>
-
+                    <td>{product.stock}</td>
                     {/* Actions */}
 
                     <td>
