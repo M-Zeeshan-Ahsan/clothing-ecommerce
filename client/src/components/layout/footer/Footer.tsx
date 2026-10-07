@@ -53,17 +53,20 @@ const Footer = () => {
           </p>
 
           <div className="footer__socials">
-            <a href="#" aria-label="Instagram">
+            {/* <a href="#" aria-label="Instagram">
               Instagram
-            </a>
+            </a> */}
 
-            <a href="#" aria-label="Facebook">
+            <a
+              href="https://www.facebook.com/share/1TpMysw6Ag/"
+              aria-label="Facebook"
+            >
               Facebook
             </a>
 
-            <a href="#" aria-label="TikTok">
+            {/* <a href="#" aria-label="TikTok">
               TikTok
-            </a>
+            </a> */}
           </div>
         </div>
 
