@@ -237,16 +237,16 @@ export const updateProduct = async (
     // DUPLICATE NAME
     // =========================
 
-    const existingProduct = await prisma.product.findFirst({
-      where: {
-        product_name,
-        NOT: { id: productId },
-      },
-    });
+    // const existingProduct = await prisma.product.findFirst({
+    //   where: {
+    //     product_name,
+    //     NOT: { id: productId },
+    //   },
+    // });
 
-    if (existingProduct) {
-      throw new ApiError(409, "Product name already exists");
-    }
+    // if (existingProduct) {
+    //   throw new ApiError(409, "Product name already exists");
+    // }
 
     // =========================
     // CHECK CATEGORY
