@@ -78,7 +78,7 @@ const EditProduct = () => {
 
       await updateProduct({
         id: productId,
-
+        brand: data.brand,
         product_name: data.name,
         product_image: imageUrl,
         categoryId: Number(data.category),
@@ -123,6 +123,7 @@ const EditProduct = () => {
 
   const initialData: ProductFormData = {
     name: product.product_name,
+    brand: product.brand,
     category: String(product.categoryId),
     price: String(product.price),
     salePrice:
