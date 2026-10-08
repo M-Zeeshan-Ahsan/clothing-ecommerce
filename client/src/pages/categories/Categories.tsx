@@ -57,35 +57,37 @@ const Categories = () => {
         </div>
 
         <div className="categories__grid">
-          {categories.map((category) => {
-            return (
-              <Link
-                key={category.id}
-                to={`/shop?categoryId=${category.id}`}
-                className="categories__card"
-              >
-                <div className="categories__image-wrapper">
-                  <img
-                    src={category.category_image}
-                    alt={category.category_name}
-                    className="categories__image"
-                  />
+          {categories
+            .filter((category) => (category._count?.products ?? 0) > 0)
+            .map((category) => {
+              return (
+                <Link
+                  key={category.id}
+                  to={`/shop?categoryId=${category.id}`}
+                  className="categories__card"
+                >
+                  <div className="categories__image-wrapper">
+                    <img
+                      src={category.category_image}
+                      alt={category.category_name}
+                      className="categories__image"
+                    />
 
-                  <div className="categories__overlay" />
-                </div>
+                    <div className="categories__overlay" />
+                  </div>
 
-                <div className="categories__card-content">
-                  <span>COLLECTION</span>
+                  <div className="categories__card-content">
+                    <span>COLLECTION</span>
 
-                  <h3>{category.category_name}</h3>
+                    <h3>{category.category_name}</h3>
 
-                  <p>{category.category_slogan}</p>
+                    <p>{category.category_slogan}</p>
 
-                  <span className="categories__link">Shop Collection →</span>
-                </div>
-              </Link>
-            );
-          })}
+                    <span className="categories__link">Shop Collection →</span>
+                  </div>
+                </Link>
+              );
+            })}
         </div>
       </section>
 

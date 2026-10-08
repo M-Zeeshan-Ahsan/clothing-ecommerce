@@ -41,7 +41,7 @@ const Home = () => {
   } = useGetCategoriesQuery();
 
   const categories = categoryData?.data ?? [];
-
+  console.log("categories", categories);
   // =========================
   // PRODUCTS
   // =========================
@@ -158,16 +158,18 @@ const Home = () => {
             </button>
 
             {/* Backend Categories */}
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                type="button"
-                className={selectedCategoryId === category.id ? "active" : ""}
-                onClick={() => handleCategoryChange(category.id)}
-              >
-                {category.category_name}
-              </button>
-            ))}
+            {categories
+              .filter((category) => (category._count?.products ?? 0) > 0)
+              .map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  className={selectedCategoryId === category.id ? "active" : ""}
+                  onClick={() => handleCategoryChange(category.id)}
+                >
+                  {category.category_name}
+                </button>
+              ))}
           </div>
         </div>
 
