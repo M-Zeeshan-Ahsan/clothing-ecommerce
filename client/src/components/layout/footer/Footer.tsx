@@ -62,13 +62,20 @@ const Footer = ({ className = "" }: FooterProps) => {
             <a
               href="https://www.facebook.com/share/1TpMysw6Ag/"
               aria-label="Facebook"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               Facebook
             </a>
 
-            {/* <a href="#" aria-label="TikTok">
+            <a
+              href="https://www.tiktok.com/@eshanishop?is_from_webapp=1&sender_device=pc"
+              aria-label="TikTok"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               TikTok
-            </a> */}
+            </a>
           </div>
         </div>
 
