@@ -11,7 +11,7 @@ import { showToast } from "../../utils/toast";
 import { getApiErrorMessage } from "../../utils/apiError";
 import Pagination from "../../components/common/pagination/Pagination";
 import useDebounce from "../../hooks/useDebounce";
-
+import { HOME_HIGHLIGHTS } from "../../utils/constant";
 interface SearchContext {
   searchTerm: string;
   setSearchTerm: (value: string) => void;
@@ -130,6 +130,31 @@ const Home = () => {
             {" "}
             Shop Collection{" "}
           </button>
+        </div>
+      </section>
+
+      <section
+        className="highlights-strip"
+        aria-label="Eshani collections and shopping highlights"
+      >
+        <div className="highlights-strip__track">
+          {[0, 1].map((group) => (
+            <div
+              className="highlights-strip__group"
+              key={group}
+              aria-hidden={group === 1}
+            >
+              {HOME_HIGHLIGHTS.map((highlight, index) => (
+                <span
+                  className="highlights-strip__item"
+                  key={`${highlight}-${index}`}
+                >
+                  {highlight}
+                  <span className="highlights-strip__star">✦</span>
+                </span>
+              ))}
+            </div>
+          ))}
         </div>
       </section>
 

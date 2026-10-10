@@ -3,8 +3,10 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useSubscribeNewsletterMutation } from "../../../store/api/newsletterApi";
 import { showToast } from "../../../utils/toast";
-
-const Footer = () => {
+interface FooterProps {
+  className?: string;
+}
+const Footer = ({ className = "" }: FooterProps) => {
   const [email, setEmail] = useState("");
 
   const [subscribeNewsletter, { isLoading }] = useSubscribeNewsletterMutation();
@@ -118,7 +120,7 @@ const Footer = () => {
       </div>
 
       {/* Bottom */}
-      <div className="footer__bottom">
+      <div className={`footer__bottom ${className}`}>
         <p>© 2026 ESHANI. All rights reserved.</p>
 
         <p>Premium Fashion Store</p>

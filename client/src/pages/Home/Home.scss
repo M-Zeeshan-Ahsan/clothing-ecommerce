@@ -53,7 +53,7 @@
     letter-spacing: 1px;
 
     &:hover {
-      background: #111;
+      background: #641f32;
       color: #fff;
     }
   }
@@ -233,5 +233,87 @@
   p {
     color: #888;
     font-size: 14px;
+  }
+}
+
+/* =========================
+   SCROLLING HIGHLIGHTS STRIP
+========================= */
+
+.highlights-strip {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  background: #641f32;
+  color: #fffaf4;
+  padding: 14px 0;
+  z-index: 9999;
+  box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.12);
+  height: 50px;
+}
+
+.highlights-strip__track {
+  display: flex;
+  width: max-content;
+  animation: eshani-marquee 32s linear infinite;
+  will-change: transform;
+}
+
+.highlights-strip__group {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 34px;
+  padding-right: 34px;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+.highlights-strip__star {
+  color: #e8c99c;
+  font-size: 15px;
+}
+
+@keyframes eshani-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Pause animation when hovered */
+.highlights-strip:hover .highlights-strip__track {
+  animation-play-state: paused;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .highlights-strip {
+    padding: 14px 0;
+  }
+
+  .highlights-strip__group {
+    gap: 22px;
+    padding-right: 22px;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+  }
+
+  .highlights-strip__star {
+    font-size: 12px;
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .highlights-strip__track {
+    animation: none;
   }
 }

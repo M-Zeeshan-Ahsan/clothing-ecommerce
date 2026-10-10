@@ -163,6 +163,9 @@
       font-size: 12px;
     }
   }
+  &__home {
+    padding-bottom: 60px;
+  }
 
   /* Responsive */
 
@@ -188,10 +191,13 @@
 
     &__bottom {
       padding: 20px 6%;
-
+      padding-bottom: 60px;
       flex-direction: column;
       align-items: flex-start;
       gap: 8px;
+    }
+    &__home {
+      padding-bottom: 60px;
     }
   }
 }
