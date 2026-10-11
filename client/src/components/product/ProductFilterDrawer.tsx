@@ -313,7 +313,7 @@ const ProductFilterDrawer = ({
                     </summary>
                     <div className="product-filter-options">
                       {[
-                        { label: "All seasons", value: undefined },
+                        { label: "All", value: undefined },
                         { label: "Summer", value: "SUMMER" },
                         { label: "Winter", value: "WINTER" },
                         { label: "All season", value: "ALL_SEASON" },
@@ -341,7 +341,7 @@ const ProductFilterDrawer = ({
                 )}
 
                 {showBrand && brands.length > 0 && (
-                  <details className="product-filter-group" open>
+                  <details className="product-filter-group d-none" open>
                     <summary>
                       <span>Brand</span>
                       <ChevronDown size={17} aria-hidden="true" />
