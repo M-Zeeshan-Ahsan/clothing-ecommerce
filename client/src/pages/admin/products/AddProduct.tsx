@@ -59,6 +59,7 @@ const AddProduct = () => {
         price: Number(data.price),
         stock: Number(data.stock),
         sale_price: data.salePrice !== "" ? Number(data.salePrice) : null,
+        season: data.season,
       }).unwrap();
 
       // =========================

@@ -1,3 +1,5 @@
+import type { Season } from "../store/api/productApi";
+
 export interface Product {
   id: number;
   product_name: string;
@@ -14,6 +16,7 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   category: Category;
+  season?: Season;
 }
 interface Category {
   id: number;

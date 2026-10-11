@@ -85,6 +85,7 @@ const EditProduct = () => {
         price: Number(data.price),
         stock: Number(data.stock),
         sale_price: data.salePrice !== "" ? Number(data.salePrice) : null,
+        season: data.season,
       }).unwrap();
 
       // =========================
@@ -133,6 +134,7 @@ const EditProduct = () => {
     imageUrl: product.product_image,
     stock: String(product.stock),
     imageFile: null,
+    season: product.season ?? "ALL_SEASON",
   };
 
   return (

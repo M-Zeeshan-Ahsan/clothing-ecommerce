@@ -18,6 +18,7 @@ export const createProduct = async (
       brand,
       sale_price,
       stock,
+      season,
     } = req.body;
 
     const category = await prisma.category.findUnique({
@@ -37,6 +38,7 @@ export const createProduct = async (
         brand,
         sale_price,
         stock,
+        season: season ?? "ALL_SEASON",
       },
     });
 
@@ -62,6 +64,9 @@ export const getProducts = async (
     const newOnly = req.query.newOnly === "true";
     const saleOnly = req.query.saleOnly === "true";
     const brand = String(req.query.brand || "").trim();
+    const season = String(req.query.season || "")
+      .trim()
+      .toUpperCase();
     // =========================
     // 20 DAYS AGO
     // =========================
@@ -106,6 +111,11 @@ export const getProducts = async (
           not: null,
         },
       }),
+      // Season filter
+      ...(season &&
+        ["SUMMER", "WINTER", "ALL_SEASON"].includes(season) && {
+          season: season as "SUMMER" | "WINTER" | "ALL_SEASON",
+        }),
     };
 
     // =========================
@@ -219,6 +229,7 @@ export const updateProduct = async (
       brand,
       sale_price,
       stock,
+      season,
     } = req.body;
 
     // =========================
@@ -274,6 +285,7 @@ export const updateProduct = async (
         brand,
         sale_price,
         stock,
+        season,
       },
     });
 

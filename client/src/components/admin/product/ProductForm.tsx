@@ -14,6 +14,7 @@ export interface ProductFormData {
   price: string;
   salePrice: string;
   imageUrl: string;
+  season: "SUMMER" | "WINTER" | "ALL_SEASON";
   stock: string;
   imageFile: File | null;
 }
@@ -34,6 +35,7 @@ const emptyForm: ProductFormData = {
   imageUrl: "",
   stock: "",
   imageFile: null,
+  season: "ALL_SEASON",
 };
 
 const ProductForm = ({
@@ -137,6 +139,24 @@ const ProductForm = ({
             required
           />{" "}
           <small> Example: Khaadi, Dae, TP, etc. </small>{" "}
+        </div>
+        {/* Season */}
+        <div className="product-form__group">
+          <label htmlFor="season">Season</label>
+
+          <select
+            id="season"
+            name="season"
+            value={formData.season}
+            onChange={handleChange}
+            required
+          >
+            <option value="ALL_SEASON">All Season</option>
+            <option value="SUMMER">Summer</option>
+            <option value="WINTER">Winter</option>
+          </select>
+
+          <small>Select the appropriate season for this product.</small>
         </div>
         {/* Category + Price */}
         <div className="product-form__row">

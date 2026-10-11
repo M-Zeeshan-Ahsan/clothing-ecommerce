@@ -10,6 +10,7 @@ interface GetProductsParams {
   categoryId?: number;
   newOnly?: boolean;
   saleOnly?: boolean;
+  season?: Season;
 }
 
 interface CreateProductRequest {
@@ -20,6 +21,7 @@ interface CreateProductRequest {
   price: number;
   sale_price?: number | null;
   stock: number;
+  season?: Season;
 }
 
 interface UpdateProductRequest {
@@ -31,13 +33,14 @@ interface UpdateProductRequest {
   brand: string;
   sale_price?: number | null;
   stock: number;
+  season?: Season;
 }
 
 interface AdminProductsParams {
   page?: number;
   limit?: number;
 }
-
+export type Season = "SUMMER" | "WINTER" | "ALL_SEASON";
 export const productApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // =========================
@@ -66,6 +69,9 @@ export const productApi = baseApi.injectEndpoints({
 
           ...(params?.saleOnly && {
             saleOnly: true,
+          }),
+          ...(params?.season && {
+            season: params.season,
           }),
         },
       }),
