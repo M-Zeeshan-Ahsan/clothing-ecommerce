@@ -7,8 +7,9 @@ import ProductCard from "../../components/product/ProductCard";
 import Pagination from "../../components/common/pagination/Pagination";
 import Loader from "../../components/common/loader/Loader";
 
-import { useGetProductsQuery } from "../../store/api/productApi";
+import { useGetProductsQuery, type Season } from "../../store/api/productApi";
 import { useGetCategoriesQuery } from "../../store/api/categoryApi";
+import ProductFilterDrawer from "../../components/product/ProductFilterDrawer";
 
 import { showToast } from "../../utils/toast";
 import { getApiErrorMessage } from "../../utils/apiError";
@@ -28,9 +29,9 @@ const Shop = () => {
   // STATES
   // =========================
 
-  const [selectedCategoryId, setSelectedCategoryId] = useState<
-    number | undefined
-  >(categoryIdFromUrl);
+  const selectedCategoryId = categoryIdFromUrl;
+  const [selectedSeason, setSelectedSeason] = useState<Season | undefined>();
+  const [selectedBrand, setSelectedBrand] = useState<string | undefined>();
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -68,6 +69,8 @@ const Shop = () => {
     limit,
     search: debouncedSearch.trim(),
     categoryId: selectedCategoryId,
+    season: selectedSeason,
+    brand: selectedBrand,
   });
 
   const products = productData?.data.products ?? [];
@@ -93,15 +96,6 @@ const Shop = () => {
       showToast(getApiErrorMessage(productsError), "error");
     }
   }, [productsError]);
-
-  // =========================
-  // URL CATEGORY SYNC
-  // =========================
-
-  useEffect(() => {
-    setSelectedCategoryId(categoryIdFromUrl);
-    setCurrentPage(1);
-  }, [categoryIdFromUrl]);
 
   // =========================
   // SELECTED CATEGORY NAME
@@ -135,15 +129,20 @@ const Shop = () => {
   // CATEGORY CHANGE
   // =========================
 
-  const handleCategoryChange = (categoryId: number | undefined) => {
-    setSelectedCategoryId(categoryId);
+  const handleApplyFilters = (filters: {
+    categoryId?: number;
+    season?: Season;
+    brand?: string;
+  }) => {
+    setSelectedSeason(filters.season);
+    setSelectedBrand(filters.brand);
     setCurrentPage(1);
 
-    if (categoryId === undefined) {
+    if (filters.categoryId === undefined) {
       setSearchParams({});
     } else {
       setSearchParams({
-        categoryId: String(categoryId),
+        categoryId: String(filters.categoryId),
       });
     }
   };
@@ -163,7 +162,8 @@ const Shop = () => {
 
   const handleClearFilters = () => {
     setSearchTerm("");
-    setSelectedCategoryId(undefined);
+    setSelectedSeason(undefined);
+    setSelectedBrand(undefined);
     setSortBy("featured");
     setCurrentPage(1);
     setSearchParams({});
@@ -212,32 +212,6 @@ const Shop = () => {
 
         {/* Filters */}
         <div className="shop-filters">
-          {/* Categories */}
-          <div className="shop-categories">
-            {/* All */}
-            <button
-              type="button"
-              className={selectedCategoryId === undefined ? "active" : ""}
-              onClick={() => handleCategoryChange(undefined)}
-            >
-              All
-            </button>
-
-            {/* Backend Categories */}
-            {categories
-              .filter((category) => (category._count?.products ?? 0) > 0)
-              .map((category) => (
-                <button
-                  key={category.id}
-                  type="button"
-                  className={selectedCategoryId === category.id ? "active" : ""}
-                  onClick={() => handleCategoryChange(category.id)}
-                >
-                  {category.category_name}
-                </button>
-              ))}
-          </div>
-
           {/* Search + Sort */}
           <div className="shop-actions">
             {/* Search */}
@@ -259,6 +233,16 @@ const Shop = () => {
                 </button>
               )}
             </div>
+
+            <ProductFilterDrawer
+              filters={{
+                categoryId: selectedCategoryId,
+                season: selectedSeason,
+                brand: selectedBrand,
+              }}
+              products={products}
+              onApply={handleApplyFilters}
+            />
 
             {/* Sort */}
             <select

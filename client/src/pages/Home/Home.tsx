@@ -3,8 +3,8 @@ import ProductCard from "../../components/product/ProductCard";
 import "./Home.scss";
 import { useOutletContext } from "react-router-dom";
 
-import { useGetProductsQuery } from "../../store/api/productApi";
-import { useGetCategoriesQuery } from "../../store/api/categoryApi";
+import { useGetProductsQuery, type Season } from "../../store/api/productApi";
+import ProductFilterDrawer from "../../components/product/ProductFilterDrawer";
 
 import Loader from "../../components/common/loader/Loader";
 import { showToast } from "../../utils/toast";
@@ -25,50 +25,35 @@ const Home = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<
     number | undefined
   >(undefined);
+  const [selectedSeason, setSelectedSeason] = useState<Season | undefined>(
+    undefined,
+  );
+  const [selectedBrand, setSelectedBrand] = useState<string | undefined>();
 
   const { searchTerm, setSearchTerm } = useOutletContext<SearchContext>();
 
   const debouncedSearch = useDebounce(searchTerm, 500);
 
   // =========================
-  // CATEGORIES
-  // =========================
-
-  const {
-    data: categoryData,
-    isLoading: categoriesLoading,
-    error: categoriesError,
-  } = useGetCategoriesQuery();
-
-  const categories = categoryData?.data ?? [];
-  console.log("categories", categories);
-  // =========================
   // PRODUCTS
   // =========================
 
   const {
-    data: productData,
+    currentData: productData,
     isLoading: productsLoading,
+    isFetching: productsFetching,
     error: productsError,
   } = useGetProductsQuery({
     page: currentPage,
     limit,
     search: debouncedSearch.trim(),
     categoryId: selectedCategoryId,
+    season: selectedSeason,
+    brand: selectedBrand,
   });
 
   const products = productData?.data.products ?? [];
   const pagination = productData?.data.pagination;
-
-  // =========================
-  // CATEGORY ERROR
-  // =========================
-
-  useEffect(() => {
-    if (categoriesError) {
-      showToast(getApiErrorMessage(categoriesError), "error");
-    }
-  }, [categoriesError]);
 
   // =========================
   // PRODUCT ERROR
@@ -80,12 +65,14 @@ const Home = () => {
     }
   }, [productsError]);
 
-  // =========================
-  // CATEGORY CHANGE
-  // =========================
-
-  const handleCategoryChange = (categoryId: number | undefined) => {
-    setSelectedCategoryId(categoryId);
+  const handleApplyFilters = (filters: {
+    categoryId?: number;
+    season?: Season;
+    brand?: string;
+  }) => {
+    setSelectedCategoryId(filters.categoryId);
+    setSelectedSeason(filters.season);
+    setSelectedBrand(filters.brand);
     setCurrentPage(1);
   };
 
@@ -107,7 +94,7 @@ const Home = () => {
   // LOADING
   // =========================
 
-  if (productsLoading || categoriesLoading) {
+  if (productsLoading) {
     return <Loader />;
   }
 
@@ -168,33 +155,22 @@ const Home = () => {
               {searchTerm ? `Search: ${searchTerm}` : "Shop Our Products"}
             </h2>
 
-            <p>{pagination?.total ?? 0} Products</p>
+            <p>
+              {pagination?.total ?? 0}{" "}
+              {pagination?.total === 1 ? "Product" : "Products"}
+            </p>
           </div>
 
-          {/* Categories */}
-          <div className="category-filter">
-            {/* All */}
-            <button
-              type="button"
-              className={selectedCategoryId === undefined ? "active" : ""}
-              onClick={() => handleCategoryChange(undefined)}
-            >
-              All
-            </button>
-
-            {/* Backend Categories */}
-            {categories
-              .filter((category) => (category._count?.products ?? 0) > 0)
-              .map((category) => (
-                <button
-                  key={category.id}
-                  type="button"
-                  className={selectedCategoryId === category.id ? "active" : ""}
-                  onClick={() => handleCategoryChange(category.id)}
-                >
-                  {category.category_name}
-                </button>
-              ))}
+          <div className="products-section__filters">
+            <ProductFilterDrawer
+              filters={{
+                categoryId: selectedCategoryId,
+                season: selectedSeason,
+                brand: selectedBrand,
+              }}
+              products={products}
+              onApply={handleApplyFilters}
+            />
           </div>
         </div>
 
@@ -219,6 +195,12 @@ const Home = () => {
           )}
         </div>
 
+        {productsFetching && (
+          <p className="products-loading" role="status">
+            Updating products...
+          </p>
+        )}
+
         {/* Products */}
         {products.length > 0 ? (
           <div className="products-grid">
@@ -226,17 +208,21 @@ const Home = () => {
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
+        ) : productsFetching ? null : productsError ? (
+          <div className="no-products">
+            <h3>Products unavailable</h3>
+            <p>Please try again shortly.</p>
+          </div>
         ) : (
           <div className="no-products">
             <h3>No products found</h3>
-
-            <p>We couldn't find anything matching "{searchTerm}"</p>
+            <p>Try adjusting your search or filters.</p>
           </div>
         )}
       </section>
 
       {/* Pagination */}
-      {products.length > 0 && (
+      {!productsFetching && products.length > 0 && (
         <Pagination
           currentPage={currentPage}
           totalPages={pagination?.totalPages ?? 1}

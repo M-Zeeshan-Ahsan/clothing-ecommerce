@@ -116,6 +116,38 @@
   }
 }
 
+.products-section__filters {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.products-section__filter-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.products-section__filter-label {
+  color: #888;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.season-filter {
+  justify-content: flex-end;
+}
+
+.products-loading {
+  margin: 0 0 20px;
+  color: #888;
+  font-size: 14px;
+  text-align: center;
+}
+
 .products-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -141,6 +173,11 @@
       flex-direction: column;
       align-items: flex-start;
     }
+  }
+
+  .products-section__filters,
+  .products-section__filter-group {
+    align-items: flex-start;
   }
 
   .products-grid {

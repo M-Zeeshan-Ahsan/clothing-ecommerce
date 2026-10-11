@@ -5,6 +5,9 @@ import Pagination from "../../components/common/pagination/Pagination";
 import Loader from "../../components/common/loader/Loader";
 
 import { useGetProductsQuery } from "../../store/api/productApi";
+import ProductFilterDrawer, {
+  type ProductFilters,
+} from "../../components/product/ProductFilterDrawer";
 import { showToast } from "../../utils/toast";
 import { getApiErrorMessage } from "../../utils/apiError";
 
@@ -13,6 +16,7 @@ import "./Sale.scss";
 const Sale = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("featured");
+  const [filters, setFilters] = useState<ProductFilters>({});
 
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(12);
@@ -22,6 +26,9 @@ const Sale = () => {
     limit,
     search: searchTerm.trim(),
     saleOnly: true,
+    categoryId: filters.categoryId,
+    season: filters.season,
+    brand: filters.brand,
   });
 
   const saleProducts = data?.data.products ?? [];
@@ -56,6 +63,11 @@ const Sale = () => {
 
   const handleClearSearch = () => {
     setSearchTerm("");
+    setCurrentPage(1);
+  };
+
+  const handleApplyFilters = (nextFilters: ProductFilters) => {
+    setFilters(nextFilters);
     setCurrentPage(1);
   };
 
@@ -117,6 +129,12 @@ const Sale = () => {
               </button>
             )}
           </div>
+
+          <ProductFilterDrawer
+            filters={filters}
+            products={saleProducts}
+            onApply={handleApplyFilters}
+          />
 
           <select
             value={sortBy}

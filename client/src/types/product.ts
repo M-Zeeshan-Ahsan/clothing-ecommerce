@@ -7,7 +7,7 @@ export interface Product {
   categoryId: number;
   price: number;
   sale_price: number;
-  brand: string;
+  brand: string | null;
   current_price: number;
   saved_amount: number;
   discount_percentage: number;

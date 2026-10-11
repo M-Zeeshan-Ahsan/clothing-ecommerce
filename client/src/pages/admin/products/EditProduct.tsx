@@ -124,7 +124,7 @@ const EditProduct = () => {
 
   const initialData: ProductFormData = {
     name: product.product_name,
-    brand: product.brand,
+    brand: product.brand ?? "",
     category: String(product.categoryId),
     price: String(product.price),
     salePrice:
