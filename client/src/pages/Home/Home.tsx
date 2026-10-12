@@ -195,11 +195,7 @@ const Home = () => {
           )}
         </div>
 
-        {productsFetching && (
-          <p className="products-loading" role="status">
-            Updating products...
-          </p>
-        )}
+        {productsFetching && <Loader />}
 
         {/* Products */}
         {products.length > 0 ? (

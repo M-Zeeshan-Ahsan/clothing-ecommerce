@@ -45,6 +45,13 @@ export const productSchema = Joi.object({
     "any.required": "Stock is required",
   }),
   brand: Joi.string().trim().min(2).max(50).optional().allow(""),
+  season: Joi.string()
+    .valid("SUMMER", "WINTER", "ALL_SEASON")
+    .default("ALL_SEASON")
+    .messages({
+      "any.only": "Season must be SUMMER, WINTER, or ALL_SEASON",
+      "string.base": "Season must be a string",
+    }),
 });
 export const idSchema = Joi.object({
   id: Joi.number().integer().positive().required().messages({
