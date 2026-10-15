@@ -19,6 +19,7 @@ export const createProduct = async (
       sale_price,
       stock,
       season,
+      description,
     } = req.body;
 
     const category = await prisma.category.findUnique({
@@ -39,6 +40,7 @@ export const createProduct = async (
         sale_price,
         stock,
         season: season ?? "ALL_SEASON",
+        description: description ?? null,
       },
     });
 
@@ -230,6 +232,7 @@ export const updateProduct = async (
       sale_price,
       stock,
       season,
+      description,
     } = req.body;
 
     // =========================
@@ -286,6 +289,7 @@ export const updateProduct = async (
         sale_price,
         stock,
         season,
+        description: description ?? null,
       },
     });
 

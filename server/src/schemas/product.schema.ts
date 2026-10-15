@@ -52,6 +52,10 @@ export const productSchema = Joi.object({
       "any.only": "Season must be SUMMER, WINTER, or ALL_SEASON",
       "string.base": "Season must be a string",
     }),
+  description: Joi.string().trim().max(5000).allow("").allow(null).messages({
+    "string.base": "Description must be a string",
+    "string.max": "Description must not exceed 5000 characters",
+  }),
 });
 export const idSchema = Joi.object({
   id: Joi.number().integer().positive().required().messages({
@@ -121,4 +125,8 @@ export const updateProductSchema = Joi.object({
     "any.required": "Stock is required",
   }),
   brand: Joi.string().trim().min(2).max(50).optional().allow(""),
+  description: Joi.string().trim().max(5000).allow("").allow(null).messages({
+    "string.base": "Description must be a string",
+    "string.max": "Description must not exceed 5000 characters",
+  }),
 });

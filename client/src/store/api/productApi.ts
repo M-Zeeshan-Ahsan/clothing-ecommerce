@@ -22,6 +22,7 @@ interface CreateProductRequest {
   sale_price?: number | null;
   stock: number;
   season?: Season;
+  description?: string | null;
 }
 
 interface UpdateProductRequest {
@@ -34,6 +35,7 @@ interface UpdateProductRequest {
   sale_price?: number | null;
   stock: number;
   season?: Season;
+  description?: string | null;
 }
 
 interface AdminProductsParams {

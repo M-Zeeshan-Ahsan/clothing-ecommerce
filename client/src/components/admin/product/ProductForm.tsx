@@ -17,6 +17,7 @@ export interface ProductFormData {
   season: "SUMMER" | "WINTER" | "ALL_SEASON";
   stock: string;
   imageFile: File | null;
+  description: string;
 }
 
 interface ProductFormProps {
@@ -35,6 +36,7 @@ const emptyForm: ProductFormData = {
   imageUrl: "",
   stock: "",
   imageFile: null,
+  description: "",
   season: "ALL_SEASON",
 };
 
@@ -62,7 +64,9 @@ const ProductForm = ({
   }, [initialData]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     const { name, value } = e.target;
 
@@ -215,6 +219,25 @@ const ProductForm = ({
           />
 
           <small>Sale price must be less than the original price.</small>
+        </div>
+        {/* Description */}
+        <div className="product-form__group">
+          <label htmlFor="description">Product Description</label>
+
+          <textarea
+            id="description"
+            name="description"
+            placeholder="Enter product description"
+            value={formData.description}
+            onChange={handleChange}
+            maxLength={5000}
+            rows={5}
+          />
+
+          <small>
+            Describe the fabric, design, quality, and other product details.
+            Maximum 5000 characters.
+          </small>
         </div>
         <div className="product-form__group">
           <label htmlFor="stock">Stock Quantity</label>

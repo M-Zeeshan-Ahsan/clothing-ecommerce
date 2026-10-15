@@ -17,6 +17,7 @@ export interface Product {
   updatedAt: string;
   category: Category;
   season?: Season;
+  description?: string | null;
 }
 interface Category {
   id: number;

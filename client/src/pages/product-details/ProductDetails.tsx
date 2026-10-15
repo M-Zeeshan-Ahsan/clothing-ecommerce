@@ -210,11 +210,17 @@ const ProductDetails = () => {
             </p>
           )}
 
-          <p className="product-details__description">
-            Discover premium quality and timeless style with our{" "}
-            {product.product_name}. Carefully selected for comfort, quality and
-            everyday elegance.
-          </p>
+          {product.description?.trim() ? (
+            <p className="product-details__description">
+              {product.description}
+            </p>
+          ) : (
+            <p className="product-details__description">
+              Discover premium quality and timeless style with our{" "}
+              {product.product_name}. Carefully selected for comfort, quality
+              and everyday elegance.
+            </p>
+          )}
 
           <div className="product-details__divider" />
 
