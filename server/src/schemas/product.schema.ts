@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 export const productSchema = Joi.object({
-  product_name: Joi.string().trim().min(3).max(50).required().messages({
+  product_name: Joi.string().trim().min(3).max(100).required().messages({
     "string.empty": "Product name is required",
     "string.min": "Product name must be at least 3 characters",
     "string.max": "Product name must not exceed 50 characters",
