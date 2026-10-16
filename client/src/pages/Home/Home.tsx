@@ -94,9 +94,9 @@ const Home = () => {
   // LOADING
   // =========================
 
-  if (productsLoading) {
-    return <Loader />;
-  }
+  // if (productsLoading) {
+  //   return <Loader />;
+  // }
 
   return (
     <main className="home">
@@ -195,16 +195,18 @@ const Home = () => {
           )}
         </div>
 
-        {productsFetching && <Loader />}
-
         {/* Products */}
-        {products.length > 0 ? (
+        {productsFetching && products.length === 0 ? (
+          <div className="products-loading" aria-label="Loading products">
+            <Loader />
+          </div>
+        ) : products.length > 0 ? (
           <div className="products-grid">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
-        ) : productsFetching ? null : productsError ? (
+        ) : productsError ? (
           <div className="no-products">
             <h3>Products unavailable</h3>
             <p>Please try again shortly.</p>
