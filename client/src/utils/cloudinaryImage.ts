@@ -19,15 +19,22 @@ export const optimizeCloudinaryImage = (imageUrl: string): string => {
 
     const remainingPath = url.pathname.slice(uploadIndex + uploadPath.length);
 
-    // Keep existing transformations; don't add duplicates.
     const parts = remainingPath.split("/");
-    const hasTransformations = parts[0]?.includes("_");
 
-    if (hasTransformations) {
+    // Detect Cloudinary version or an existing transformation.
+    const firstPart = parts[0] ?? "";
+    const isVersion = /^v\d+$/.test(firstPart);
+    const isTransformation =
+      !isVersion &&
+      /^(?=.*(?:^|,)f_auto(?:,|$)|^.*(?:^|,)q_auto(?:,|$)|^.*(?:^|,)c_[a-z]+(?:,|$)|^.*(?:^|,)w_\d+(?:,|$)|^.*(?:^|,)h_\d+(?:,|$))/.test(
+        firstPart,
+      );
+
+    if (isTransformation) {
       return url.href;
     }
 
-    url.pathname = `${prefix}f_auto/q_auto/${remainingPath}`;
+    url.pathname = `${prefix}f_auto,q_auto/${remainingPath}`;
 
     return url.href;
   } catch {
