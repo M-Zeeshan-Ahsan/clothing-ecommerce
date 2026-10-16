@@ -42,7 +42,11 @@ const ProductDetails = () => {
       `Shop ${product.product_name} at Eshani. Discover quality fashion with convenient delivery across Pakistan.`;
 
     const metaDescription = description.slice(0, 155);
-    const imageUrl = new URL(product.product_image, siteUrl).href;
+
+    const imageUrl = new URL(product.product_image, siteUrl);
+    imageUrl.protocol = "https:";
+
+    const productImageUrl = imageUrl.href;
 
     document.title = `${product.product_name} | Eshani`;
 
@@ -71,12 +75,12 @@ const ProductDetails = () => {
     setMeta("property", "og:title", document.title);
     setMeta("property", "og:description", metaDescription);
     setMeta("property", "og:url", canonicalUrl);
-    setMeta("property", "og:image", imageUrl);
+    setMeta("property", "og:image", productImageUrl);
 
     setMeta("name", "twitter:card", "summary_large_image");
     setMeta("name", "twitter:title", document.title);
     setMeta("name", "twitter:description", metaDescription);
-    setMeta("name", "twitter:image", imageUrl);
+    setMeta("name", "twitter:image", productImageUrl);
 
     // Canonical URL
     let canonical = document.head.querySelector<HTMLLinkElement>(
@@ -97,7 +101,7 @@ const ProductDetails = () => {
       "@type": "Product",
       name: product.product_name,
       description: description,
-      image: imageUrl,
+      image: productImageUrl,
       sku: String(product.id),
       category: product.category.category_name,
       url: canonicalUrl,
