@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "../../store/store";
@@ -30,6 +30,103 @@ const ProductDetails = () => {
   );
 
   const product = data?.data;
+
+  useEffect(() => {
+    if (!product) return;
+
+    const siteUrl = "https://eshanishop.com";
+    const canonicalUrl = `${siteUrl}/product/${product.id}`;
+
+    const description =
+      product.description?.trim() ||
+      `Shop ${product.product_name} at Eshani. Discover quality fashion with convenient delivery across Pakistan.`;
+
+    const metaDescription = description.slice(0, 155);
+    const imageUrl = new URL(product.product_image, siteUrl).href;
+
+    document.title = `${product.product_name} | Eshani`;
+
+    // Create or update meta tags
+    const setMeta = (
+      attribute: "name" | "property",
+      key: string,
+      content: string,
+    ) => {
+      let element = document.head.querySelector<HTMLMetaElement>(
+        `meta[${attribute}="${key}"]`,
+      );
+
+      if (!element) {
+        element = document.createElement("meta");
+        element.setAttribute(attribute, key);
+        document.head.appendChild(element);
+      }
+
+      element.content = content;
+    };
+
+    setMeta("name", "description", metaDescription);
+
+    setMeta("property", "og:type", "product");
+    setMeta("property", "og:title", document.title);
+    setMeta("property", "og:description", metaDescription);
+    setMeta("property", "og:url", canonicalUrl);
+    setMeta("property", "og:image", imageUrl);
+
+    setMeta("name", "twitter:card", "summary_large_image");
+    setMeta("name", "twitter:title", document.title);
+    setMeta("name", "twitter:description", metaDescription);
+    setMeta("name", "twitter:image", imageUrl);
+
+    // Canonical URL
+    let canonical = document.head.querySelector<HTMLLinkElement>(
+      'link[rel="canonical"]',
+    );
+
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.appendChild(canonical);
+    }
+
+    canonical.href = canonicalUrl;
+
+    // Product structured data
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: product.product_name,
+      description: description,
+      image: imageUrl,
+      sku: String(product.id),
+      category: product.category.category_name,
+      url: canonicalUrl,
+      offers: {
+        "@type": "Offer",
+        url: canonicalUrl,
+        priceCurrency: "PKR",
+        price: Number(product.current_price).toFixed(2),
+        availability:
+          product.stock > 0
+            ? "https://schema.org/InStock"
+            : "https://schema.org/OutOfStock",
+        itemCondition: "https://schema.org/NewCondition",
+      },
+    };
+
+    let jsonLd = document.getElementById(
+      "product-json-ld",
+    ) as HTMLScriptElement | null;
+
+    if (!jsonLd) {
+      jsonLd = document.createElement("script");
+      jsonLd.id = "product-json-ld";
+      jsonLd.type = "application/ld+json";
+      document.head.appendChild(jsonLd);
+    }
+
+    jsonLd.textContent = JSON.stringify(structuredData);
+  }, [product]);
 
   const [quantity, setQuantity] = useState(1);
   const cartItems = useAppSelector((state) => state.cart.items);
