@@ -98,10 +98,20 @@ const ProductCard = ({ product }: Props) => {
         </button>
 
         <Link to={`/product/${product.id}`}>
+          {/* <img
+            src={product.product_image}
+            alt={product.product_name}
+            className="product-card__image"
+          /> */}
+
           <img
             src={product.product_image}
             alt={product.product_name}
             className="product-card__image"
+            loading="lazy"
+            decoding="async"
+            width={400}
+            height={500}
           />
         </Link>
 
