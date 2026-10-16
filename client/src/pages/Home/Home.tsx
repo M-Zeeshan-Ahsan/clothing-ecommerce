@@ -40,7 +40,6 @@ const Home = () => {
 
   const {
     currentData: productData,
-    isLoading: productsLoading,
     isFetching: productsFetching,
     error: productsError,
   } = useGetProductsQuery({
