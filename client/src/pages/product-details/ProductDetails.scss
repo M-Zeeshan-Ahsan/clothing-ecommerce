@@ -48,21 +48,18 @@
 
 .product-details__image-wrapper {
   position: relative;
-
   overflow: hidden;
-
+  width: 100%;
+  aspect-ratio: 4 / 5;
   background: #f7f7f7;
 }
 
 .product-details__image {
   display: block;
-
   width: 100%;
-  aspect-ratio: 4 / 5;
-
+  height: 100%;
   object-fit: cover;
-
-  transition: transform 0.5s ease;
+  transition: transform 0.3s ease;
 
   &:hover {
     transform: scale(1.03);
@@ -450,9 +447,9 @@
     gap: 7px;
   }
 
-  .product-details__image {
-    aspect-ratio: 4 / 5;
-  }
+  // .product-details__image {
+  //   aspect-ratio: 4 / 5;
+  // }
 
   .product-details__badge {
     top: 12px;

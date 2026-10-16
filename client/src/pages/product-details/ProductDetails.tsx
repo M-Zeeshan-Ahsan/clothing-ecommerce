@@ -10,6 +10,7 @@ import Loader from "../../components/common/loader/Loader";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import { showToast } from "../../utils/toast";
+import { optimizeCloudinaryImage } from "../../utils/cloudinaryImage";
 
 import "./ProductDetails.scss";
 
@@ -279,9 +280,17 @@ const ProductDetails = () => {
             )
           )}
 
-          <img
+          {/* <img
             src={product.product_image}
             alt={product.product_name}
+            className="product-details__image"
+          /> */}
+          <img
+            src={optimizeCloudinaryImage(product.product_image)}
+            alt={product.product_name}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
             className="product-details__image"
           />
         </div>

@@ -7,6 +7,7 @@ import { showToast } from "../../utils/toast";
 import { addToCart } from "../../store/slices/cartSlice";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
+import { optimizeCloudinaryImage } from "../../utils/cloudinaryImage";
 
 interface Props {
   product: Product;
@@ -105,7 +106,7 @@ const ProductCard = ({ product }: Props) => {
           /> */}
 
           <img
-            src={product.product_image}
+            src={optimizeCloudinaryImage(product.product_image)}
             alt={product.product_name}
             className="product-card__image"
             loading="lazy"
