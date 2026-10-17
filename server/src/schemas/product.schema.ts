@@ -124,6 +124,13 @@ export const updateProductSchema = Joi.object({
     "number.min": "Stock cannot be negative",
     "any.required": "Stock is required",
   }),
+  season: Joi.string()
+    .valid("SUMMER", "WINTER", "ALL_SEASON")
+    .default("ALL_SEASON")
+    .messages({
+      "any.only": "Season must be SUMMER, WINTER, or ALL_SEASON",
+      "string.base": "Season must be a string",
+    }),
   brand: Joi.string().trim().min(2).max(50).optional().allow(""),
   description: Joi.string().trim().max(5000).allow("").allow(null).messages({
     "string.base": "Description must be a string",
