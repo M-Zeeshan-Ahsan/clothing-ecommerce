@@ -13,7 +13,7 @@ import ProductFilterDrawer from "../../components/product/ProductFilterDrawer";
 
 import { showToast } from "../../utils/toast";
 import { getApiErrorMessage } from "../../utils/apiError";
-
+import SEO from "../../components/common/SEO";
 import "./Shop.scss";
 
 const Shop = () => {
@@ -178,129 +178,137 @@ const Shop = () => {
   }
 
   return (
-    <main className="shop">
-      {/* Shop Hero */}
-      <section className="shop-hero">
-        <div className="shop-hero__content">
-          <span>ESHANI COLLECTION</span>
+    <>
+      {" "}
+      <SEO
+        title="Men's & Women's Clothing Collection"
+        description="Explore men's and women's clothing at Eshani. Discover stylish outfits, embroidered suits and seasonal collections online in Pakistan."
+        path="/shop"
+      />
+      <main className="shop">
+        {/* Shop Hero */}
+        <section className="shop-hero">
+          <div className="shop-hero__content">
+            <span>ESHANI COLLECTION</span>
 
-          <h1>Shop</h1>
+            <h1>Shop</h1>
 
-          <p>Discover our latest collection of premium clothing.</p>
-        </div>
-      </section>
+            <p>Discover our latest collection of premium clothing.</p>
+          </div>
+        </section>
 
-      {/* Products Section */}
-      <section className="shop-products">
-        {/* Header */}
-        <div className="shop-products__header">
-          <div>
-            <span>OUR COLLECTION</span>
+        {/* Products Section */}
+        <section className="shop-products">
+          {/* Header */}
+          <div className="shop-products__header">
+            <div>
+              <span>OUR COLLECTION</span>
 
-            <h2>
-              {selectedCategory
-                ? selectedCategory.category_name
-                : "All Products"}
-            </h2>
+              <h2>
+                {selectedCategory
+                  ? selectedCategory.category_name
+                  : "All Products"}
+              </h2>
+            </div>
+
+            <p>
+              {pagination?.total ?? 0}{" "}
+              {pagination?.total === 1 ? "Product" : "Products"}
+            </p>
           </div>
 
-          <p>
-            {pagination?.total ?? 0}{" "}
-            {pagination?.total === 1 ? "Product" : "Products"}
-          </p>
-        </div>
+          {/* Filters */}
+          <div className="shop-filters">
+            {/* Search + Sort */}
+            <div className="shop-actions">
+              {/* Search */}
+              <div className="shop-search">
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                />
 
-        {/* Filters */}
-        <div className="shop-filters">
-          {/* Search + Sort */}
-          <div className="shop-actions">
-            {/* Search */}
-            <div className="shop-search">
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => handleSearchChange(e.target.value)}
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={() => handleSearchChange("")}
+                    aria-label="Clear search"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+
+              <ProductFilterDrawer
+                filters={{
+                  categoryId: selectedCategoryId,
+                  season: selectedSeason,
+                  brand: selectedBrand,
+                }}
+                products={products}
+                onApply={handleApplyFilters}
               />
 
-              {searchTerm && (
-                <button
-                  type="button"
-                  onClick={() => handleSearchChange("")}
-                  aria-label="Clear search"
-                >
-                  ×
+              {/* Sort */}
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                <option value="featured">Featured</option>
+
+                <option value="price-low">Price: Low to High</option>
+
+                <option value="price-high">Price: High to Low</option>
+
+                <option value="name">Name: A-Z</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Fetching Indicator */}
+          {isFetching && !productsLoading && (
+            <div className="shop-loading">
+              <Loader />
+            </div>
+          )}
+
+          {/* Products */}
+          {!isFetching && sortedProducts.length > 0 ? (
+            <div className="shop-grid">
+              {sortedProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            !isFetching && (
+              <div className="shop-empty">
+                <h3>No products found</h3>
+
+                <p>Try another search or category.</p>
+
+                <button type="button" onClick={handleClearFilters}>
+                  Clear Filters
                 </button>
-              )}
-            </div>
+              </div>
+            )
+          )}
 
-            <ProductFilterDrawer
-              filters={{
-                categoryId: selectedCategoryId,
-                season: selectedSeason,
-                brand: selectedBrand,
-              }}
-              products={products}
-              onApply={handleApplyFilters}
+          {/* Pagination */}
+          {!isFetching && sortedProducts.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={pagination?.totalPages ?? 1}
+              onPageChange={setCurrentPage}
             />
-
-            {/* Sort */}
-            <select
-              value={sortBy}
-              onChange={(e) => {
-                setSortBy(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              <option value="featured">Featured</option>
-
-              <option value="price-low">Price: Low to High</option>
-
-              <option value="price-high">Price: High to Low</option>
-
-              <option value="name">Name: A-Z</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Fetching Indicator */}
-        {isFetching && !productsLoading && (
-          <div className="shop-loading">
-            <Loader />
-          </div>
-        )}
-
-        {/* Products */}
-        {!isFetching && sortedProducts.length > 0 ? (
-          <div className="shop-grid">
-            {sortedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        ) : (
-          !isFetching && (
-            <div className="shop-empty">
-              <h3>No products found</h3>
-
-              <p>Try another search or category.</p>
-
-              <button type="button" onClick={handleClearFilters}>
-                Clear Filters
-              </button>
-            </div>
-          )
-        )}
-
-        {/* Pagination */}
-        {!isFetching && sortedProducts.length > 0 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={pagination?.totalPages ?? 1}
-            onPageChange={setCurrentPage}
-          />
-        )}
-      </section>
-    </main>
+          )}
+        </section>
+      </main>
+    </>
   );
 };
 

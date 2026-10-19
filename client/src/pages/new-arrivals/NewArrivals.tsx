@@ -10,7 +10,7 @@ import ProductFilterDrawer, {
 } from "../../components/product/ProductFilterDrawer";
 import { showToast } from "../../utils/toast";
 import { getApiErrorMessage } from "../../utils/apiError";
-
+import SEO from "../../components/common/SEO";
 import "./NewArrivals.scss";
 
 const NewArrivals = () => {
@@ -102,118 +102,126 @@ const NewArrivals = () => {
   }
 
   return (
-    <main className="new-arrivals">
-      {/* Hero */}
-      <section className="new-arrivals__hero">
-        <div className="new-arrivals__hero-content">
-          <span>JUST DROPPED</span>
+    <>
+      {" "}
+      <SEO
+        title="New Arrivals | Men's & Women's Clothing"
+        description="Discover the latest men's and women's clothing at Eshani Pakistan. Explore new outfits, stylish designs and seasonal fashion arrivals online."
+        path="/new-arrivals"
+      />
+      <main className="new-arrivals">
+        {/* Hero */}
+        <section className="new-arrivals__hero">
+          <div className="new-arrivals__hero-content">
+            <span>JUST DROPPED</span>
 
-          <h1>New Arrivals</h1>
+            <h1>New Arrivals</h1>
 
-          <p>Explore the latest additions to the ESHANI collection.</p>
-        </div>
-      </section>
-
-      {/* Products */}
-      <section className="new-arrivals__products">
-        {/* Header */}
-        <div className="new-arrivals__header">
-          <div>
-            <span>FRESH FROM ESHANI</span>
-
-            <h2>Latest Collection</h2>
+            <p>Explore the latest additions to the ESHANI collection.</p>
           </div>
-
-          <p>
-            {pagination?.total ?? 0}{" "}
-            {pagination?.total === 1 ? "Product" : "Products"}
-          </p>
-        </div>
-
-        {/* Filters */}
-        <div className="new-arrivals__filters">
-          {/* Search */}
-          <div className="new-arrivals__search">
-            <input
-              type="text"
-              placeholder="Search new arrivals..."
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-            />
-
-            {searchTerm && (
-              <button
-                type="button"
-                onClick={handleClearSearch}
-                aria-label="Clear search"
-              >
-                ×
-              </button>
-            )}
-          </div>
-
-          <ProductFilterDrawer
-            filters={filters}
-            products={products}
-            onApply={handleApplyFilters}
-          />
-
-          {/* Sort */}
-          <select
-            value={sortBy}
-            onChange={(e) => {
-              setSortBy(e.target.value);
-              setCurrentPage(1);
-            }}
-          >
-            <option value="featured">Featured</option>
-
-            <option value="price-low">Price: Low to High</option>
-
-            <option value="price-high">Price: High to Low</option>
-
-            <option value="name">Name: A-Z</option>
-          </select>
-        </div>
-
-        {/* Fetching */}
-        {isFetching && !isLoading && (
-          <div className="new-arrivals__loading">
-            <Loader />
-          </div>
-        )}
+        </section>
 
         {/* Products */}
-        {!isFetching && sortedProducts.length > 0 ? (
-          <div className="new-arrivals__grid">
-            {sortedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        ) : (
-          !isFetching && (
-            <div className="new-arrivals__empty">
-              <h3>No new arrivals found</h3>
+        <section className="new-arrivals__products">
+          {/* Header */}
+          <div className="new-arrivals__header">
+            <div>
+              <span>FRESH FROM ESHANI</span>
 
-              <p>Try another search.</p>
-
-              <button type="button" onClick={handleClearSearch}>
-                Clear Search
-              </button>
+              <h2>Latest Collection</h2>
             </div>
-          )
-        )}
 
-        {/* Pagination */}
-        {!isFetching && sortedProducts.length > 0 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={pagination?.totalPages ?? 1}
-            onPageChange={setCurrentPage}
-          />
-        )}
-      </section>
-    </main>
+            <p>
+              {pagination?.total ?? 0}{" "}
+              {pagination?.total === 1 ? "Product" : "Products"}
+            </p>
+          </div>
+
+          {/* Filters */}
+          <div className="new-arrivals__filters">
+            {/* Search */}
+            <div className="new-arrivals__search">
+              <input
+                type="text"
+                placeholder="Search new arrivals..."
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            <ProductFilterDrawer
+              filters={filters}
+              products={products}
+              onApply={handleApplyFilters}
+            />
+
+            {/* Sort */}
+            <select
+              value={sortBy}
+              onChange={(e) => {
+                setSortBy(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="featured">Featured</option>
+
+              <option value="price-low">Price: Low to High</option>
+
+              <option value="price-high">Price: High to Low</option>
+
+              <option value="name">Name: A-Z</option>
+            </select>
+          </div>
+
+          {/* Fetching */}
+          {isFetching && !isLoading && (
+            <div className="new-arrivals__loading">
+              <Loader />
+            </div>
+          )}
+
+          {/* Products */}
+          {!isFetching && sortedProducts.length > 0 ? (
+            <div className="new-arrivals__grid">
+              {sortedProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            !isFetching && (
+              <div className="new-arrivals__empty">
+                <h3>No new arrivals found</h3>
+
+                <p>Try another search.</p>
+
+                <button type="button" onClick={handleClearSearch}>
+                  Clear Search
+                </button>
+              </div>
+            )
+          )}
+
+          {/* Pagination */}
+          {!isFetching && sortedProducts.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={pagination?.totalPages ?? 1}
+              onPageChange={setCurrentPage}
+            />
+          )}
+        </section>
+      </main>
+    </>
   );
 };
 

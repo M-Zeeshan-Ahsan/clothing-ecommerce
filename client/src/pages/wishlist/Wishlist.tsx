@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { removeFromWishlist } from "../../store/slices/wishlistSlice";
 import { addToCart } from "../../store/slices/cartSlice";
-
+import SEO from "../../components/common/SEO";
 import "./Wishlist.scss";
 
 const Wishlist = () => {
@@ -43,78 +43,92 @@ const Wishlist = () => {
   }
 
   return (
-    <main className="wishlist">
-      <div className="wishlist__header">
-        <div>
-          <span className="wishlist__subtitle">YOUR FAVORITES</span>
+    <>
+      <SEO
+        title="My Wishlist | Eshani"
+        description="View and manage your favorite clothing products at Eshani."
+        path="/wishlist"
+        noIndex={true}
+      />
+      <main className="wishlist">
+        <div className="wishlist__header">
+          <div>
+            <span className="wishlist__subtitle">YOUR FAVORITES</span>
 
-          <h1>My Wishlist</h1>
+            <h1>My Wishlist</h1>
+          </div>
+
+          <span className="wishlist__count">
+            {wishlistItems.length}{" "}
+            {wishlistItems.length === 1 ? "Item" : "Items"}
+          </span>
         </div>
 
-        <span className="wishlist__count">
-          {wishlistItems.length} {wishlistItems.length === 1 ? "Item" : "Items"}
-        </span>
-      </div>
+        <div className="wishlist__grid">
+          {wishlistItems.map((product) => {
+            const isSale = product.sale_price !== null;
 
-      <div className="wishlist__grid">
-        {wishlistItems.map((product) => {
-          const isSale = product.sale_price !== null;
+            return (
+              <article className="wishlist__card" key={product.id}>
+                <div className="wishlist__image-wrapper">
+                  {product.badge && (
+                    <span className="wishlist__badge">{product.badge}</span>
+                  )}
 
-          return (
-            <article className="wishlist__card" key={product.id}>
-              <div className="wishlist__image-wrapper">
-                {product.badge && (
-                  <span className="wishlist__badge">{product.badge}</span>
-                )}
+                  <button
+                    type="button"
+                    className="wishlist__remove"
+                    aria-label="Remove from wishlist"
+                    onClick={() => dispatch(removeFromWishlist(product.id))}
+                  >
+                    ♥
+                  </button>
 
-                <button
-                  type="button"
-                  className="wishlist__remove"
-                  aria-label="Remove from wishlist"
-                  onClick={() => dispatch(removeFromWishlist(product.id))}
-                >
-                  ♥
-                </button>
-
-                <Link to={`/product/${product.id}`}>
-                  <img
-                    src={product.product_image}
-                    alt={product.product_name}
-                    className="wishlist__image"
-                  />
-                </Link>
-              </div>
-
-              <div className="wishlist__content">
-                <span className="wishlist__category">
-                  {product.category.category_name}
-                </span>
-
-                <Link to={`/product/${product.id}`} className="wishlist__name">
-                  {product.product_name}
-                </Link>
-
-                <div className="wishlist__price">
-                  <strong>Rs. {product.current_price.toLocaleString()}</strong>
-
-                  {isSale && <del>Rs. {product.price.toLocaleString()}</del>}
-
-                  {isSale && <span>{product.discount_percentage}% OFF</span>}
+                  <Link to={`/product/${product.id}`}>
+                    <img
+                      src={product.product_image}
+                      alt={product.product_name}
+                      className="wishlist__image"
+                    />
+                  </Link>
                 </div>
 
-                <button
-                  type="button"
-                  className="wishlist__cart-button"
-                  onClick={() => handleAddToCart(product)}
-                >
-                  Add to Cart
-                </button>
-              </div>
-            </article>
-          );
-        })}
-      </div>
-    </main>
+                <div className="wishlist__content">
+                  <span className="wishlist__category">
+                    {product.category.category_name}
+                  </span>
+
+                  <Link
+                    to={`/product/${product.id}`}
+                    className="wishlist__name"
+                  >
+                    {product.product_name}
+                  </Link>
+
+                  <div className="wishlist__price">
+                    <strong>
+                      Rs. {product.current_price.toLocaleString()}
+                    </strong>
+
+                    {isSale && <del>Rs. {product.price.toLocaleString()}</del>}
+
+                    {isSale && <span>{product.discount_percentage}% OFF</span>}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="wishlist__cart-button"
+                    onClick={() => handleAddToCart(product)}
+                  >
+                    Add to Cart
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </main>
+    </>
   );
 };
 

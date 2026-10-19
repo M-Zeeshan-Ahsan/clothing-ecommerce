@@ -10,7 +10,7 @@ import ProductFilterDrawer, {
 } from "../../components/product/ProductFilterDrawer";
 import { showToast } from "../../utils/toast";
 import { getApiErrorMessage } from "../../utils/apiError";
-
+import SEO from "../../components/common/SEO";
 import "./Sale.scss";
 
 const Sale = () => {
@@ -76,118 +76,126 @@ const Sale = () => {
   }
 
   return (
-    <main className="sale">
-      {/* Hero */}
-      <section className="sale__hero">
-        <div className="sale__hero-content">
-          <span>LIMITED TIME OFFER</span>
+    <>
+      {" "}
+      <SEO
+        title="Men's & Women's Clothing Sale in Pakistan"
+        description="Shop men's and women's clothing on sale at Eshani Pakistan. Discover stylish outfits, embroidered suits and special offers on selected fashion collections."
+        path="/sale"
+      />
+      <main className="sale">
+        {/* Hero */}
+        <section className="sale__hero">
+          <div className="sale__hero-content">
+            <span>LIMITED TIME OFFER</span>
 
-          <h1>Sale</h1>
+            <h1>Sale</h1>
 
-          <p>
-            Discover exclusive styles at special prices. Shop your favorites
-            before they're gone.
-          </p>
+            <p>
+              Discover exclusive styles at special prices. Shop your favorites
+              before they're gone.
+            </p>
 
-          <a href="#sale-products" className="sale__hero-button">
-            Shop Sale
-          </a>
-        </div>
-      </section>
+            <a href="#sale-products" className="sale__hero-button">
+              Shop Sale
+            </a>
+          </div>
+        </section>
 
-      {/* Products */}
-      <section className="sale__products" id="sale-products">
-        <div className="sale__header">
-          <div>
-            <span>EXCLUSIVE OFFERS</span>
-            <h2>Sale Collection</h2>
+        {/* Products */}
+        <section className="sale__products" id="sale-products">
+          <div className="sale__header">
+            <div>
+              <span>EXCLUSIVE OFFERS</span>
+              <h2>Sale Collection</h2>
+            </div>
+
+            <p>
+              {pagination?.total ?? 0}{" "}
+              {pagination?.total === 1 ? "Product" : "Products"}
+            </p>
           </div>
 
-          <p>
-            {pagination?.total ?? 0}{" "}
-            {pagination?.total === 1 ? "Product" : "Products"}
-          </p>
-        </div>
+          {/* Filters */}
+          <div className="sale__filters">
+            <div className="sale__search">
+              <input
+                type="text"
+                placeholder="Search sale products..."
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
 
-        {/* Filters */}
-        <div className="sale__filters">
-          <div className="sale__search">
-            <input
-              type="text"
-              placeholder="Search sale products..."
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            <ProductFilterDrawer
+              filters={filters}
+              products={saleProducts}
+              onApply={handleApplyFilters}
             />
 
-            {searchTerm && (
-              <button
-                type="button"
-                onClick={handleClearSearch}
-                aria-label="Clear search"
-              >
-                ×
-              </button>
-            )}
+            <select
+              value={sortBy}
+              onChange={(e) => {
+                setSortBy(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="featured">Featured</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="name">Name: A-Z</option>
+            </select>
           </div>
 
-          <ProductFilterDrawer
-            filters={filters}
-            products={saleProducts}
-            onApply={handleApplyFilters}
-          />
-
-          <select
-            value={sortBy}
-            onChange={(e) => {
-              setSortBy(e.target.value);
-              setCurrentPage(1);
-            }}
-          >
-            <option value="featured">Featured</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="name">Name: A-Z</option>
-          </select>
-        </div>
-
-        {/* Loading */}
-        {isFetching && !isLoading && (
-          <div className="sale__loading">
-            <Loader />
-          </div>
-        )}
-
-        {/* Product Grid */}
-        {!isFetching && sortedProducts.length > 0 ? (
-          <div className="sale__grid">
-            {sortedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        ) : (
-          !isFetching && (
-            <div className="sale__empty">
-              <h3>No sale products found</h3>
-
-              <p>Try another search or browse our full collection.</p>
-
-              <button type="button" onClick={handleClearSearch}>
-                Clear Search
-              </button>
+          {/* Loading */}
+          {isFetching && !isLoading && (
+            <div className="sale__loading">
+              <Loader />
             </div>
-          )
-        )}
+          )}
 
-        {/* Pagination */}
-        {!isFetching && sortedProducts.length > 0 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={pagination?.totalPages ?? 1}
-            onPageChange={setCurrentPage}
-          />
-        )}
-      </section>
-    </main>
+          {/* Product Grid */}
+          {!isFetching && sortedProducts.length > 0 ? (
+            <div className="sale__grid">
+              {sortedProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            !isFetching && (
+              <div className="sale__empty">
+                <h3>No sale products found</h3>
+
+                <p>Try another search or browse our full collection.</p>
+
+                <button type="button" onClick={handleClearSearch}>
+                  Clear Search
+                </button>
+              </div>
+            )
+          )}
+
+          {/* Pagination */}
+          {!isFetching && sortedProducts.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={pagination?.totalPages ?? 1}
+              onPageChange={setCurrentPage}
+            />
+          )}
+        </section>
+      </main>
+    </>
   );
 };
 

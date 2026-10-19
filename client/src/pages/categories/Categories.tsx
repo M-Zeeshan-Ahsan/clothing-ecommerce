@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 import { useGetCategoriesQuery } from "../../store/api/categoryApi";
 import Loader from "../../components/common/loader/Loader";
-
+import SEO from "../../components/common/SEO";
 import "./Categories.scss";
 
 const Categories = () => {
@@ -28,90 +28,100 @@ const Categories = () => {
   }
 
   return (
-    <main className="categories">
-      {/* Hero */}
-      <section className="categories__hero">
-        <div className="categories__hero-content">
-          <span>EXPLORE ESHANI</span>
+    <>
+      {" "}
+      <SEO
+        title="Clothing Categories for Men & Women"
+        description="Explore men's and women's clothing categories at Eshani Pakistan. Discover stylish outfits, embroidered suits and seasonal collections online."
+        path="/categories"
+      />
+      <main className="categories">
+        {/* Hero */}
+        <section className="categories__hero">
+          <div className="categories__hero-content">
+            <span>EXPLORE ESHANI</span>
 
-          <h1>Categories</h1>
+            <h1>Categories</h1>
 
-          <p>
-            Discover our carefully selected collections designed for every style
-            and occasion.
-          </p>
-        </div>
-      </section>
+            <p>
+              Discover our carefully selected collections designed for every
+              style and occasion.
+            </p>
+          </div>
+        </section>
 
-      {/* Categories */}
-      <section className="categories__content">
-        <div className="categories__heading">
-          <span>SHOP BY CATEGORY</span>
+        {/* Categories */}
+        <section className="categories__content">
+          <div className="categories__heading">
+            <span>SHOP BY CATEGORY</span>
 
-          <h2>Find Your Style</h2>
+            <h2>Find Your Style</h2>
 
-          <p>
-            Explore our collections and discover pieces that match your personal
-            style.
-          </p>
-        </div>
+            <p>
+              Explore our collections and discover pieces that match your
+              personal style.
+            </p>
+          </div>
 
-        <div className="categories__grid">
-          {categories
-            .filter((category) => (category._count?.products ?? 0) > 0)
-            .map((category) => {
-              return (
-                <Link
-                  key={category.id}
-                  to={`/shop?categoryId=${category.id}`}
-                  className="categories__card"
-                >
-                  <div className="categories__image-wrapper">
-                    <img
-                      src={category.category_image}
-                      alt={category.category_name}
-                      className="categories__image"
-                    />
+          <div className="categories__grid">
+            {categories
+              .filter((category) => (category._count?.products ?? 0) > 0)
+              .map((category) => {
+                return (
+                  <Link
+                    key={category.id}
+                    to={`/shop?categoryId=${category.id}`}
+                    className="categories__card"
+                  >
+                    <div className="categories__image-wrapper">
+                      <img
+                        src={category.category_image}
+                        alt={category.category_name}
+                        className="categories__image"
+                      />
 
-                    <div className="categories__overlay" />
-                  </div>
+                      <div className="categories__overlay" />
+                    </div>
 
-                  <div className="categories__card-content">
-                    <span>COLLECTION</span>
+                    <div className="categories__card-content">
+                      <span>COLLECTION</span>
 
-                    <h3>{category.category_name}</h3>
+                      <h3>{category.category_name}</h3>
 
-                    <p>{category.category_slogan}</p>
+                      <p>{category.category_slogan}</p>
 
-                    <span className="categories__link">Shop Collection →</span>
-                  </div>
-                </Link>
-              );
-            })}
-        </div>
-      </section>
+                      <span className="categories__link">
+                        Shop Collection →
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+          </div>
+        </section>
 
-      {/* Bottom CTA */}
-      <section className="categories__cta">
-        <div className="categories__cta-content">
-          <span>ESHANI COLLECTION</span>
+        {/* Bottom CTA */}
+        <section className="categories__cta">
+          <div className="categories__cta-content">
+            <span>ESHANI COLLECTION</span>
 
-          <h2>
-            Something for
-            <br />
-            Every Style
-          </h2>
+            <h2>
+              Something for
+              <br />
+              Every Style
+            </h2>
 
-          <p>
-            Browse our complete collection and find your next favorite piece.
-          </p>
+            <p>
+              Browse our complete collection and find your next favorite piece.
+            </p>
 
-          <Link to="/shop" className="categories__cta-button">
-            Shop All Products
-          </Link>
-        </div>
-      </section>
-    </main>
+            <Link to="/shop" className="categories__cta-button">
+              Shop All Products
+            </Link>
+          </div>
+        </section>
+      </main>
+    </>
   );
 };
 
